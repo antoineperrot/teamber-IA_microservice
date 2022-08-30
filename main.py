@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import Body, FastAPI
 
 import pandas as pd
-from module import solve_problem
+from modules.task_assigner import solve_problem
 
 app = FastAPI()
 
