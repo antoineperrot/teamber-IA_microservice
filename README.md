@@ -25,7 +25,7 @@ __avancée des travaux :__
 
 ## Notes
 
-- Faire tourner une RestAPI en local avec __uvicorn__ :
+- Faire tourner une RestAPI en local avec __uvicorn__ : dans un terminal PowerShell, lancer la commande :
 ```
 uvicorn main:app --reload
 ```
