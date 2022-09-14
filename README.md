@@ -34,3 +34,12 @@ uvicorn main:app --reload
 ```
 pipreqs --force .
 ```
+
+- __docker__ : This will build the Docker image of the Dockerfile, and give the image the tag "myimg"
+```
+docker build -t myimg .
+```    
+- __docker__ : This will run a container corresponding to the Docker image "myimg"  on ports 8000:8000, name it "myctn"
+```
+docker run -p 8000:8000 --name myctn myimg
+```
