@@ -24,7 +24,7 @@ __à faire :__
 __avancée des travaux :__
 1. preuve de concept terminée avec des données synthétiques (voir *demo_notebooks/task_assigner.ipynb*)
 
-## Notes
+# Notes
 
 - Faire tourner une RestAPI en local avec __uvicorn__ : dans un terminal PowerShell, lancer la commande :
 ```
@@ -35,11 +35,27 @@ uvicorn main:app --reload
 pipreqs --force .
 ```
 
-- __docker__ : This will build the Docker image of the Dockerfile, and give the image the tag "myimg"
+## Docker
+1. This will build the Docker image of the Dockerfile, and give the image the tag "myimg"
 ```
 docker build -t myimg .
 ```    
-- __docker__ : This will run a container corresponding to the Docker image "myimg"  on ports 8000:8000, name it "myctn"
+2. This will run a container corresponding to the Docker image "myimg"  on ports 8000:8000, name it "myctn"
 ```
 docker run -p 8000:8000 --name myctn myimg
 ```
+
+## Jenkins 
+
+- [Installing Jenkins for WSL (Windows Subsystem Linux 2)](https://dev.to/davidkou/install-jenkins-in-windows-subsystem-for-linux-wsl2-209)
+- [Jenkins on OVHcloud Managed Kubernetes](https://docs.ovh.com/ie/en/kubernetes/installing-jenkins/)
+
+##### Starting Jenkins on WSL2 :
+1. Open Ubuntu on the start menu of your windows machine
+
+2. Enter command line 
+```
+sudo service jenkins start
+```
+3. Go to http://localhost:8080/ on your web browser
+4. Enter login and password : _admin 1e77cbda2e1249dcaea2f59975e00bf1_
