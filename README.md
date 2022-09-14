@@ -12,18 +12,17 @@ __organisation du service :__
 4. <span style="color:red"> l'__API__ retourne les données au __back__ ? A discuter.</span>
 
 __avancée des travaux :__
-1. preuve de concept terminée avec des données synthétiques (voir *demo_notebooks/task_assigner.ipynb*)
-2. rédaction des requêtes pour aller chercher les données auprès du back en cours. Plus précisément : on peut aller chercher les dispos, la matrice projet, il manque encore la matrice de compétences et la liste des tâches à assigner.
+- dans main.py, l'endpoint *solve* va chercher les données auprès du BACK, les prépare, génère une solution mathématique, valide la solution par une batterie de tests, retourne la solution au format JSON formatted string. 
+- dans main.py, un endpoint *test_with_random_data* teste la fonction __solve()__ avec des données générées aléatoirement et de manière cohérente (propose un grand panel de possibilitées pour la situation des entreprises: surchargées, sous-effectif, sous-chargées, correctes, peu de projets, bcp de projets ...).
+
+__à faire :__
+- endpoint *solve* : manque plus qu'à pouvoir préciser une date de départ et de fin pour ensuite aller chercher les bonnes taches dans le BACK. Le curseur politique aussi.
 
 
 ## 2. Développement "planning_optimizer" à venir
 
 __avancée des travaux :__
-- dans main.py, l'endpoint *solve* va chercher les données, les prépare, génère une solution mathématique, valide la solution par une batterie de tests, retourne la solution au format JSON formatted string. 
-- dans main.py, un endpoint *test_with_random_data* teste la fonction __solve()__ avec des données générées aléatoirement et de manière cohérente (propose un grand panel de possibilitées pour la situation des entreprises: surchargées, sous-effectif, sous-chargées, correctes, peu de projets, bcp de projets ...).
-
-__à faire :__
-- endpoint *solve* : manque plus qu'à pouvoir préciser une date de départ et de fin pour ensuite aller chercher les bonnes taches dans le BACK. Le curseur politique aussi.
+1. preuve de concept terminée avec des données synthétiques (voir *demo_notebooks/task_assigner.ipynb*)
 
 ## Notes
 
