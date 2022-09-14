@@ -19,9 +19,11 @@ __avancée des travaux :__
 ## 2. Développement "planning_optimizer" à venir
 
 __avancée des travaux :__
-1. preuve de concept terminée avec des données synthétiques (voir *demo_notebooks/planning_optimizer.ipynb*)
-2. rédaction des requêtes à faire ...
+- dans main.py, l'endpoint *solve* va chercher les données, les prépare, génère une solution mathématique, valide la solution par une batterie de tests, retourne la solution au format JSON formatted string. 
+- dans main.py, un endpoint *test_with_random_data* teste la fonction __solve()__ avec des données générées aléatoirement et de manière cohérente (propose un grand panel de possibilitées pour la situation des entreprises: surchargées, sous-effectif, sous-chargées, correctes, peu de projets, bcp de projets ...).
 
+__à faire :__
+- endpoint *solve* : manque plus qu'à pouvoir préciser une date de départ et de fin pour ensuite aller chercher les bonnes taches dans le BACK. Le curseur politique aussi.
 
 ## Notes
 
