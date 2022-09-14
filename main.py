@@ -22,13 +22,27 @@ app = FastAPI()
 def _return_json(OUT):
     return simplejson.dumps(OUT, ignore_nan=True)
 
-@app.get("/")
-async def home():
-    return {'response':'welcome'}
+@app.get("/task_assigner/")
+def task_assigner(datein, dateout,
+    curseur:float = 0.0, contrainte_etre_sur_projet: str = 'de_preference', avantage_projet : float = 1.0):
+    """
+    récupère les données (taches, matrices_competence, dispo_utilisateurs, liste_des_participants par projet)
+    dans le BACK-END Wandeed pour les dates indiquées et fournie une solution de répartition optimale des tâches entre les utilisateurs.
 
+    :datein:  date de début du sprint pour la sélection des tâches auprès du BACK
+    
+    :dateout: date de fin du sprint pour la sélection des tâches auprès du BACK
+    
+    :curseur: float compris entre 0 et 1 (valeur par défaut 0). Pour une valeur de 0, l'algorithme tente de maximiser le niveau de compétence auquel est réalisé une heure de travail; à 1 il cherche à affecter la tâche à une personne "qui ne sait faire que cette tâche".
+    
+    :contrainte_etre_sur_projet: str = "de_preference". Valeurs possibles {"oui","de_preference","non"} Si "oui", les tâches peuvent être affectées uniquement à des utilisateurs participants au projet auquel se réfère la tâche.
+    Si "de_preference", l'agorithme préférera assigner la tache à quelqu'un qui est sur le projet par rapport à quelqu'un qui ne l'est pas, tout en ne l'interdisant pas.
+    Sachant que l'utilité maximale d'assignation d'une tache à quelqu'un de parfaitement compétent est de 3 points, le paramètre "avantage_projet" fixé à 1 mais réglable permet d'influencer la solution.
+    Si "non", une personne n'étant par sur un projet ne peut se voir attribuer des tâches de ce même projet.
 
-@app.get("/solve/")
-def main():
+    :avantage_projet : float = 1.0: voir explication pour le paramètre contrainte_etre_sur_projet.
+
+    """
     OUT = {key:ans for key,ans in zip(['SUCCES_RECUPERATION_DONNEES','SUCCES_SOLVEUR','VALIDITE_SOLUTION','SUCCES_GLOBAL'],[np.nan]*3+[False])}
     
     dic = get_data_task_assigner()
@@ -47,8 +61,11 @@ def main():
     return _return_json(OUT)
 
 
-@app.get("/test_with_random_data/")
-def test_with_random_data():
+@app.get("/test_task_assigner_with_random_data/")
+def test_task_assigner_with_random_data():
+    """
+    teste la fonction task_assigner(...) avec des données générées aléatoirement et de manière cohérente (propose un grand panel de possibilitées pour la situation des entreprises: surchargées, sous-effectif, sous-chargées, correctes, peu de projets, bcp de projets ...).
+    """
     OUT = {key:ans for key,ans in zip(['SUCCES_SOLVEUR','VALIDITE_SOLUTION','SUCCES_GLOBAL'],[np.nan]*2+[False])}
     OUT["SUCCES_RECUPERATION_DONNEES"] = "Les données sont générées de manière aléatoire et cohérente."
     df_prj, df_cmp, df_tsk, df_dsp = mock_coherent_data()
@@ -67,7 +84,7 @@ def test_with_random_data():
 
 
 
-@app.get('/get_data_task_assigner/')
+#@app.get('/get_data_task_assigner/')
 def get_data_task_assigner():
     out = {}
     sql_querys_dict = {
