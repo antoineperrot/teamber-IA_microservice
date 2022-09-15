@@ -69,4 +69,4 @@ docker run -p 8000:8000 --name myctn myimg
 sudo service jenkins start
 ```
 3. Go to http://localhost:8080/ on your web browser
-4. Enter login and password : _admin 1e77cbda2e1249dcaea2f59975e00bf1_
+4. Enter login and password : _admin f236a8ea59c141e784d241170f18e67e
