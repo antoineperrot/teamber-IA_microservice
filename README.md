@@ -12,19 +12,20 @@ __organisation du service :__
 4. <span style="color:red"> l'__API__ retourne les données au __back__ ? A discuter.</span>
 
 __avancée des travaux :__
-- L'endpoint *task_assigner/* va chercher les données auprès du BACK, les prépare, génère une solution mathématique, valide la solution par une batterie de tests, retourne la solution au format JSON formatted string. 
-- L'endpoint *test_task_assigner_with_random_data/* teste la fonction __task_assigner()__ avec des données générées aléatoirement et de manière cohérente (propose un grand panel de possibilitées pour la situation des entreprises: surchargées, sous-effectif, sous-chargées, correctes, peu de projets, bcp de projets ...).
-- Implémentation de réponses HTTP pour les éxceptions, selon les cas de figures, à tous les niveaux du process 
+1. L'endpoint *task_assigner/* va chercher les données auprès du BACK, les prépare, génère une solution mathématique, valide la solution par une batterie de tests, retourne la solution au format JSON formatted string. 
+2. Possibilité de spécifier des préférences d'optimisation via différents paramètres lors de l'appel à l'endpoint *task_assigner/*.
+3. L'endpoint *test_task_assigner_with_random_data/* teste la fonction __task_assigner()__ avec des données générées aléatoirement et de manière cohérente (propose un grand panel de possibilitées pour la situation des entreprises: surchargées, sous-effectif, sous-chargées, correctes, peu de projets, bcp de projets ...).
+3. Implémentation de réponses HTTP pour les éxceptions, selon les cas de figures, à tous les niveaux du process 
     1. Réception des paramètres front,
     2. Collecte des données auprès du BACK
     3. __Vérification de la cohérence des données (à faire)__
-    3. Mise en forme des données
-    4. Production d'une solution mathématique
+    4. Mise en forme des données
+    5. Production d'une solution mathématique
 
 __ensuite:__
 
-1. Prendre en compte les préférences d'optimisation spécifiées dans les paramètres
-2. Voir comment on teste la fonctionnalité. Avec des données aléatoires ? Avec des vraies données provenant du BACK ?
+1. Voir comment on teste la fonctionnalité. Avec des données aléatoires ? Avec des vraies données provenant du BACK ?
+    - __idée__: générérer des triplets (variables_entrees, fonction, variables_sorties_attendues) à différents instants du programme. Les stocker dans un répertoire *synthetic_data_test/*et s'en servir pour tester ensuite chaque fonction du module.
 
 
 

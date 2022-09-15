@@ -49,7 +49,8 @@ def task_assigner(datein_isoformat : str, dateout_isoformat :str ,
     data = get_data_task_assigner(datein_isoformat, dateout_isoformat)
     df_prj, df_cmp, df_tsk, df_dsp = split_data(data)
     ## verification cohérence/qualité données ??
-    solution = solve(df_prj, df_cmp, df_tsk, df_dsp)
+    solution = solve(df_prj, df_cmp, df_tsk, df_dsp,
+                    curseur, contrainte_etre_sur_projet, avantage_projet)
     out = {
         "validite_solution" : test_solution(solution),
         'solution':solution
@@ -59,16 +60,17 @@ def task_assigner(datein_isoformat : str, dateout_isoformat :str ,
 
 
 @app.get("/test_task_assigner_with_random_data/")
-def test_task_assigner_with_random_data():
+def test_task_assigner_with_random_data(curseur:float = 0.0, contrainte_etre_sur_projet: str = 'de_preference', avantage_projet : float = 1.0):
     """
     teste la fonction task_assigner(...) avec des données générées aléatoirement et de manière cohérente (propose un grand panel de possibilitées pour la situation des entreprises: surchargées, sous-effectif, sous-chargées, correctes, peu de projets, bcp de projets ...).
     """
     df_prj, df_cmp, df_tsk, df_dsp = mock_coherent_data()
     ## verification cohérence/qualité données ??
-    solution = solve(df_prj, df_cmp, df_tsk, df_dsp)
+    solution = solve(df_prj, df_cmp, df_tsk, df_dsp,
+                    curseur, contrainte_etre_sur_projet, avantage_projet)
     out = {
         "validite_solution" : test_solution(solution),
-        'solution':solution
+        'solution':solution 
     }
     return _return_json(out)
 
