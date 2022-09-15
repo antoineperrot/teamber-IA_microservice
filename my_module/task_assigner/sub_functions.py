@@ -1,19 +1,75 @@
+from typing import Type
 import pandas as pd
 import numpy as np
 from scipy.optimize import linprog
+import datetime
 
-def split_data_from_dic(dic):
+from fastapi import HTTPException
+
+
+def HTTPException_check_parameters(datein_isoformat, dateout_isoformat, curseur, contrainte_etre_sur_projet, avantage_projet):
+    if not isinstance(curseur, float):
+        raise HTTPException(
+            status_code=422,
+            detail="'curseur' doit être un nombre flottant.",
+        )
+
+    if not (0.0 <= curseur and curseur <= 1.0 ):
+        raise HTTPException(
+        status_code=422,
+        detail=f"Le paramètre 'curseur' est incorrect. Valeur spécifiée par l'utilisateur:  {curseur}.\n 'curseur' est un flottant compris entre 0 et 1." )
+
+    if not isinstance(datein_isoformat, str):
+        raise HTTPException(status_code=422,
+                                detail="'datein_isoformat' doit être de  string.")
+
+    if not isinstance(dateout_isoformat, str):
+        raise HTTPException(status_code=422,
+                                detail="'dateout_isoformat' doit être de  string.")
+
+    try :
+        datetime.datetime.fromisoformat(datein_isoformat)
+    except:
+        raise HTTPException(status_code=422,
+                                detail=f"Invalid isoformat string for 'datein_isoformat': {datein_isoformat}")
+    
+    try :
+        datetime.datetime.fromisoformat(dateout_isoformat)
+    except:
+        raise HTTPException(status_code=422,
+                                detail=f"Invalid isoformat string for 'dateout_isoformat': {dateout_isoformat}")
+
+    if not isinstance(contrainte_etre_sur_projet,str):
+        raise HTTPException(status_code=422,
+                                detail=f"'contrainte_etre_sur_projet' doit être de type string. Valeur spécifiée par l'utilisateur: {contrainte_etre_sur_projet}." )
+    
+    authorized_values = ['oui','de_preference','non']
+    if not contrainte_etre_sur_projet in authorized_values:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Valeur incorrecte fournie pour 'contrainte_etre_sur_projet': {contrainte_etre_sur_projet}. Valeurs possibles: {authorized_values}.",
+        )
+
+    if not isinstance(avantage_projet,float):
+        raise HTTPException(
+            status_code=422,
+            detail="'avantage_projet' doit être de type float.")
+    
+
+    
+
+def split_data(data):
     """
     RECUPERATION DES DONNEES
     """
     # recuperation matrice_projet
-    df_prj = pd.DataFrame(dic['matrice_projet']['data']['result'])
+    df_prj = pd.DataFrame(data['matrice_projet'])
     # recuperation matrice_competence : on oublie les compétences pour lesquels les utl sont indéfinis
-    df_cmp = pd.DataFrame(dic['matrice_competence']['data']['result']).dropna().reset_index(drop=True).astype(int)
+    df_cmp = pd.DataFrame(data['matrice_competence']).dropna().reset_index(drop=True).astype(int)
     # recuperation des taches à assigner :
-    df_tsk = pd.DataFrame(dic['taches']['data']['result'])
+    df_tsk = pd.DataFrame(data['taches'])
     # recuperation des disponibilites utl :
-    df_dsp = pd.DataFrame(dic['dispos_utilisateurs']['data']['result'])
+    df_dsp = pd.DataFrame(data['dispos_utilisateurs'])
     
     return df_prj, df_cmp, df_tsk, df_dsp
 
@@ -318,8 +374,7 @@ def make_stat_prj(df_out):
 
 
 def solve(df_prj, df_cmp, df_tsk, df_dsp):
-    success = True
-    try :
+    try:
         # FAIT LA LISTE DE TOUS LES IDS (PRJ, CMP, TSK, UTL) CONTENUS DANS LES DONNEES RECUES
         id_utl, id_prj, id_cmp, id_tsk = make_list_ids(df_prj, df_cmp, df_tsk, df_dsp)
 
@@ -390,11 +445,12 @@ def solve(df_prj, df_cmp, df_tsk, df_dsp):
                 'utl':stat_utl.to_dict(),
                 'tsk':stat_tsk.to_dict(),
                 'prj':stat_prj.to_dict()
-            },
-            "SUCCES_SOLVEUR": success
             }
+        }
     except:
-        success = False
-        solution = {"SUCCES_SOLVEUR": success}
+        raise HTTPException(
+            status_code=500,
+            detail='Le solveur a échoué à produire une solution.'
+        )
     return solution
 
