@@ -189,6 +189,20 @@ def make_mat_cmp(df_cmp, n_cmp, n_utl):
     
     return mat_cmp
 
+def make_mat_spe(mat_cmp):
+    """
+    la matrice de spécialisation permet de mettre en avant le fait que certaines personnes ne
+    savent réaliser qu'un nombre limité de tâches, a un niveau de compétence peut-être inférieur à d'autmat_spe personnes plus expertes, mais étant donné
+    qu'elle ne savent faire que ces tâches, il vaut mieux leur assigner à eux et laisser le champ libre à des personnes plus expertes, souvent plus transverses (chef d'équipe etc).
+    """
+    mat_spe = mat_cmp.astype(float)
+    mat_spe[:,mat_cmp.sum(axis=0)==0] = np.nan
+    mat_spe = mat_spe/mat_spe.sum(axis=0) * 3
+    mat_spe[mat_spe == np.nan] =0
+    mat_spe[:,mat_cmp.max(axis=0)==0]=0
+    return mat_spe
+
+
 def make_usefull_mapping_dicts(df_tsk, df_dsp):
     """
     FABRICATION DE DICTIONNAIRE UTILES PAR LA SUITE
@@ -202,7 +216,8 @@ def make_usefull_mapping_dicts(df_tsk, df_dsp):
 
 def make_arcs_and_cost_func(n_tsk, n_utl, 
               d_tsk_to_cmp, d_tsk_to_prj,
-              mat_cmp, mat_prj,
+              mat_cmp, mat_prj, mat_cpr,
+              contrainte_etre_sur_projet, avantage_projet,
               penalty=-100):
     """
     FABRICATION DES ARCS RELIANT TACHES A UTILISATEURS POTENTIELS, AINSI QUE FONCTION DE COUT
@@ -215,10 +230,20 @@ def make_arcs_and_cost_func(n_tsk, n_utl,
             cmp = d_tsk_to_cmp[tsk]
             prj = d_tsk_to_prj[tsk]
             lvl = mat_cmp[cmp, utl]
+            score_cpr = mat_cpr[cmp,utl] # score compromis
             utl_on_prj = mat_prj[prj, utl]
-            if lvl >= 0 and utl_on_prj : 
-                arcs.append( tuple((tsk,utl)) )
-                cost_func.append(lvl)
+            if contrainte_etre_sur_projet == 'oui':
+                if lvl >= 0 and utl_on_prj : 
+                    arcs.append( tuple((tsk,utl)) )
+                    cost_func.append(score_cpr)
+            if contrainte_etre_sur_projet == 'non':
+                if lvl >= 0 : 
+                    arcs.append( tuple((tsk,utl)) )
+                    cost_func.append(score_cpr)
+            if contrainte_etre_sur_projet == 'de_preference':
+                if lvl >= 0 : 
+                    arcs.append( tuple((tsk,utl)) )
+                    cost_func.append(score_cpr)
 
     # chaque tache a également la possibilité de ne pas être assignée, ce qui est fortement pénalisé
     for tsk in range(n_tsk):
@@ -373,8 +398,10 @@ def make_stat_prj(df_out):
 
 
 
-def solve(df_prj, df_cmp, df_tsk, df_dsp):
-    try:
+def solve(df_prj, df_cmp, df_tsk, df_dsp,
+          curseur, contrainte_etre_sur_projet, avantage_projet):
+    #try:
+    if True :
         # FAIT LA LISTE DE TOUS LES IDS (PRJ, CMP, TSK, UTL) CONTENUS DANS LES DONNEES RECUES
         id_utl, id_prj, id_cmp, id_tsk = make_list_ids(df_prj, df_cmp, df_tsk, df_dsp)
 
@@ -398,6 +425,12 @@ def solve(df_prj, df_cmp, df_tsk, df_dsp):
         # FABRICATION MATRICE COMPETENCE
         mat_cmp = make_mat_cmp(df_cmp, n_cmp, n_utl)
 
+        # FABRICATION MATRICE COMPETENCE
+        mat_spe = make_mat_spe(mat_cmp)
+
+        # FABRICATION MATRICE COMPROMIS COMPETENCE <--> SPECIALISATION
+        mat_cpr = (1 - curseur) * mat_cmp + curseur * mat_spe
+
         # FABRICATION DE DICTIONNAIRE UTILES PAR LA SUITE
         d_tsk_to_cmp, d_tsk_to_prj, d_tsk_to_lgt, d_utl_to_dsp = make_usefull_mapping_dicts(df_tsk, df_dsp)
 
@@ -405,8 +438,9 @@ def solve(df_prj, df_cmp, df_tsk, df_dsp):
         # FABRICATION DES ARCS RELIANT TACHES A UTILISATEURS POTENTIELS, AINSI QUE FONCTION DE COUT
         arcs, cost_func, n_arcs = make_arcs_and_cost_func(n_tsk, n_utl, 
                     d_tsk_to_cmp, d_tsk_to_prj,
-                    mat_cmp, mat_prj)
-
+                    mat_cmp, mat_prj, mat_cpr,
+                    contrainte_etre_sur_projet, avantage_projet)
+        
         # FABRICATION DES MATRICES A et B POUR RESOUDRE AX<=B
         A, b = make_A_and_b(n_tsk,n_utl,n_arcs,
                         d_tsk_to_lgt, d_utl_to_dsp,
@@ -447,6 +481,7 @@ def solve(df_prj, df_cmp, df_tsk, df_dsp):
                 'prj':stat_prj.to_dict()
             }
         }
+    try : pass
     except:
         raise HTTPException(
             status_code=500,
