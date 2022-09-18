@@ -6,7 +6,7 @@ from fastapi import Body, FastAPI
 import pandas as pd
 import requests
 from my_module.task_assigner.sub_functions import *
-from my_module.task_assigner.test import *
+from my_module.task_assigner.validation import *
 from my_module.task_assigner.data_mocker import *
 
 import simplejson
@@ -69,14 +69,14 @@ def test_task_assigner_with_random_data(curseur:float = 0.0, contrainte_etre_sur
     solution = solve(df_prj, df_cmp, df_tsk, df_dsp,
                     curseur, contrainte_etre_sur_projet, avantage_projet)
     out = {
-        "validite_solution" : test_solution(solution),
+        "validite_solution" : validation_solution(solution),
         'solution':solution 
     }
     return _return_json(out)
 
 
 #@app.get('/get_data_task_assigner/')
-def get_data_task_assigner(datein_isoformat:str , dateout_isoformat:str):
+def get_data_task_assigner(datein_isoformat : str , dateout_isoformat:str):
     data = {}
     sql_querys_dict = {
         "matrice_projet": {"select": ["utl_spkutilisateur","int_sfkprojet"],"from": "lst_vprojet_utilisateur_py"},
