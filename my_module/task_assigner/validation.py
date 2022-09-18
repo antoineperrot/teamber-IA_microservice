@@ -36,7 +36,7 @@ def validation_stat_tsk(stat_tsk):
 def validation_solution(OUT):
     success = True
     try:
-        validation_validite_mathematique_solution(OUT['solution'])
+        validation_mathematique_solution(OUT['solution'])
         validation_stat_cmp(OUT['statistics_for']['cmp'])
         validation_stat_utl(OUT['statistics_for']['utl'])
         validation_stat_prj(OUT['statistics_for']['prj'])
