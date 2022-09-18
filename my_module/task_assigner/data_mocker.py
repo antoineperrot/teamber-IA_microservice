@@ -75,3 +75,9 @@ def mock_coherent_data():
     df_dsp = df_dsp.astype(int)
 
     return df_prj, df_cmp, df_tsk, df_dsp
+
+def mock_random_parameters():
+    curseur = np.random.uniform(0,1)
+    contrainte_etre_sur_projet = choices(['oui','de_preference','non'])
+    avantage_projet = np.random.randint(1,5)*1.0
+    return curseur, contrainte_etre_sur_projet, avantage_projet

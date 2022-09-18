@@ -1,8 +1,10 @@
 FROM python:3.8-slim
 
-COPY ./src /app/src
+COPY . /app/src
 
 WORKDIR /app/src
+
+CMD ["ls"]
 
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
