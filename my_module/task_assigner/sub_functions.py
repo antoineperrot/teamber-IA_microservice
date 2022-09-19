@@ -393,7 +393,8 @@ def make_stat_tsk(df_out, d_tsk_to_lgt, int_to_tsk):
     stat_tsk['pct_assignation_tache'] =  stat_tsk['pct_assignation_tache'].astype(int)
     stat_tsk.reset_index(inplace=True)
     stat_tsk.sort_values(by='pct_assignation_tache',inplace=True)
-    stat_tsk.rename(mapper={"index":'utl'},axis=1,inplace=True)
+    stat_tsk.rename(mapper={"index":'tsk'},axis=1,inplace=True)
+    stat_tsk.reset_index(inplace=True,drop=True)
     return stat_tsk
 
 def make_stat_prj(df_out):
@@ -406,6 +407,7 @@ def make_stat_prj(df_out):
     stat_prj.reset_index(inplace=True)
     stat_prj['n_missing_cmp_per_prj'] =  stat_prj['n_missing_cmp_per_prj'].fillna(0).astype(int)
     stat_prj.sort_values('total_h_non_assignees',ascending=False,inplace=True)
+    stat_prj.reset_index(inplace=True)
     return stat_prj
 
 
