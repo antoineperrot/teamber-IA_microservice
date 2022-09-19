@@ -29,6 +29,9 @@ __ensuite:__
     - A) S'assurer qu'elle fonctionne dans un nombre de cas maximal.
     - B) A l'avenir : pouvoir s'assurer de la reproductibilité des résultats fournis par le programme.
 
+2. Auprès de quelle URL aller chercher les données ? Si j'ai bien compris, un client Wandeed = une entité à part, une URL? l'URL où aller chercher les données en BDD est donc possiblement un paramètre à précisier lors des requêtes auprès de mon API ?
+
+
 
 
 
