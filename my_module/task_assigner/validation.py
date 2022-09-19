@@ -36,11 +36,11 @@ def validation_stat_tsk(stat_tsk):
 def validation_solution(OUT):
     success = True
     try:
-        validation_mathematique_solution(OUT['solution'])
-        validation_stat_cmp(OUT['statistics_for']['cmp'])
-        validation_stat_utl(OUT['statistics_for']['utl'])
-        validation_stat_prj(OUT['statistics_for']['prj'])
-        validation_stat_tsk(OUT['statistics_for']['tsk'])
+        validation_mathematique_solution(OUT['solution_brute'])
+        validation_stat_cmp(OUT['statistics']['cmp'])
+        validation_stat_utl(OUT['statistics']['utl'])
+        validation_stat_prj(OUT['statistics']['prj'])
+        validation_stat_tsk(OUT['statistics']['tsk'])
     except :
         success = False
 
