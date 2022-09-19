@@ -6,9 +6,10 @@
 
 __organisation du service :__
 
-1. le __front__ envoie les données légères à l'__API__ (la liste d'utilisateur, peut-être une date de début et de fin pour mieux sélectionner les tâches dans la BDD ensuite)
-2. l'__API__ va chercher les données auprès du __back__
-3. l'__API__ assigner les tâches aux utilisateurs de manière optimale
+1. le __front__ envoie les données légères à l'__API__ (token d'accès BDD, date début sprint, date fin sprint, préferences d'optimisation)
+2. l'__API__ va chercher les données auprès du __back__ avec en paramètres (token d'accès BDD, date début sprint, date fin sprint)
+3. l'__API__ vérifier que les données récupérées sont valides, sinon retourne une HTTP Exception, status code 422.
+3. l'__API__ assigner les tâches aux utilisateurs de manière optimale. Si la procédure échoue retourne une HTTP Exception, status code 422.
 4. <span style="color:red"> l'__API__ retourne les données au __back__ ? A discuter.</span>
 
 __avancée des travaux :__
@@ -18,14 +19,15 @@ __avancée des travaux :__
 3. Implémentation de réponses HTTP pour les éxceptions, selon les cas de figures, à tous les niveaux du process 
     1. Réception des paramètres front,
     2. Collecte des données auprès du BACK
-    3. __Vérification de la cohérence des données (à faire)__
+    3. Vérification de la cohérence des données
     4. Mise en forme des données
     5. Production d'une solution mathématique
 
 __ensuite:__
 
-1. Voir comment on teste la fonctionnalité. Avec des données aléatoires ? Avec des vraies données provenant du BACK ?
-    - __idée__: générérer des triplets (variables_entrees, fonction, variables_sorties_attendues) à différents instants du programme. Les stocker dans un répertoire *synthetic_data_test/*et s'en servir pour tester ensuite chaque fonction du module.
+1. Se construire un jeu de données réelles (provenant des utilisateurs wandeed) et le stocker dans un dossier à l'intérieur du micro-service afin de :
+    - A) S'assurer qu'elle fonctionne dans un nombre de cas maximal.
+    - B) A l'avenir : pouvoir s'assurer de la reproductibilité des résultats fournis par le programme.
 
 
 

@@ -7,6 +7,15 @@ import datetime
 from fastapi import HTTPException
 
 
+def HTTPException_check_coherence_data(df_prj, df_cmp, df_tsk, df_dsp):
+    if len(df_cmp)== 0:
+        raise HTTPException(status_code=422,
+            detail= "Pas de matrice de compétence disponible.")
+    if len(df_tsk) == 0:
+        raise HTTPException(status_code=422,
+            detail= "Pas de tâches à assigner.")
+        
+
 def HTTPException_check_parameters(datein_isoformat, dateout_isoformat, curseur, contrainte_etre_sur_projet, avantage_projet):
     if not isinstance(curseur, float):
         raise HTTPException(
@@ -27,17 +36,17 @@ def HTTPException_check_parameters(datein_isoformat, dateout_isoformat, curseur,
         raise HTTPException(status_code=422,
                                 detail="'dateout_isoformat' doit être de  string.")
 
-    try :
-        datetime.datetime.fromisoformat(datein_isoformat)
-    except:
-        raise HTTPException(status_code=422,
-                                detail=f"Invalid isoformat string for 'datein_isoformat': {datein_isoformat}")
+    # try :
+    #     datetime.datetime.fromisoformat(datein_isoformat)
+    # except:
+    #     raise HTTPException(status_code=422,
+    #                             detail=f"Invalid isoformat string for 'datein_isoformat': {datein_isoformat}")
     
-    try :
-        datetime.datetime.fromisoformat(dateout_isoformat)
-    except:
-        raise HTTPException(status_code=422,
-                                detail=f"Invalid isoformat string for 'dateout_isoformat': {dateout_isoformat}")
+    # try :
+    #     datetime.datetime.fromisoformat(dateout_isoformat)
+    # except:
+    #     raise HTTPException(status_code=422,
+    #                             detail=f"Invalid isoformat string for 'dateout_isoformat': {dateout_isoformat}")
 
     if not isinstance(contrainte_etre_sur_projet,str):
         raise HTTPException(status_code=422,
