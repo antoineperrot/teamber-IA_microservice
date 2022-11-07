@@ -12,7 +12,7 @@ from my_module.test_task_assigner import *
 
 import simplejson
 
-api_url = 'https://development.api.wandeed.com/api/lst/search?offset=0&limit=500'
+api_url = 'https://teamber.api.wandeed.com/api/lst/search?offset=0&limit=500'
 
 app = FastAPI()
 
@@ -115,7 +115,7 @@ def endpoint_test_task_assigner():
     test_task_assigner_on_synthetic_data()
 
 
-def get_data_task_assigner(access_token :str , datein_isoformat : str , dateout_isoformat:str):
+def get_data_task_assigner(access_token :str , datein_isoformat : str , dateout_isoformat:str, url: str = api_url):
     data = {}
     sql_querys_dict = {
         "matrice_projet": {"select": ["utl_spkutilisateur","int_sfkprojet"],"from": "lst_vprojet_utilisateur_py"},
@@ -163,7 +163,7 @@ def get_data_task_assigner(access_token :str , datein_isoformat : str , dateout_
              'Content-Type':'application/json'}
 
     for key, sql_query  in sql_querys_dict.items(): 
-        request = requests.post(api_url, headers=headers, json = sql_query)    
+        request = requests.post(url, headers=headers, json = sql_query)
         if request.status_code != 200 :
             raise HTTPException(
                 status_code=424,
@@ -176,7 +176,7 @@ def get_data_task_assigner(access_token :str , datein_isoformat : str , dateout_
     return data
 
 
-def get_data_planning_optimizer(access_token :str , datein_isoformat : str , dateout_isoformat:str, id_utl: int):
+def get_data_planning_optimizer(access_token :str , datein_isoformat : str , dateout_isoformat:str, id_utl: int, url: str = api_url):
     data = {}
     sql_querys_dict = {
         "imperatifs": { "select":
@@ -277,7 +277,7 @@ def get_data_planning_optimizer(access_token :str , datein_isoformat : str , dat
              'Content-Type':'application/json'}
 
     for key, sql_query  in sql_querys_dict.items(): 
-        request = requests.post(api_url, headers=headers, json = sql_query)    
+        request = requests.post(url, headers=headers, json = sql_query)
         if request.status_code != 200 :
             raise HTTPException(
                 status_code=424,
