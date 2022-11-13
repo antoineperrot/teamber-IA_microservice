@@ -98,7 +98,7 @@ def generate_synthetic_testing_data_task_assigner(
     """
     Génère des expériences à partir de données aléatoires qui seront ensuite à reproduire par les tests.
     :n_exp: integer = 10, nombre d'expériences à créer.
-    
+
     """
     data = mock_coherent_data()
     df_prj, df_cmp, df_tsk, df_dsp = data
@@ -218,8 +218,16 @@ def generate_synthetic_testing_data_task_assigner(
 
         steps.append(
             step(
-                (df_rmd_tsk, df_rmd_dsp,),
-                (d_tsk_to_cmp, d_tsk_to_prj, d_tsk_to_lgt, d_utl_to_dsp,),
+                (
+                    df_rmd_tsk,
+                    df_rmd_dsp,
+                ),
+                (
+                    d_tsk_to_cmp,
+                    d_tsk_to_prj,
+                    d_tsk_to_lgt,
+                    d_utl_to_dsp,
+                ),
                 make_usefull_mapping_dicts,
             )
         )
@@ -250,7 +258,11 @@ def generate_synthetic_testing_data_task_assigner(
                     contrainte_etre_sur_projet,
                     avantage_projet,
                 ),
-                (arcs, cost_func, n_arcs,),
+                (
+                    arcs,
+                    cost_func,
+                    n_arcs,
+                ),
                 make_arcs_and_cost_func,
             )
         )
@@ -260,8 +272,18 @@ def generate_synthetic_testing_data_task_assigner(
 
         steps.append(
             step(
-                (n_tsk, n_utl, n_arcs, d_tsk_to_lgt, d_utl_to_dsp, arcs,),
-                (A, b,),
+                (
+                    n_tsk,
+                    n_utl,
+                    n_arcs,
+                    d_tsk_to_lgt,
+                    d_utl_to_dsp,
+                    arcs,
+                ),
+                (
+                    A,
+                    b,
+                ),
                 make_A_and_b,
             )
         )
@@ -274,7 +296,11 @@ def generate_synthetic_testing_data_task_assigner(
         steps.append(
             step(
                 (A, b, cost_func),
-                (solution_vector, outcome, method,),
+                (
+                    solution_vector,
+                    outcome,
+                    method,
+                ),
                 solve_linear_programmation_problem,
             )
         )
@@ -328,14 +354,30 @@ def generate_synthetic_testing_data_task_assigner(
         stat_utl = make_stat_utl(df_rmd_out, d_utl_to_dsp, utl_to_int)
 
         steps.append(
-            step((df_rmd_out, d_utl_to_dsp, utl_to_int,), (stat_utl,), make_stat_utl)
+            step(
+                (
+                    df_rmd_out,
+                    d_utl_to_dsp,
+                    utl_to_int,
+                ),
+                (stat_utl,),
+                make_stat_utl,
+            )
         )
 
         # Production de statistiques par tache
         stat_tsk = make_stat_tsk(df_rmd_out, d_tsk_to_lgt, int_to_tsk)
 
         steps.append(
-            step((df_rmd_out, d_tsk_to_lgt, int_to_tsk,), (stat_tsk,), make_stat_tsk)
+            step(
+                (
+                    df_rmd_out,
+                    d_tsk_to_lgt,
+                    int_to_tsk,
+                ),
+                (stat_tsk,),
+                make_stat_tsk,
+            )
         )
 
         # Production de statistiques par projet

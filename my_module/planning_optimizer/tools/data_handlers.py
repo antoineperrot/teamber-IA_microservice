@@ -80,15 +80,16 @@ def handler_union_hor(union: pd.DataFrame) -> pd.DataFrame:
             final_hd = heure_debut
             final_hf = heure_fin
 
-        final_row_df = pd.DataFrame({
-            "eeh_sfkperiode": [day],
-            "eeh_xheuredebut": [final_hd],
-            "eeh_xheurefin": [final_hf],
-        })
-
+        final_row_df = pd.DataFrame(
+            {
+                "eeh_sfkperiode": [day],
+                "eeh_xheuredebut": [final_hd],
+                "eeh_xheurefin": [final_hf],
+            }
+        )
 
         out = pd.concat([out, final_row_df], ignore_index=True)
-#         out = out.append(final_row, ignore_index=True)
+    #         out = out.append(final_row, ignore_index=True)
 
     out["eeh_sfkperiode"] = out["eeh_sfkperiode"].astype(int)
 
@@ -102,14 +103,20 @@ def make_horaire_clean(df_hor: pd.DataFrame) -> dict:
     nettoyé et cohérent.
     """
     out = {}
-    for utl in df_hor['epu_sfkutilisateur'].unique():
-        list_dict_hor_utl = list(df_hor.loc[df_hor['epu_sfkutilisateur']==utl,]['epl_employe_horaire'])
+    for utl in df_hor["epu_sfkutilisateur"].unique():
+        list_dict_hor_utl = list(
+            df_hor.loc[
+                df_hor["epu_sfkutilisateur"] == utl,
+            ]["epl_employe_horaire"]
+        )
         list_df_hor_utl = [pd.DataFrame(_d) for _d in list_dict_hor_utl]
         out[utl] = handler_list_hor_utl(list_df_hor_utl)
     return out
 
 
-def split_data_planning_optimizer(data: dict) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def split_data_planning_optimizer(
+    data: dict,
+) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Split les datas reçues à la sortie de get_data_planning_optimizer en 3 pd.DataFrame:
     :return df_imp:
@@ -128,13 +135,21 @@ def split_data_planning_optimizer(data: dict) -> Tuple[pd.DataFrame, pd.DataFram
         "evt_sfkprojet"       -> projet de rattachement de la tâche
 
     """
-    df_imp = pd.DataFrame(data['imperatifs'])
-    df_hor = pd.DataFrame(data['horaires']).reindex(
-        columns=['epu_sfkutilisateur', 'epl_xdebutperiode', 'epl_xfinperiode', 'epl_employe_horaire'])
+    df_imp = pd.DataFrame(data["imperatifs"])
+    df_hor = pd.DataFrame(data["horaires"]).reindex(
+        columns=[
+            "epu_sfkutilisateur",
+            "epl_xdebutperiode",
+            "epl_xfinperiode",
+            "epl_employe_horaire",
+        ]
+    )
     df_hor.epl_xdebutperiode = pd.to_datetime(df_hor.epl_xdebutperiode).dt.date
     df_hor.epl_xfinperiode = pd.to_datetime(df_hor.epl_xfinperiode).dt.date
-    df_hor = df_hor.sort_values(by=['epu_sfkutilisateur', 'epl_xdebutperiode']).reset_index(drop=True)
-    df_tsk = pd.DataFrame(data['taches'])
+    df_hor = df_hor.sort_values(
+        by=["epu_sfkutilisateur", "epl_xdebutperiode"]
+    ).reset_index(drop=True)
+    df_tsk = pd.DataFrame(data["taches"])
     return df_imp, df_hor, df_tsk
 
 
@@ -150,12 +165,14 @@ def split_tsk_utl(dict_hor: dict, df_tsk: pd.DataFrame) -> Tuple[dict, List[int]
     task_to_optimize_dict = {}  # {id_utilisateur: df_tache}
 
     utl_without_horaire = []
-    for utl in df_tsk['lgl_sfkligneparent'].unique():
+    for utl in df_tsk["lgl_sfkligneparent"].unique():
         if not utl in dict_hor.keys():
             # pas d'horaires dispo pour cet utilisateur -> impossible de lancer le programme
             utl_without_horaire.append(utl)
         else:
-            df_tsk_utl = df_tsk.loc[df_tsk['lgl_sfkligneparent'] == utl,]
+            df_tsk_utl = df_tsk.loc[
+                df_tsk["lgl_sfkligneparent"] == utl,
+            ]
             task_to_optimize_dict[utl] = df_tsk_utl
 
     return task_to_optimize_dict, utl_without_horaire

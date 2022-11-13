@@ -25,7 +25,8 @@ def HTTPException_check_parameters(
 ):
     if not isinstance(curseur, float):
         raise HTTPException(
-            status_code=422, detail="'curseur' doit être un nombre flottant.",
+            status_code=422,
+            detail="'curseur' doit être un nombre flottant.",
         )
 
     if not (0.0 <= curseur and curseur <= 1.0):

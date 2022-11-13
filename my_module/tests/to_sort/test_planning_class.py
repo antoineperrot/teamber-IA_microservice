@@ -1,4 +1,3 @@
-
 import pandas as pd
 from test_data.reference_data.reference_variables import *
 

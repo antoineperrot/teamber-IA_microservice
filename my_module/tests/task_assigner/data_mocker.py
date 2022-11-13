@@ -51,7 +51,12 @@ def mock_coherent_data():
     df_cmp = df_cmp.astype(int)
 
     mat_prj = np.random.randint(0, 2, (n_prj, n_utl))
-    df_prj = pd.DataFrame({"utl_spkutilisateur": [], "int_sfkprojet": [],})
+    df_prj = pd.DataFrame(
+        {
+            "utl_spkutilisateur": [],
+            "int_sfkprojet": [],
+        }
+    )
     for prj in range(n_prj):
         for utl in range(n_utl):
             if mat_prj[prj, utl] > 0:
@@ -91,13 +96,21 @@ def mock_coherent_data():
 
     np_ = np.round(df_tsk["evt_dduree"].sum() / n_utl, 2) * np.random.uniform(0.8, 1.2)
 
-    df_dsp = pd.DataFrame({"utl_spkutilisateur": [], "utl_sdispo": [],})
+    df_dsp = pd.DataFrame(
+        {
+            "utl_spkutilisateur": [],
+            "utl_sdispo": [],
+        }
+    )
     for utl in range(n_utl):
         p = np.random.uniform(0.1, 0.9)
         n = np_ / p
         dispo = np.random.binomial(n, p)
         df_dsp = df_dsp.append(
-            {"utl_spkutilisateur": ids_utl[utl], "utl_sdispo": dispo,},
+            {
+                "utl_spkutilisateur": ids_utl[utl],
+                "utl_sdispo": dispo,
+            },
             ignore_index=True,
         )
     df_dsp = df_dsp.astype(int)

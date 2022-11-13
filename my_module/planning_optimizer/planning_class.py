@@ -245,7 +245,11 @@ class Planning(object):
                 df.loc[index_df, "Date fin"] = DF.loc[index_DF, "Date fin"]
                 index_DF += 1
             if index_DF < len(DF):
-                df = df.append(DF.loc[[index_DF],]).reset_index(drop=True)
+                df = df.append(
+                    DF.loc[
+                        [index_DF],
+                    ]
+                ).reset_index(drop=True)
                 index_df += 1
                 index_DF += 1
 
