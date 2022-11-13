@@ -1,5 +1,4 @@
-import pandas as pd
-from test_data.reference_data.reference_variables import *
+from my_module.tests.to_sort.test_data.reference_variables import *
 
 
 def to_json(path):

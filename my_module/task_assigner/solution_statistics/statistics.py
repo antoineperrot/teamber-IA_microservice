@@ -1,4 +1,8 @@
-def make_stat_cmp(df_out):
+import numpy as np
+import pandas as pd
+
+
+def make_stat_cmp(df_out: pd.DataFrame) -> pd.DataFrame:
     """
     Production de statistiques par compétences
     """
@@ -22,7 +26,7 @@ def make_stat_cmp(df_out):
     return stat_cmp
 
 
-def make_stat_utl(df_out, d_utl_to_dsp, utl_to_int):
+def make_stat_utl(df_out: pd.DataFrame, d_utl_to_dsp: dict, utl_to_int: dict) -> pd.DataFrame:
     """
     Production de statistiques par utilisateur
     """
@@ -52,7 +56,7 @@ def make_stat_utl(df_out, d_utl_to_dsp, utl_to_int):
     return stat_utl
 
 
-def make_stat_tsk(df_out, d_tsk_to_lgt, int_to_tsk):
+def make_stat_tsk(df_out: pd.DataFrame, d_tsk_to_lgt: dict, int_to_tsk: dict) -> pd.DataFrame:
     """
     Production de statistiques par tache
     """
@@ -64,7 +68,7 @@ def make_stat_tsk(df_out, d_tsk_to_lgt, int_to_tsk):
         .astype(int)
     )
     tmp = pd.Series(d_tsk_to_lgt).sort_index()
-    tmp.set_axis(list(int_to_tsk.values()), inplace=True)
+    tmp = tmp.set_axis(list(int_to_tsk.values()), copy=False)
     pct_per_tsk = (
         (
             df_out.loc[df_out["utl"] != "not assigned"]
@@ -86,7 +90,7 @@ def make_stat_tsk(df_out, d_tsk_to_lgt, int_to_tsk):
     return stat_tsk
 
 
-def make_stat_prj(df_out):
+def make_stat_prj(df_out: pd.DataFrame) -> pd.DataFrame:
     """
     Production de statistiques par projet
     """

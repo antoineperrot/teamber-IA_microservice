@@ -188,7 +188,8 @@ def make_output_dataframe(
         if solution_vector[j] > 0:
             tsk, utl = arcs[j]
             lvl = cost_func[j]
-            out = out.append(
+            out = pd.concat(
+                [out,
                 pd.DataFrame(
                     {
                         "prj": [d_tsk_to_prj[tsk]],
@@ -201,7 +202,7 @@ def make_output_dataframe(
                         "cmp": [d_tsk_to_cmp[tsk]],
                         "lvl": [lvl],
                     }
-                )
+                )]
             )
 
     out.loc[out["utl"] == "not assigned", "lvl"] = None
