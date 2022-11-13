@@ -47,7 +47,8 @@ un paramètre à précisier lors des requêtes auprès de mon API ?
     - [x] Nettoyage des horaires utilisateurs
     - [ ] Découpage des tâches entre les utilisateurs
     - [ ] Prise en compte des impératifs
-- [ ]
+
+...
 
 ### Tests
 
@@ -56,7 +57,10 @@ un paramètre à précisier lors des requêtes auprès de mon API ?
 - [ ] Programme d'optimisation
     - [ ] Tester les fonctions de calcul de potentiel
     - [ ] Tester les fonctions de permutations des tâches
-    - [ ]
+
+...
+
+
 ### TODO List
 - Modifier requête pour avoir les niveaux de priorité des tâches
 
