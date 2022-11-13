@@ -1,5 +1,5 @@
 """
-Test la fonction make_clean_hor
+Test la fonction make_horaire_clean
 """
 import pickle
 import unittest
@@ -10,7 +10,7 @@ from my_module.planning_optimizer.planning_optimizer.tools.data_handlers import 
 
 class TestMakeCleanHor(unittest.TestCase):
     """
-    Test la fonction make_clean_hor
+    Test la fonction make_horaire_clean
     """
 
     def setUp(self):
