@@ -1,16 +1,18 @@
 # Développement d'un microservice IA pour la société TEAMBER
 
+## Organisation du service :
 
+1. le __front__ envoie les données légères à l'__API__ (token d'accès BDD, 
+date début sprint, date fin sprint, préferences d'optimisation)
+2. l'__API__ va chercher les données auprès du __back__ avec en paramètres 
+(token d'accès BDD, date début sprint, date fin sprint)
+3. l'__API__ vérifier que les données récupérées sont valides, 
+sinon retourne une HTTP Exception, status code 422.
+3. l'__API__  effectue l'opération d'optimisation. Si la procédure échoue 
+retourne une HTTP Exception, status code 422.
+4. <span style="color:red"> l'__API__ retourne les données au __back__ ? A discuter.</span>
 
 ## 1. Développement "task_assigner" en cours
-
-__organisation du service :__
-
-1. le __front__ envoie les données légères à l'__API__ (token d'accès BDD, date début sprint, date fin sprint, préferences d'optimisation)
-2. l'__API__ va chercher les données auprès du __back__ avec en paramètres (token d'accès BDD, date début sprint, date fin sprint)
-3. l'__API__ vérifier que les données récupérées sont valides, sinon retourne une HTTP Exception, status code 422.
-3. l'__API__ assigner les tâches aux utilisateurs de manière optimale. Si la procédure échoue retourne une HTTP Exception, status code 422.
-4. <span style="color:red"> l'__API__ retourne les données au __back__ ? A discuter.</span>
 
 __avancée des travaux :__
 1. L'endpoint *task_assigner/* va chercher les données auprès du BACK, les prépare, génère une solution mathématique, valide la solution par une batterie de tests, retourne la solution au format JSON formatted string. 
@@ -25,21 +27,38 @@ __avancée des travaux :__
 
 __ensuite:__
 
-1. Se construire un jeu de données réelles (provenant des utilisateurs wandeed) et le stocker dans un dossier à l'intérieur du micro-service afin de :
+1. Se construire un jeu de données réelles (provenant des utilisateurs wandeed) 
+et le stocker dans un dossier à l'intérieur du micro-service afin de :
     - A) S'assurer qu'elle fonctionne dans un nombre de cas maximal.
     - B) A l'avenir : pouvoir s'assurer de la reproductibilité des résultats fournis par le programme.
 
-2. Auprès de quelle URL aller chercher les données ? Si j'ai bien compris, un client Wandeed = une entité à part, une URL? l'URL où aller chercher les données en BDD est donc possiblement un paramètre à précisier lors des requêtes auprès de mon API ?
+2. Auprès de quelle URL aller chercher les données ? Si j'ai bien compris, un client Wandeed = 
+une entité à part, une URL? l'URL où aller chercher les données en BDD est donc possiblement 
+un paramètre à précisier lors des requêtes auprès de mon API ?
 
 
 
+## 2. Planning Optimizer
 
+[__Proof of Concept notebook__](https://github.com/antoineperrot/teamber-IA_microservice/blob/main/demo_notebooks/planning_optimizer.ipynb)
+### Avancée des travaux
+- [x] Aller chercher les données auprès du Back
+- [ ] Gérer les données brutes Wandeed
+    - [x] Nettoyage des horaires utilisateurs
+    - [ ] Découpage des tâches entre les utilisateurs
+    - [ ] Prise en compte des impératifs
+- [ ]
 
+### Tests
 
-## 2. Développement "planning_optimizer" à venir
-
-__avancée des travaux :__
-1. preuve de concept terminée avec des données synthétiques (voir *demo_notebooks/task_assigner.ipynb*)
+- [x] Fonctionnalités de nettoyages des horaires
+- [ ] Prise en compte des impératifs
+- [ ] Programme d'optimisation
+    - [ ] Tester les fonctions de calcul de potentiel
+    - [ ] Tester les fonctions de permutations des tâches
+    - [ ]
+### TODO List
+- Modifier requête pour avoir les niveaux de priorité des tâches
 
 # Notes
 
