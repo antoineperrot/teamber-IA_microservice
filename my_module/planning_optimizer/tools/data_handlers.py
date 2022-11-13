@@ -1,4 +1,8 @@
-from typing import List
+"""
+Fonctions pour préparer les données brutes de Wandeed à l'optimisation
+"""
+
+from typing import List, Tuple
 import pandas as pd
 
 
@@ -103,3 +107,55 @@ def make_horaire_clean(df_hor: pd.DataFrame) -> dict:
         list_df_hor_utl = [pd.DataFrame(_d) for _d in list_dict_hor_utl]
         out[utl] = handler_list_hor_utl(list_df_hor_utl)
     return out
+
+
+def split_data_planning_optimizer(data: dict) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """
+    Split les datas reçues à la sortie de get_data_planning_optimizer en 3 pd.DataFrame:
+    :return df_imp:
+        TODO: à compléter
+
+    :return df_hor: dataframe contenant les horaires des utilisateurs
+        "epu_sfkutilisateur"  -> id de l'utilisateur
+        "epl_xdebutperiode"   -> debut de période d'application de l'horaire
+        "epl_xfinperiode"     -> fin de période d'application de l'horaire
+        "epl_employe_horaire" -> horaire de l'employe
+
+    :return df_tsk:
+        "evt_dduree"          -> duree (en h) de la tâche
+        "evt_spkevenement"    -> id de la tâche
+        "lgl_sfkligneparent"  -> utilisateur concerné
+        "evt_sfkprojet"       -> projet de rattachement de la tâche
+
+    """
+    df_imp = pd.DataFrame(data['imperatifs'])
+    df_hor = pd.DataFrame(data['horaires']).reindex(
+        columns=['epu_sfkutilisateur', 'epl_xdebutperiode', 'epl_xfinperiode', 'epl_employe_horaire'])
+    df_hor.epl_xdebutperiode = pd.to_datetime(df_hor.epl_xdebutperiode).dt.date
+    df_hor.epl_xfinperiode = pd.to_datetime(df_hor.epl_xfinperiode).dt.date
+    df_hor = df_hor.sort_values(by=['epu_sfkutilisateur', 'epl_xdebutperiode']).reset_index(drop=True)
+    df_tsk = pd.DataFrame(data['taches'])
+    return df_imp, df_hor, df_tsk
+
+
+def split_tsk_utl(dict_hor: dict, df_tsk: pd.DataFrame) -> Tuple[dict, List[int]]:
+    """
+    :param dict_hor: dictionnaire des horaires sortant de la fonction make_clean_hor
+    :param df_tsk: pd.DataFrame des taches sur la période concernée
+
+    :return task_to_optimize_dict: un dictionnaire {id_utl:taches_de_utl} à optimiser ensuite pour chaque utl
+    :return utl_without_horaire: la liste des id_utl contenus dans df_tsk, pour qui on souhaiterait donc
+    potentiellement optimiser les emplois du temps, mais pour qui on ne dispose pas des horaires de travail.
+    """
+    task_to_optimize_dict = {}  # {id_utilisateur: df_tache}
+
+    utl_without_horaire = []
+    for utl in df_tsk['lgl_sfkligneparent'].unique():
+        if not utl in dict_hor.keys():
+            # pas d'horaires dispo pour cet utilisateur -> impossible de lancer le programme
+            utl_without_horaire.append(utl)
+        else:
+            df_tsk_utl = df_tsk.loc[df_tsk['lgl_sfkligneparent'] == utl,]
+            task_to_optimize_dict[utl] = df_tsk_utl
+
+    return task_to_optimize_dict, utl_without_horaire
