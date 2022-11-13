@@ -5,7 +5,7 @@
 - *api/* contient tout ce qui relève des interfaces avec le back et le front Wandeed.
 - *api/data_handling/* contient tous les outils permettant le nettoyage des données
 fournies par le back.
-- *my_module/* contient les fonctionnalités d'optimisation, sensées recevoir des données propre.
+- *my_module/* contient les fonctionnalités d'optimisation, sensées recevoir des données propres.
 
 
 ## Fonctionnement général du webservice :
