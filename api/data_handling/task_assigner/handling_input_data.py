@@ -18,7 +18,7 @@ def split_data_task_assigner(data: dict) -> Tuple[pd.DataFrame,pd.DataFrame,pd.D
 
     :return df_tsk:
 
-    :return df_tsk:
+    :return df_dsp:
 
     """
     # recuperation matrice_projet
@@ -35,4 +35,4 @@ def split_data_task_assigner(data: dict) -> Tuple[pd.DataFrame,pd.DataFrame,pd.D
     # recuperation des disponibilites utl :
     df_dsp = pd.DataFrame(data["dispos_utilisateurs"])
 
-    return df_prj, df_cmp, df_tsk, df_tsk
+    return df_prj, df_cmp, df_tsk, df_dsp
