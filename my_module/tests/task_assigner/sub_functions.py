@@ -9,25 +9,6 @@ from fastapi import HTTPException
 
 
 
-def split_data(data):
-    """
-    RECUPERATION DES DONNEES
-    """
-    # recuperation matrice_projet
-    df_prj = pd.DataFrame(data["matrice_projet"])
-    # recuperation matrice_competence : on oublie les compétences pour lesquels les utl sont indéfinis
-    df_cmp = (
-        pd.DataFrame(data["matrice_competence"])
-        .dropna()
-        .reset_index(drop=True)
-        .astype(int)
-    )
-    # recuperation des taches à assigner :
-    df_tsk = pd.DataFrame(data["taches"])
-    # recuperation des disponibilites utl :
-    df_dsp = pd.DataFrame(data["dispos_utilisateurs"])
-
-    return df_prj, df_cmp, df_tsk, df_dsp
 
 
 def flatten_list(list_of_list):
