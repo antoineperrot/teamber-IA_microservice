@@ -5,5 +5,3 @@ class ContrainteEtreSurProjet(Enum):
     OUI = "oui"
     NON = "non"
     DE_PREFERENCE = "de_preference"
-
-

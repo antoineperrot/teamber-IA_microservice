@@ -1,9 +1,26 @@
-from my_module.task_assigner.tools.id_remapping import make_list_ids, make_mapping_dicts_extern_to_local,\
-                                                        make_mapping_dicts_local_to_extern, add_local_ids_in_dfs,\
-                                                            make_usefull_mapping_dicts, remap_df_out
-from my_module.task_assigner.tools.matrix_maker import make_mat_cmp, make_mat_prj, make_mat_spe
-from my_module.task_assigner.tools.problem_formulation import make_A_and_b, make_arcs_and_cost_func
-from my_module.task_assigner.solution_statistics.statistics import make_stat_cmp, make_stat_prj, make_stat_tsk, make_stat_utl
+from my_module.task_assigner.tools.id_remapping import (
+    make_list_ids,
+    make_mapping_dicts_extern_to_local,
+    make_mapping_dicts_local_to_extern,
+    add_local_ids_in_dfs,
+    make_usefull_mapping_dicts,
+    remap_df_out,
+)
+from my_module.task_assigner.tools.matrix_maker import (
+    make_mat_cmp,
+    make_mat_prj,
+    make_mat_spe,
+)
+from my_module.task_assigner.tools.problem_formulation import (
+    make_A_and_b,
+    make_arcs_and_cost_func,
+)
+from my_module.task_assigner.solution_statistics.statistics import (
+    make_stat_cmp,
+    make_stat_prj,
+    make_stat_tsk,
+    make_stat_utl,
+)
 from my_module.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
 
 from typing import Tuple, List
@@ -13,9 +30,16 @@ from scipy.optimize import linprog
 from fastapi import HTTPException
 
 
-def solveur(df_prj: pd.DataFrame, df_cmp: pd.DataFrame, df_tsk: pd.DataFrame, df_dsp: pd.DataFrame,
-            curseur: float, contrainte_etre_sur_projet: ContrainteEtreSurProjet, avantage_projet: float,
-            data_generation=False):
+def solveur(
+    df_prj: pd.DataFrame,
+    df_cmp: pd.DataFrame,
+    df_tsk: pd.DataFrame,
+    df_dsp: pd.DataFrame,
+    curseur: float,
+    contrainte_etre_sur_projet: ContrainteEtreSurProjet,
+    avantage_projet: float,
+    data_generation=False,
+):
     """
     Mettre data_generation=True pour générer des paire (donnees_entree, donnees_sorties) pour ensuite tester les fonctions.
     """
@@ -143,10 +167,9 @@ def solveur(df_prj: pd.DataFrame, df_cmp: pd.DataFrame, df_tsk: pd.DataFrame, df
     return solution
 
 
-def solve_linear_programmation_problem(A: np.ndarray,
-                                       b: np.ndarray,
-                                       cost_func: np.ndarray)\
-        -> Tuple[np.ndarray, str, str]:
+def solve_linear_programmation_problem(
+    A: np.ndarray, b: np.ndarray, cost_func: np.ndarray
+) -> Tuple[np.ndarray, str, str]:
     """
     RESOLUTION DU PROBLEME DE PROGRAMMATION LINEAIRE
     """
@@ -189,24 +212,27 @@ def make_output_dataframe(
             tsk, utl = arcs[j]
             lvl = cost_func[j]
             out = pd.concat(
-                [out,
-                pd.DataFrame(
-                    {
-                        "prj": [d_tsk_to_prj[tsk]],
-                        "tsk": [tsk],
-                        "utl": [utl],
-                        "duree_assignee": [solution_vector[j]],
-                        "tsk_lgt": [d_tsk_to_lgt[tsk]],
-                        "duree_non_assignee": [d_tsk_to_lgt[tsk] - solution_vector[j]],
-                        "dsp_utl": [d_utl_to_dsp[utl]],
-                        "cmp": [d_tsk_to_cmp[tsk]],
-                        "lvl": [lvl],
-                    }
-                )]
+                [
+                    out,
+                    pd.DataFrame(
+                        {
+                            "prj": [d_tsk_to_prj[tsk]],
+                            "tsk": [tsk],
+                            "utl": [utl],
+                            "duree_assignee": [solution_vector[j]],
+                            "tsk_lgt": [d_tsk_to_lgt[tsk]],
+                            "duree_non_assignee": [
+                                d_tsk_to_lgt[tsk] - solution_vector[j]
+                            ],
+                            "dsp_utl": [d_utl_to_dsp[utl]],
+                            "cmp": [d_tsk_to_cmp[tsk]],
+                            "lvl": [lvl],
+                        }
+                    ),
+                ]
             )
 
     out.loc[out["utl"] == "not assigned", "lvl"] = None
     out.sort_values(by=["prj", "tsk", "utl"], inplace=True)
     out.reset_index(drop=True, inplace=True)
     return out
-

@@ -40,14 +40,13 @@ def mock_coherent_data():
     for cmp in range(n_cmp):
         for utl in range(n_utl):
             if mat_cmp[cmp, utl] > 0:
-                df_cmp = df_cmp.append(
-                    {
+                df_cmp = pd.concat([df_cmp,
+                                    pd.DataFrame({
                         "emc_sfkarticle": ids_cmp[cmp],
                         "emc_sniveau": mat_cmp[cmp, utl],
                         "emc_sfkutilisateur": ids_utl[utl],
-                    },
-                    ignore_index=True,
-                )
+                    }, ignore_index=True)
+                ])
     df_cmp = df_cmp.astype(int)
 
     mat_prj = np.random.randint(0, 2, (n_prj, n_utl))
@@ -60,13 +59,13 @@ def mock_coherent_data():
     for prj in range(n_prj):
         for utl in range(n_utl):
             if mat_prj[prj, utl] > 0:
-                df_prj = df_prj.append(
-                    {
+                df_prj = pd.concat([
+                    df_prj,
+                    pd.DataFrame({
                         "utl_spkutilisateur": ids_utl[utl],
                         "int_sfkprojet": ids_prj[prj],
-                    },
-                    ignore_index=True,
-                )
+                    }, ignore_index=True)
+                ])
     df_prj = df_prj.astype(int)
 
     df_tsk = pd.DataFrame(
@@ -81,15 +80,16 @@ def mock_coherent_data():
         p = np.random.uniform(0.1, 0.4)
         duree = np.random.binomial(50, p) / 4
 
-        df_tsk = df_tsk.append(
+        df_tsk = pd.concat([df_tsk,
+                            pd.DataFrame(
             {
                 "evt_dduree": duree,
                 "evt_spkevenement": tsk,
                 "lgl_sfkligneparent": choices(ids_cmp)[0],
                 "evt_sfkprojet": choices(ids_prj)[0],
             },
-            ignore_index=True,
-        )
+            ignore_index=True)
+        ])
 
     for key in df_tsk.columns[1:]:
         df_tsk[key] = df_tsk[key].astype(int)
@@ -106,13 +106,12 @@ def mock_coherent_data():
         p = np.random.uniform(0.1, 0.9)
         n = np_ / p
         dispo = np.random.binomial(n, p)
-        df_dsp = df_dsp.append(
-            {
-                "utl_spkutilisateur": ids_utl[utl],
-                "utl_sdispo": dispo,
-            },
-            ignore_index=True,
-        )
+        df_dsp = pd.concat([df_dsp,
+                            pd.DataFrame({
+                                        "utl_spkutilisateur": ids_utl[utl],
+                                        "utl_sdispo": dispo},
+                                ignore_index=True)
+        ])
     df_dsp = df_dsp.astype(int)
 
     return df_prj, df_cmp, df_tsk, df_dsp

@@ -2,6 +2,7 @@ from typing import Tuple, List
 import numpy as np
 from my_module.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
 
+
 def make_arcs_and_cost_func(
     n_tsk: int,
     n_utl: int,
@@ -27,13 +28,18 @@ def make_arcs_and_cost_func(
             score_cpr = mat_cpr[cmp, utl]  # score compromis
             utl_on_prj = mat_prj[prj, utl]
             if lvl >= 0:
-                if contrainte_etre_sur_projet == ContrainteEtreSurProjet.OUI and utl_on_prj:
+                if (
+                    contrainte_etre_sur_projet == ContrainteEtreSurProjet.OUI
+                    and utl_on_prj
+                ):
                     arcs.append(tuple((tsk, utl)))
                     cost_func.append(score_cpr)
                 elif contrainte_etre_sur_projet == ContrainteEtreSurProjet.NON:
                     arcs.append(tuple((tsk, utl)))
                     cost_func.append(score_cpr)
-                elif contrainte_etre_sur_projet == ContrainteEtreSurProjet.DE_PREFERENCE:
+                elif (
+                    contrainte_etre_sur_projet == ContrainteEtreSurProjet.DE_PREFERENCE
+                ):
                     arcs.append(tuple((tsk, utl)))
                     cost_func.append(score_cpr + avantage_projet)
 

@@ -26,7 +26,9 @@ def make_stat_cmp(df_out: pd.DataFrame) -> pd.DataFrame:
     return stat_cmp
 
 
-def make_stat_utl(df_out: pd.DataFrame, d_utl_to_dsp: dict, utl_to_int: dict) -> pd.DataFrame:
+def make_stat_utl(
+    df_out: pd.DataFrame, d_utl_to_dsp: dict, utl_to_int: dict
+) -> pd.DataFrame:
     """
     Production de statistiques par utilisateur
     """
@@ -56,7 +58,9 @@ def make_stat_utl(df_out: pd.DataFrame, d_utl_to_dsp: dict, utl_to_int: dict) ->
     return stat_utl
 
 
-def make_stat_tsk(df_out: pd.DataFrame, d_tsk_to_lgt: dict, int_to_tsk: dict) -> pd.DataFrame:
+def make_stat_tsk(
+    df_out: pd.DataFrame, d_tsk_to_lgt: dict, int_to_tsk: dict
+) -> pd.DataFrame:
     """
     Production de statistiques par tache
     """

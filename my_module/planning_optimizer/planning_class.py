@@ -3,8 +3,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from .tools.potentiels import *
-from .tools.tools import *
 
 
 class Planning(object):
