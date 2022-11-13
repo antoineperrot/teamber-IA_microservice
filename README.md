@@ -12,7 +12,7 @@ sinon retourne une HTTP Exception, status code 422.
 retourne une HTTP Exception, status code 422.
 4. <span style="color:red"> l'__API__ retourne les données au __back__ ? A discuter.</span>
 
-## 1. Développement "task_assigner" en cours
+## 1. Task Assigner
 
 __avancée des travaux :__
 1. L'endpoint *task_assigner/* va chercher les données auprès du BACK, les prépare, génère une solution mathématique, valide la solution par une batterie de tests, retourne la solution au format JSON formatted string. 
