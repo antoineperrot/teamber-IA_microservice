@@ -16,7 +16,8 @@ def task_assigner(
     curseur: float = 0.0,
     contrainte_etre_sur_projet: str = "de_preference",
     avantage_projet: float = 1.0,
-    url: str = api_url):
+    url: str = api_url,
+):
 
     """
     Fonction d'optimisation de la répartition des tâches au sein d'un groupe de collaborateurs
@@ -64,7 +65,9 @@ def task_assigner(
     contrainte_etre_sur_projet = ContrainteEtreSurProjet(contrainte_etre_sur_projet)
 
     # récupération des données
-    data = get_data_task_assigner(access_token, datein_isoformat, dateout_isoformat, url)
+    data = get_data_task_assigner(
+        access_token, datein_isoformat, dateout_isoformat, url
+    )
     df_prj, df_cmp, df_tsk, df_dsp = split_data_task_assigner(data)
 
     # verification cohérence/qualité données
