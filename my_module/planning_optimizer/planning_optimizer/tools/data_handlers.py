@@ -3,6 +3,9 @@ import pandas as pd
 
 
 def handler_clean_hor(hor: pd.DataFrame) -> pd.DataFrame:
+    """
+    Ré-ordonne les colonnes et les lignes d'un dataframe d'horaires utilisateurs.
+    """
     hor.sort_values(
         by=["eeh_sfkperiode", "eeh_xheuredebut", "eeh_xheurefin"], inplace=True
     )
@@ -15,6 +18,9 @@ def handler_clean_hor(hor: pd.DataFrame) -> pd.DataFrame:
 
 
 def handler_list_hor_utl(list_hor_utl: List[pd.DataFrame]) -> pd.DataFrame:
+    """
+    Concatène un ensemble de dataframe d'horaires utilisateurs en un seul dataframe (appelé union dans la fonction suivante) et le nettoie.
+    """
     list_hor_utl = [handler_clean_hor(hor) for hor in list_hor_utl]
 
     if len(list_hor_utl) == 1:
@@ -30,6 +36,10 @@ def handler_list_hor_utl(list_hor_utl: List[pd.DataFrame]) -> pd.DataFrame:
 
 
 def handler_union_hor(union: pd.DataFrame) -> pd.DataFrame:
+    """
+    Lorsque qu'un dataframe d'horaire est une union d'horaires possible, cette fonction fusionne tous les créneaux
+    horaires pour qu'il n'y ait plus que l'essentiel avec des créneaux propres sans redondance.
+    """
     out = pd.DataFrame({key: [] for key in list(union.columns)})
     temp = pd.DataFrame.copy(union)
 
@@ -66,14 +76,30 @@ def handler_union_hor(union: pd.DataFrame) -> pd.DataFrame:
             final_hd = heure_debut
             final_hf = heure_fin
 
-        final_row = {
-            "eeh_sfkperiode": day,
-            "eeh_xheuredebut": final_hd,
-            "eeh_xheurefin": final_hf,
-        }
+        final_row_df = pd.DataFrame({
+            "eeh_sfkperiode": [day],
+            "eeh_xheuredebut": [final_hd],
+            "eeh_xheurefin": [final_hf],
+        })
 
-        out = out.append(final_row, ignore_index=True)
+
+        out = pd.concat([out, final_row_df], ignore_index=True)
+#         out = out.append(final_row, ignore_index=True)
 
     out["eeh_sfkperiode"] = out["eeh_sfkperiode"].astype(int)
 
+    return out
+
+
+def make_horaire_clean(df_hor: pd.DataFrame) -> dict:
+    """
+    Prend le dataframe d'horaires envoyé par Wandeed pour en faire un dictionnaire
+    propre contenant pour chaque id utilisateur ses horaires sous forme de pd.DataFrame
+    nettoyé et cohérent.
+    """
+    out = {}
+    for utl in df_hor['epu_sfkutilisateur'].unique():
+        list_dict_hor_utl = list(df_hor.loc[df_hor['epu_sfkutilisateur']==utl,]['epl_employe_horaire'])
+        list_df_hor_utl = [pd.DataFrame(_d) for _d in list_dict_hor_utl]
+        out[utl] = handler_list_hor_utl(list_df_hor_utl)
     return out
