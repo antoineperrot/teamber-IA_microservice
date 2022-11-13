@@ -1,6 +1,14 @@
 # Développement d'un microservice IA pour la société TEAMBER
 
-## Organisation du service :
+## Organisation du dépôt
+
+- *api/* contient tout ce qui relève des interfaces avec le back et le front Wandeed.
+- *api/data_handling/* contient tous les outils permettant le nettoyage des données
+fournies par le back.
+- *my_module/* contient les fonctionnalités d'optimisation, sensées recevoir des données propre.
+
+
+## Fonctionnement général du webservice :
 
 1. le __front__ envoie les données légères à l'__API__ (token d'accès BDD, 
 date début sprint, date fin sprint, préferences d'optimisation)
