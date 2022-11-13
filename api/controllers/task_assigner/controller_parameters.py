@@ -1,12 +1,13 @@
 from fastapi import HTTPException
 
 
-def controller_parameters(datein_isoformat,
-                        dateout_isoformat,
-                        curseur,
-                        contrainte_etre_sur_projet,
-                        avantage_projet,
-    ):
+def controller_parameters(
+    datein_isoformat,
+    dateout_isoformat,
+    curseur,
+    contrainte_etre_sur_projet,
+    avantage_projet,
+):
     """
     Vérifie que les valeurs des paramètres sont correctes.
     """

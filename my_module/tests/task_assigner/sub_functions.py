@@ -4,7 +4,6 @@ import numpy as np
 from scipy.optimize import linprog
 
 
-
 def make_arcs_and_cost_func(
     n_tsk: int,
     n_utl: int,
@@ -55,12 +54,14 @@ def make_arcs_and_cost_func(
     return arcs, cost_func, n_arcs
 
 
-def make_A_and_b(n_tsk: int,
-                 n_utl: int,
-                 n_arcs: int,
-                 d_tsk_to_lgt: dict,
-                 d_utl_to_dsp: dict,
-                 arcs: List[tuple]) -> Tuple[np.ndarray, np.ndarray]:
+def make_A_and_b(
+    n_tsk: int,
+    n_utl: int,
+    n_arcs: int,
+    d_tsk_to_lgt: dict,
+    d_utl_to_dsp: dict,
+    arcs: List[tuple],
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     FABRICATION DES MATRICES A et B POUR RESOUDRE AX<=B
     """
@@ -89,10 +90,9 @@ def make_A_and_b(n_tsk: int,
     return A, b
 
 
-
-def solve_linear_programmation_problem(A: np.ndarray,
-                                       b: np.ndarray,
-                                       cost_func: np.ndarray) -> Tuple[np.ndarray, str, str]:
+def solve_linear_programmation_problem(
+    A: np.ndarray, b: np.ndarray, cost_func: np.ndarray
+) -> Tuple[np.ndarray, str, str]:
     """
     RESOLUTION DU PROBLEME DE PROGRAMMATION LINEAIRE
     """
@@ -124,8 +124,8 @@ def make_output_dataframe(
     d_tsk_to_lgt: dict,
     d_tsk_to_cmp: dict,
     d_tsk_to_prj: dict,
-    d_utl_to_dsp: dict)\
-        -> pd.DataFrame:
+    d_utl_to_dsp: dict,
+) -> pd.DataFrame:
     """
     MET EN FORME LA SOLUTION DANS UN DATAFRAME PANDAS
     """
@@ -154,10 +154,3 @@ def make_output_dataframe(
     out.sort_values(by=["prj", "tsk", "utl"], inplace=True)
     out.reset_index(drop=True, inplace=True)
     return out
-
-
-
-
-
-
-

@@ -112,4 +112,3 @@ def make_horaire_clean(df_hor: pd.DataFrame) -> dict:
         list_df_hor_utl = [pd.DataFrame(_d) for _d in list_dict_hor_utl]
         out[utl] = handler_list_hor_utl(list_df_hor_utl)
     return out
-

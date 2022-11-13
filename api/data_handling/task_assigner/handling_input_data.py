@@ -6,7 +6,9 @@ import pandas as pd
 from typing import Tuple
 
 
-def split_data_task_assigner(data: dict) -> Tuple[pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame]:
+def split_data_task_assigner(
+    data: dict,
+) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Split les datas reçues à la sortie de get_data_task_assigner en 4 pd.DataFrame:
 

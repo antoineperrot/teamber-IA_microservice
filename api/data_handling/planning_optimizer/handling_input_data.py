@@ -44,4 +44,3 @@ def split_data_planning_optimizer(
     ).reset_index(drop=True)
     df_tsk = pd.DataFrame(data["taches"])
     return df_imp, df_hor, df_tsk
-
