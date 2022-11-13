@@ -4,6 +4,7 @@ from my_module.task_assigner.tools.id_remapping import make_list_ids, make_mappi
 from my_module.task_assigner.tools.matrix_maker import make_mat_cmp, make_mat_prj, make_mat_spe
 from my_module.task_assigner.tools.problem_formulation import make_A_and_b, make_arcs_and_cost_func
 from my_module.task_assigner.solution_statistics.statistics import make_stat_cmp, make_stat_prj, make_stat_tsk, make_stat_utl
+from my_module.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
 
 from typing import Tuple, List
 import pandas as pd
@@ -12,16 +13,9 @@ from scipy.optimize import linprog
 from fastapi import HTTPException
 
 
-def solveur(
-    df_prj: pd.DataFrame,
-    df_cmp: pd.DataFrame,
-    df_tsk: pd.DataFrame,
-    df_dsp: pd.DataFrame,
-    curseur: float,
-    contrainte_etre_sur_projet: bool,
-    avantage_projet: float,
-    data_generation=False,
-):
+def solveur(df_prj: pd.DataFrame, df_cmp: pd.DataFrame, df_tsk: pd.DataFrame, df_dsp: pd.DataFrame,
+            curseur: float, contrainte_etre_sur_projet: ContrainteEtreSurProjet, avantage_projet: float,
+            data_generation=False):
     """
     Mettre data_generation=True pour générer des paire (donnees_entree, donnees_sorties) pour ensuite tester les fonctions.
     """

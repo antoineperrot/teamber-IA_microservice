@@ -1,6 +1,6 @@
 from typing import Tuple, List
 import numpy as np
-
+from my_module.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
 
 def make_arcs_and_cost_func(
     n_tsk: int,
@@ -10,7 +10,7 @@ def make_arcs_and_cost_func(
     mat_cmp: np.ndarray,
     mat_prj: np.ndarray,
     mat_cpr: np.ndarray,
-    contrainte_etre_sur_projet: bool,
+    contrainte_etre_sur_projet: ContrainteEtreSurProjet,
     avantage_projet: float,
     penalty=-100,
 ) -> Tuple[List[tuple], np.ndarray, int]:
@@ -18,7 +18,6 @@ def make_arcs_and_cost_func(
     FABRICATION DES ARCS RELIANT TACHES A UTILISATEURS POTENTIELS, AINSI QUE FONCTION DE COUT
     """
     arcs = []
-    n_arcs = 0
     cost_func = []
     for tsk in range(n_tsk):
         for utl in range(n_utl):
@@ -27,18 +26,16 @@ def make_arcs_and_cost_func(
             lvl = mat_cmp[cmp, utl]
             score_cpr = mat_cpr[cmp, utl]  # score compromis
             utl_on_prj = mat_prj[prj, utl]
-            if contrainte_etre_sur_projet == "oui":
-                if lvl >= 0 and utl_on_prj:
+            if lvl >= 0:
+                if contrainte_etre_sur_projet == ContrainteEtreSurProjet.OUI and utl_on_prj:
                     arcs.append(tuple((tsk, utl)))
                     cost_func.append(score_cpr)
-            if contrainte_etre_sur_projet == "non":
-                if lvl >= 0:
+                elif contrainte_etre_sur_projet == ContrainteEtreSurProjet.NON:
                     arcs.append(tuple((tsk, utl)))
                     cost_func.append(score_cpr)
-            if contrainte_etre_sur_projet == "de_preference":
-                if lvl >= 0:
+                elif contrainte_etre_sur_projet == ContrainteEtreSurProjet.DE_PREFERENCE:
                     arcs.append(tuple((tsk, utl)))
-                    cost_func.append(score_cpr)
+                    cost_func.append(score_cpr + avantage_projet)
 
     # chaque tache a également la possibilité de ne pas être assignée, ce qui est fortement pénalisé
     for tsk in range(n_tsk):
