@@ -5,7 +5,7 @@ LONGUEUR_MAX = 3.0
 mod_length = 1.0
 seed = 1
 
-test_data_path = "data_test/"
+test_data_path = "test_data/"
 ref_path = "reference_data/"
 
 ref_plagehoraire_path = test_data_path + ref_path + "horaires.json"

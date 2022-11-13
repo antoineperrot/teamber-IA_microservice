@@ -6,7 +6,7 @@ import pytest
 
 def test_calcul_base_planning():
     import pandas as pd
-    from data_test.reference_data.reference_variables import (
+    from test_data.reference_data.reference_variables import (
         ref_plagehoraire_path,
         DATE_DEBUT,
         DATE_FIN,
@@ -27,7 +27,7 @@ def test_calcul_base_planning():
 
 def test_add_imperatifs():
     from module.planning_optimizer.tools import add_imperatifs
-    from data_test.reference_data.reference_variables import (
+    from test_data.reference_data.reference_variables import (
         ref_imperatifs_path,
         ref_base_path,
         ref_base_sans_imperatifs_path,
@@ -48,7 +48,7 @@ def test_add_imperatifs():
 
 def test_split_tasks():
     import pandas as pd
-    from data_test.reference_data.reference_variables import (
+    from test_data.reference_data.reference_variables import (
         ref_tasks_path,
         mod_length,
         ref_splitted_tasks_path,

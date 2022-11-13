@@ -1,13 +1,7 @@
 # from os import sync
 #from curses.ascii import HT
-import sqlite3
-import uvicorn
-from fastapi import Body, FastAPI
-import pandas as pd
+from fastapi import FastAPI
 import requests
-from my_module.task_assigner.sub_functions import *
-from my_module.task_assigner.validation import *
-from my_module.task_assigner.data_mocker import *
 from my_module.test_task_assigner import *
 
 import simplejson
