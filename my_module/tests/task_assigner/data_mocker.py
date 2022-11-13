@@ -1,9 +1,13 @@
+from typing import Tuple, List
 import numpy as np
 import pandas as pd
 from random import choices
+from my_module.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
 
-
-def generate_unique_ids(n):
+def generate_unique_ids(n: int ) -> List[int]:
+    """
+    Génère des listes aléatoires d'id
+    """
     ids = []
     for i in range(n):
         rdm_id = np.random.randint(1000, 10000)
@@ -14,8 +18,10 @@ def generate_unique_ids(n):
     return ids
 
 
-# génère des configurations aléatoires et cohérentes de tailles d'entreprise, nombre de projets, n de cmp, n de tsk.
-def mock_coherent_data():
+def mock_coherent_data() -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """
+    Génère des configurations aléatoires et cohérentes de tailles d'entreprise, nombre de projets, n de cmp, n de tsk.
+    """
     p = 0.7
     N = np.random.randint(7, 70)
     n_prj = np.random.binomial(N * 0.3, p)
@@ -42,11 +48,11 @@ def mock_coherent_data():
             if mat_cmp[cmp, utl] > 0:
                 df_cmp = pd.concat([df_cmp,
                                     pd.DataFrame({
-                        "emc_sfkarticle": ids_cmp[cmp],
-                        "emc_sniveau": mat_cmp[cmp, utl],
-                        "emc_sfkutilisateur": ids_utl[utl],
-                    }, ignore_index=True)
-                ])
+                        "emc_sfkarticle": [ids_cmp[cmp]],
+                        "emc_sniveau": [mat_cmp[cmp, utl]],
+                        "emc_sfkutilisateur": [ids_utl[utl]],
+                    })
+                ], ignore_index=True)
     df_cmp = df_cmp.astype(int)
 
     mat_prj = np.random.randint(0, 2, (n_prj, n_utl))
@@ -62,10 +68,10 @@ def mock_coherent_data():
                 df_prj = pd.concat([
                     df_prj,
                     pd.DataFrame({
-                        "utl_spkutilisateur": ids_utl[utl],
-                        "int_sfkprojet": ids_prj[prj],
-                    }, ignore_index=True)
-                ])
+                        "utl_spkutilisateur": [ids_utl[utl]],
+                        "int_sfkprojet": [ids_prj[prj]],
+                    })
+                ], ignore_index=True)
     df_prj = df_prj.astype(int)
 
     df_tsk = pd.DataFrame(
@@ -83,13 +89,13 @@ def mock_coherent_data():
         df_tsk = pd.concat([df_tsk,
                             pd.DataFrame(
             {
-                "evt_dduree": duree,
-                "evt_spkevenement": tsk,
-                "lgl_sfkligneparent": choices(ids_cmp)[0],
-                "evt_sfkprojet": choices(ids_prj)[0],
+                "evt_dduree": [duree],
+                "evt_spkevenement": [tsk],
+                "lgl_sfkligneparent": [choices(ids_cmp)[0]],
+                "evt_sfkprojet": [choices(ids_prj)[0]],
             },
-            ignore_index=True)
-        ])
+            )
+        ], ignore_index=True)
 
     for key in df_tsk.columns[1:]:
         df_tsk[key] = df_tsk[key].astype(int)
@@ -108,17 +114,20 @@ def mock_coherent_data():
         dispo = np.random.binomial(n, p)
         df_dsp = pd.concat([df_dsp,
                             pd.DataFrame({
-                                        "utl_spkutilisateur": ids_utl[utl],
-                                        "utl_sdispo": dispo},
-                                ignore_index=True)
-        ])
+                                        "utl_spkutilisateur": [ids_utl[utl]],
+                                        "utl_sdispo": [dispo]},
+                                )
+        ], ignore_index=True)
     df_dsp = df_dsp.astype(int)
 
     return df_prj, df_cmp, df_tsk, df_dsp
 
 
-def mock_random_parameters():
+def mock_random_parameters() -> Tuple[float, ContrainteEtreSurProjet, float]:
+    """
+    Génère des paramètres aléatoires de préférences d'optimisation.
+    """
     curseur = np.random.uniform(0, 1)
-    contrainte_etre_sur_projet = choices(["oui", "de_preference", "non"])
+    contrainte_etre_sur_projet = ContrainteEtreSurProjet(choices(["oui", "de_preference", "non"]))
     avantage_projet = np.random.randint(1, 5) * 1.0
     return curseur, contrainte_etre_sur_projet, avantage_projet
