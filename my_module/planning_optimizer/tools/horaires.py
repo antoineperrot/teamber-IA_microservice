@@ -2,6 +2,7 @@
 Module des fonctions servant à manipuler les horaires des utilisateurs
 """
 import pandas as pd
+import datetime
 
 
 def find_first_plage_horaire(df_hor: pd.DataFrame, date_debut: pd.Timestamp) -> int:
@@ -41,3 +42,20 @@ def find_first_plage_horaire(df_hor: pd.DataFrame, date_debut: pd.Timestamp) -> 
 
     first_plage_horaire_index = premieres_plages_horaires_valides.index[0]
     return first_plage_horaire_index
+
+
+def avance_cuseur_temps(curseur_temps: pd.Timestamp, ph: pd.Series) -> pd.Timestamp:
+    """
+    Amène le curseur temps courant à la fin de la prochaine plage horaire ph utilisée.
+    """
+    day_ph = ph['eeh_sfkperiode']
+    if curseur_temps.weekday() <= day_ph:
+        diff_days = day_ph - curseur_temps.weekday()
+    else:
+        diff_days = 7 - (curseur_temps.weekday() - day_ph)
+
+    curseur_temps = curseur_temps + datetime.timedelta(days=int(diff_days))
+    hour_ph = int(ph['eeh_xheurefin'][:2])
+    minutes_ph = int(ph['eeh_xheurefin'][-2:])
+    curseur_temps = curseur_temps.replace(hour=hour_ph, minute=minutes_ph, second=0)
+    return curseur_temps

@@ -1,6 +1,7 @@
 import pandas as pd
 import unittest
 from my_module.planning_optimizer.tools.horaires import find_first_plage_horaire
+from my_module.planning_optimizer.tools.horaires import avance_cuseur_temps
 
 
 class TestFindPremierePlageHoraire(unittest.TestCase):
@@ -78,4 +79,26 @@ class TestFindPremierePlageHoraire(unittest.TestCase):
     def test(self):
         for df_hor, date_debut, expected_result in zip(self.df_hors, self.dates_debut, self.expected_results):
             output_func = find_first_plage_horaire(df_hor, date_debut)
+            self.assertEqual(output_func, expected_result)
+
+
+class TestAvanceCurseurTemps(unittest.TestCase):
+    def setUp(self):
+        self.phs = []
+        self.curseurs_temps = []
+        self.expected_results = []
+
+        # test 1
+        self.phs.append(pd.Series({'eeh_sfkperiode': 0, 'eeh_xheuredebut': '06:30', 'eeh_xheurefin': '10:30'}))
+        self.curseurs_temps.append(pd.Timestamp('2022-09-10 17:00:00+0000', tz='UTC'))
+        self.expected_results.append(pd.Timestamp('2022-09-12 10:30:00+0000', tz='UTC'))
+
+        # test 2
+        self.phs.append(pd.Series({'eeh_sfkperiode': 1, 'eeh_xheuredebut': '11:30', 'eeh_xheurefin': '15:30'}))
+        self.curseurs_temps.append(pd.Timestamp('2022-09-13 12:00:00+0000', tz='UTC'))
+        self.expected_results.append(pd.Timestamp('2022-09-13 15:30:00+0000', tz='UTC'))
+
+    def test(self):
+        for ph, curseur_temps, expected_result in zip(self.phs, self.curseurs_temps, self.expected_results):
+            output_func = avance_cuseur_temps(curseur_temps, ph)
             self.assertEqual(output_func, expected_result)
