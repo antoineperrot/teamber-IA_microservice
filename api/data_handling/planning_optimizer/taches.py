@@ -19,7 +19,7 @@ def split_tsk_utl(dict_hor: dict, df_tsk: pd.DataFrame) -> Tuple[dict, List[int]
 
     utl_without_horaire = []
     for utl in df_tsk["lgl_sfkligneparent"].unique():
-        if not utl in dict_hor.keys():
+        if utl not in dict_hor.keys():
             # pas d'horaires dispo pour cet utilisateur -> impossible de lancer le programme
             utl_without_horaire.append(utl)
         else:
@@ -29,3 +29,25 @@ def split_tsk_utl(dict_hor: dict, df_tsk: pd.DataFrame) -> Tuple[dict, List[int]
             task_to_optimize_dict[utl] = df_tsk_utl
 
     return task_to_optimize_dict, utl_without_horaire
+
+
+def make_clean_task(df_tsk: pd.DataFrame):
+    """
+    Enlève les lignes contenant des NaN.
+    """
+    df_tsk.dropna(inplace=True)
+    df_tsk['evt_sfkprojet'] = df_tsk['evt_sfkprojet'].astype(int)
+    return df_tsk
+
+
+def map_priorite(df_tsk: pd.DataFrame, dict_priorites: dict) -> pd.DataFrame:
+    """
+    :param df_tsk: pd.DataFrame contenant les taches: (id, duree, id_utl, id_projet)
+    :param dict_priorites: dict faisant le mapping id_projet <-> niveau de priorité du projet.
+
+    -> le niveau de priorité de la tâches est alors défini comme étant celui du projet auquel la tâche se réfère.
+
+    :return df_tsk: idem que df_tsk input, avec les niveaux de priorités des tâches en plus.
+    """
+    df_tsk['priorite'] = df_tsk['evt_sfkprojet'].map(dict_priorites)
+    return df_tsk
