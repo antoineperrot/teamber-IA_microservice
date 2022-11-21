@@ -5,27 +5,28 @@ import pandas as pd
 import datetime
 
 
-def find_first_plage_horaire(df_hor: pd.DataFrame, date_debut: pd.Timestamp) -> int:
+def find_next_ph(df_hor: pd.DataFrame, curseur_temps: pd.Timestamp) -> int:
     """
-    Trouve dans le dataframe d'horaire la première plage horaire par laquelle l'utilsateur va commencer son sprint
-    étant donné la date de début du sprint.
+    Trouve dans le dataframe d'horaire la prochaine plage horaire utilisée à remplir étant donné le temps courant
+    curseur_temps.
     Renvoie l'index du data frame de la plage horaire concernée.
     """
-    day0 = date_debut.weekday()
+    day0 = curseur_temps.weekday()
     found = False
 
     while not found:
         premieres_plages_horaires_valides = df_hor.loc[df_hor['eeh_sfkperiode'] == day0]
 
-        on_debut_day = len(premieres_plages_horaires_valides) > 0 and day0 == date_debut.weekday()
+        on_same_day = len(premieres_plages_horaires_valides) > 0 and day0 == curseur_temps.weekday()
 
-        if on_debut_day:
-            # Si on a trouvé des plages horaires qui tombent le premier jour du sprint, il faut prendre celle qui
-            # contient le timestamp de la date début.
-            # Exemple, le sprint commence lundi à 15h, la personne fait 8h-12 et 13h-17h tous les jours. Elle
-            # commence donc le lundi sur sa deuxième plage horaire de 13h à 17h.
+        if on_same_day:
+            # Si on a trouvé des plages horaires qui tombent le même jour que le curseur, il faut prendre celle qui
+            # contient le timestamp du curseur.
+            # Exemple, le curseur est lundi à 15h, la personne fait 8h-12 et 13h-17h tous les jours ouvrés. Sa prochaine
+            # plage est donc le lundi sur sa deuxième plage horaire de 13h à 17h.
+            # On s'occupera ensuite de tronquer.
             premieres_plages_horaires_valides = premieres_plages_horaires_valides.loc[
-                (premieres_plages_horaires_valides['eeh_xheurefin'] >= str(date_debut.time())),
+                (premieres_plages_horaires_valides['eeh_xheurefin'] > str(curseur_temps.time())),
             ]
             found = len(premieres_plages_horaires_valides) > 0
             if not found:
@@ -44,7 +45,7 @@ def find_first_plage_horaire(df_hor: pd.DataFrame, date_debut: pd.Timestamp) -> 
     return first_plage_horaire_index
 
 
-def avance_cuseur_temps(curseur_temps: pd.Timestamp, ph: pd.Series) -> pd.Timestamp:
+def avance_cuseur_temps(curseur_temps: pd.Timestamp, date_fin_sprint: pd.Timestamp, ph: pd.Series) -> pd.Timestamp:
     """
     Amène le curseur temps courant à la fin de la prochaine plage horaire ph utilisée.
     """
@@ -58,4 +59,5 @@ def avance_cuseur_temps(curseur_temps: pd.Timestamp, ph: pd.Series) -> pd.Timest
     hour_ph = int(ph['eeh_xheurefin'][:2])
     minutes_ph = int(ph['eeh_xheurefin'][-2:])
     curseur_temps = curseur_temps.replace(hour=hour_ph, minute=minutes_ph, second=0)
+    curseur_temps = min(curseur_temps, date_fin_sprint)
     return curseur_temps
