@@ -2,10 +2,13 @@
 set installpath=%cd%\test_venv
 echo Install path : %installpath%
 
-echo Installing test venv
-python -m venv "%installpath%"
+echo Removing test_venv if exists
+@RD /S /Q "%installpath%"
 
-echo Activating venv
+echo Installing venv
+python -m test_venv "%installpath%"
+
+echo Activating test_venv
 call "%installpath%\Scripts\activate.bat"
 
 echo Installing requirements
