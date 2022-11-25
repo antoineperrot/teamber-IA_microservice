@@ -18,6 +18,7 @@ def split_tsk_utl(dict_hor: dict, df_tsk: pd.DataFrame) -> Tuple[dict, List[int]
     task_to_optimize_dict = {}  # {id_utilisateur: df_tache}
 
     missing_data_utl = []
+    # TODO: corriger la clé quand j'aurai la bonne
     for utl in df_tsk["lgl_sfkligneparent"].unique():
         if utl not in dict_hor.keys():
             # pas d'horaires dispo pour cet utilisateur -> impossible de lancer le programme
