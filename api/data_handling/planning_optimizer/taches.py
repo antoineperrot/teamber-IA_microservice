@@ -39,7 +39,7 @@ def make_clean_task(df_tsk: pd.DataFrame):
     Enlève les lignes contenant des NaN.
     """
     df_tsk.dropna(inplace=True)
-    df_tsk['evt_sfkprojet'] = df_tsk['evt_sfkprojet'].astype(int)
+    df_tsk["evt_sfkprojet"] = df_tsk["evt_sfkprojet"].astype(int)
     return df_tsk
 
 
@@ -52,5 +52,5 @@ def map_priorite(df_tsk: pd.DataFrame, dict_priorites: dict) -> pd.DataFrame:
 
     :return df_tsk: idem que df_tsk input, avec les niveaux de priorités des tâches en plus.
     """
-    df_tsk['priorite'] = df_tsk['evt_sfkprojet'].map(dict_priorites)
+    df_tsk["priorite"] = df_tsk["evt_sfkprojet"].map(dict_priorites)
     return df_tsk

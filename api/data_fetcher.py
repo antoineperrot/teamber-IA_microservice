@@ -5,6 +5,7 @@ import requests
 
 # TODO: corriger les ValueError
 
+
 def get_data_task_assigner(
     access_token: str, datein_isoformat: str, dateout_isoformat: str, url: str
 ) -> dict:
@@ -69,7 +70,9 @@ def get_data_task_assigner(
         if request.status_code != 200:
             # TODO: add controller
             # Add bonne exception
-            raise ValueError(f"Erreur lors de la récupération des données auprès du BACK: {key}.")
+            raise ValueError(
+                f"Erreur lors de la récupération des données auprès du BACK: {key}."
+            )
         else:
             data[key] = request.json()["result"]
     return data
@@ -88,9 +91,9 @@ def get_data_planning_optimizer(
                 "evt_spkevenement",
                 "evt_sfkprojet",
                 "evt_dduree",
-                "lgl_sfkligneparent", # TODO : à remplacer par clé utilisateur
+                "lgl_sfkligneparent",  # TODO : à remplacer par clé utilisateur
                 "evt_xdate_debut",
-                "evt_xdate_fin"
+                "evt_xdate_fin",
             ],
             "from": "lst_vevenement_py",
             "where": {
@@ -172,7 +175,7 @@ def get_data_planning_optimizer(
                 "evt_spkevenement",
                 "evt_sfkprojet",
                 "evt_dduree",
-                "lgl_sfkligneparent", # TODO : à remplacer par clé utilisateur
+                "lgl_sfkligneparent",  # TODO : à remplacer par clé utilisateur
             ],
             "from": "lst_vevenement_py",
             "where": {
@@ -209,7 +212,9 @@ def get_data_planning_optimizer(
     for key, sql_query in sql_querys_dict.items():
         request = requests.post(url, headers=headers, json=sql_query)
         if request.status_code != 200:
-            raise ValueError(f"Erreur lors de la récupération des données auprès du BACK: {key}.")
+            raise ValueError(
+                f"Erreur lors de la récupération des données auprès du BACK: {key}."
+            )
         else:
             data[key] = request.json()["result"]
     return data

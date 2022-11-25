@@ -5,11 +5,11 @@ from api.tools import return_json
 
 @app.get("/planning_optimizer/")
 def planning_optimizer(
-        access_token: str,
-        datein_isoformat: str,
-        dateout_isoformat: str,
-        id_utl: int,
-        priorite_projets: dict,
+    access_token: str,
+    datein_isoformat: str,
+    dateout_isoformat: str,
+    id_utl: int,
+    priorite_projets: dict,
 ):
     """Fonction d'optimisation des plannings utilisateurs
 

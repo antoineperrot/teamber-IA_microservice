@@ -29,6 +29,7 @@ if app.config["MODE"] == DEV:
 # Import is not at the beginning of the file, because app should be declared before
 # import routes ...
 
+
 @app.errorhandler(Exception)
 def errorhandler(error):
     """
@@ -36,9 +37,27 @@ def errorhandler(error):
     """
     app.logger.error(error)
     if isinstance(error, HTTPException):
-        return jsonify({"statusCode": error.code, "name": error.name, "description": error.description}), error.code
+        return (
+            jsonify(
+                {
+                    "statusCode": error.code,
+                    "name": error.name,
+                    "description": error.description,
+                }
+            ),
+            error.code,
+        )
     # Unhandled error formatting
-    return jsonify({"statusCode": 500, "name": "Internal Server Error", "description": str(error)}), 500
+    return (
+        jsonify(
+            {
+                "statusCode": 500,
+                "name": "Internal Server Error",
+                "description": str(error),
+            }
+        ),
+        500,
+    )
 
 
 @app.before_request
