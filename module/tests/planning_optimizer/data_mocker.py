@@ -43,13 +43,14 @@ def mock_df_tsk(dict_hor: dict) -> pd.DataFrame:
     liste_utl = list(dict_hor.keys())
     n_utl = len(liste_utl)
     n_tasks = 25 * n_utl
-    n_projets = n_utl // 2
+    n_projets = n_utl // 2 + 1
     ids_tasks = generate_unique_ids(n_tasks)
     ids_prj = generate_unique_ids(n_projets)
     duree_tasks = np.round(np.random.randint(1, 4 * 4, n_tasks) / 4, 2)
 
     task_utl = choices(liste_utl, k=n_tasks)
     task_prj = choices(ids_prj, k=n_tasks)
+    # TODO: corriger la clé quand j'aurai la bonne
     out = pd.DataFrame({"evt_dduree": duree_tasks,
                         "evt_spkevenement": ids_tasks,
                         "lgl_sfkligneparent": task_utl,
