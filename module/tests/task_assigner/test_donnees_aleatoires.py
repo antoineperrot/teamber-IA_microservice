@@ -1,12 +1,12 @@
 """
 Teste la validité de solutions calculées sur des données aléatoires.
 """
-from my_module.tests.task_assigner.data_mocker import (
+from module.tests.task_assigner.data_mocker import (
     mock_coherent_data,
     mock_random_parameters,
 )
-from my_module.task_assigner.main import solveur
-from my_module.tests.task_assigner.test_solution import TestSolution
+from module.task_assigner.main import solveur
+from module.tests.task_assigner.test_solution import TestSolution
 
 import unittest
 

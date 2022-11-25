@@ -1,4 +1,4 @@
-from my_module.task_assigner.tools.id_remapping import (
+from module.task_assigner.tools.id_remapping import (
     make_list_ids,
     make_mapping_dicts_extern_to_local,
     make_mapping_dicts_local_to_extern,
@@ -6,22 +6,22 @@ from my_module.task_assigner.tools.id_remapping import (
     make_usefull_mapping_dicts,
     remap_df_out,
 )
-from my_module.task_assigner.tools.matrix_maker import (
+from module.task_assigner.tools.matrix_maker import (
     make_mat_cmp,
     make_mat_prj,
     make_mat_spe,
 )
-from my_module.task_assigner.tools.problem_formulation import (
+from module.task_assigner.tools.problem_formulation import (
     make_A_and_b,
     make_arcs_and_cost_func,
 )
-from my_module.task_assigner.solution_statistics.statistics import (
+from module.task_assigner.solution_statistics.statistics import (
     make_stat_cmp,
     make_stat_prj,
     make_stat_tsk,
     make_stat_utl,
 )
-from my_module.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
+from module.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
 
 from typing import Tuple, List
 import pandas as pd

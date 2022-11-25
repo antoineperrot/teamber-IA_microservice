@@ -1,6 +1,6 @@
 from main import app, api_url
-from my_module.task_assigner.main import solveur
-from my_module.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
+from module.task_assigner.main import solveur
+from module.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
 from api.data_handling.task_assigner.handling_input_data import split_data_task_assigner
 from api.data_fetcher import get_data_task_assigner
 from api.controllers.task_assigner.controller_data import controller_data

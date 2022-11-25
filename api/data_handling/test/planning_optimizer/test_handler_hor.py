@@ -7,13 +7,13 @@ class TestHandlerHor(unittest.TestCase):
     def setUp(self):
         self.input_data = pickle.load(
             open(
-                "my_module/tests/planning_optimizer/test_data/input_handler_hor.pkl",
+                "module/tests/planning_optimizer/test_data/input_handler_hor.pkl",
                 "rb",
             )
         )
         self.expected_output = pickle.load(
             open(
-                "my_module/tests/planning_optimizer/test_data/expected_result_handler_hor.pkl",
+                "module/tests/planning_optimizer/test_data/expected_result_handler_hor.pkl",
                 "rb",
             )
         )

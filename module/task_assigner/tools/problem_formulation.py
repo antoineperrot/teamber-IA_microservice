@@ -1,6 +1,6 @@
 from typing import Tuple, List
 import numpy as np
-from my_module.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
+from module.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
 
 
 def make_arcs_and_cost_func(

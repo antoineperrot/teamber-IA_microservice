@@ -16,8 +16,8 @@ def find_next_ph(df_hor: pd.DataFrame, curseur_temps: pd.Timestamp) -> int:
     str_heure_curseur = str(curseur_temps.time())
     while not found:
         if day0 == curseur_temps.weekday():
-            premieres_plages_horaires_valides = df_hor.loc[ (df_hor['eeh_sfkperiode'] == day0)
-                                                           &(str_heure_curseur < df_hor['eeh_xheurefin'] )]
+            premieres_plages_horaires_valides = df_hor.loc[(df_hor['eeh_sfkperiode'] == day0)
+                                                           & (str_heure_curseur < df_hor['eeh_xheurefin'])]
         else:
             premieres_plages_horaires_valides = df_hor.loc[df_hor['eeh_sfkperiode'] == day0]
         found = len(premieres_plages_horaires_valides) > 0
@@ -47,11 +47,17 @@ def avance_cuseur_temps(curseur_temps: pd.Timestamp, date_fin_sprint: pd.Timesta
 
 
 # TODO: YA plus qua tester cette fonction et que ca marche bien aux bords
-def make_df_ph(plages_horaires_df, date_debut, date_fin):
+def make_df_ph(plages_horaires_df: pd.DataFrame, date_debut: str, date_fin: str) -> pd.DataFrame:
+    """
+    :param plages_horaires_df: pd.DataFrame des horaires d'un utilisateur
+    :param date_debut: str au format ISO, date de début du sprint
+    :param date_fin: str au format ISO, date de fin du sprint
+    """
+    date_debut = pd.Timestamp(date_debut)
+    date_fin = pd.Timestamp(date_fin)
     curseur_temps = date_debut
 
     sequence_ph = []
-
     while curseur_temps < date_fin:
         index_next_ph = find_next_ph(plages_horaires_df, curseur_temps)
         next_ph = plages_horaires_df.iloc[index_next_ph]
@@ -66,8 +72,9 @@ def make_df_ph(plages_horaires_df, date_debut, date_fin):
 
     out = pd.concat(sequence_ph)
 
-    out.loc[out['timestamp_debut'] < date_debut]['timestamp_debut'] = date_debut
-    out.loc[out['timestamp_fin'] > date_fin]['timestamp_fin'] = date_fin
+    out.loc[out['timestamp_debut'] < date_debut, 'timestamp_debut'] = date_debut
+    out.loc[out['timestamp_fin'] > date_fin, 'timestamp_fin'] = date_fin
 
     out = out[['timestamp_debut', 'timestamp_fin']]
+    out.reset_index(inplace=True, drop=True)
     return out
