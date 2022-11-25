@@ -1,14 +1,14 @@
 import datetime
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-
-# AUTRES FONCTIONS :
 
 # Calcule la base du planning, supprime les plages horaires < LONGUEUR MIN
+
+
 def calcul_base_planning(
-    plage_horaire_df: pd.DataFrame, DATE_DEBUT, DATE_FIN, LONGUEUR_MIN: float = 0.5
-):
+    """
+    """
+    plage_horaire_df: pd.DataFrame, DATE_DEBUT, DATE_FIN, LONGUEUR_MIN: float = 0.5):
 
     DATE_DEBUT = pd.to_datetime(DATE_DEBUT)
     DATE_FIN = pd.to_datetime(DATE_FIN)

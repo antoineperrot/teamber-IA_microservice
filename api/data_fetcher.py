@@ -1,12 +1,16 @@
+"""
+Module de récupération des données auprès du BACK.
+"""
 import requests
 
-from api.tools import return_json
-from fastapi import HTTPException
-
+# TODO: corriger les ValueError
 
 def get_data_task_assigner(
     access_token: str, datein_isoformat: str, dateout_isoformat: str, url: str
 ) -> dict:
+    """
+    Va chercher auprès du Back les données nécessaires à l'optimisation de l'assignation des tâches.
+    """
     data = {}
     sql_querys_dict = {
         "matrice_projet": {
@@ -64,14 +68,8 @@ def get_data_task_assigner(
         request = requests.post(url, headers=headers, json=sql_query)
         if request.status_code != 200:
             # TODO: add controller
-            raise HTTPException(
-                status_code=424,
-                detail=f"Erreur lors de la récupération des données auprès du BACK: {key}.",
-                headers={
-                    "status_code_BACK": str(request.status_code),
-                    "sql_query_to_BACK": return_json(sql_query),
-                },
-            )
+            # Add bonne exception
+            raise ValueError(f"Erreur lors de la récupération des données auprès du BACK: {key}.")
         else:
             data[key] = request.json()["result"]
     return data
@@ -90,7 +88,9 @@ def get_data_planning_optimizer(
                 "evt_spkevenement",
                 "evt_sfkprojet",
                 "evt_dduree",
-                "lgl_sfkligneparent",
+                "lgl_sfkligneparent", # TODO : à remplacer par clé utilisateur
+                "evt_xdate_debut",
+                "evt_xdate_fin"
             ],
             "from": "lst_vevenement_py",
             "where": {
@@ -172,7 +172,7 @@ def get_data_planning_optimizer(
                 "evt_spkevenement",
                 "evt_sfkprojet",
                 "evt_dduree",
-                "lgl_sfkligneparent",
+                "lgl_sfkligneparent", # TODO : à remplacer par clé utilisateur
             ],
             "from": "lst_vevenement_py",
             "where": {
@@ -209,14 +209,7 @@ def get_data_planning_optimizer(
     for key, sql_query in sql_querys_dict.items():
         request = requests.post(url, headers=headers, json=sql_query)
         if request.status_code != 200:
-            raise HTTPException(
-                status_code=424,
-                detail=f"Erreur lors de la récupération des données auprès du BACK: {key}.",
-                headers={
-                    "status_code_BACK": str(request.status_code),
-                    "sql_query_to_BACK": return_json(sql_query),
-                },
-            )
+            raise ValueError(f"Erreur lors de la récupération des données auprès du BACK: {key}.")
         else:
             data[key] = request.json()["result"]
     return data

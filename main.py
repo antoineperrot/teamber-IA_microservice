@@ -1,12 +1,14 @@
 from fastapi import FastAPI, HTTPException
 import requests
-from my_module.test_task_assigner import *
+
 
 api_url = "https://teamber.api.wandeed.com/api/lst/search?offset=0&limit=500"
 
 # Instanciation de l'app
 app = FastAPI()
 
+from api.routes.planning_optimizer import *
+from api.routes.task_assigner import *
 
 
 

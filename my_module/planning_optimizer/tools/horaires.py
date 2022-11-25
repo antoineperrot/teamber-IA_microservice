@@ -44,3 +44,30 @@ def avance_cuseur_temps(curseur_temps: pd.Timestamp, date_fin_sprint: pd.Timesta
     curseur_temps = curseur_temps.replace(hour=hour_ph, minute=minutes_ph, second=0)
     curseur_temps = min(curseur_temps, date_fin_sprint)
     return curseur_temps
+
+
+# TODO: YA plus qua tester cette fonction et que ca marche bien aux bords
+def make_df_ph(plages_horaires_df, date_debut, date_fin):
+    curseur_temps = date_debut
+
+    sequence_ph = []
+
+    while curseur_temps < date_fin:
+        index_next_ph = find_next_ph(plages_horaires_df, curseur_temps)
+        next_ph = plages_horaires_df.iloc[index_next_ph]
+        next_ph_dict = next_ph.to_dict()
+        curseur_temps = avance_cuseur_temps(curseur_temps, date_fin, next_ph)
+        next_ph_dict['timestamp_fin'] = curseur_temps
+        next_ph_dict['timestamp_debut'] = curseur_temps.replace(hour=int(next_ph.eeh_xheuredebut[:2]),
+                                                                minute=int(next_ph.eeh_xheuredebut[-2:]),
+                                                                second=0)
+        if next_ph_dict['timestamp_debut'] < date_fin:
+            sequence_ph.append(pd.DataFrame([next_ph_dict]))
+
+    out = pd.concat(sequence_ph)
+
+    out.loc[out['timestamp_debut'] < date_debut]['timestamp_debut'] = date_debut
+    out.loc[out['timestamp_fin'] > date_fin]['timestamp_fin'] = date_fin
+
+    out = out[['timestamp_debut', 'timestamp_fin']]
+    return out

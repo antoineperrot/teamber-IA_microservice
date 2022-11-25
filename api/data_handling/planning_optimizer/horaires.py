@@ -9,6 +9,7 @@ import pandas as pd
 def handler_clean_hor(hor: pd.DataFrame) -> pd.DataFrame:
     """
     Ré-ordonne les colonnes et les lignes d'un dataframe d'horaires utilisateurs.
+    - retire 1 à l'index des jours de la semaine pour que le lundi corresponde au jour 0 et pas 1.
     """
     hor.sort_values(
         by=["eeh_sfkperiode", "eeh_xheuredebut", "eeh_xheurefin"], inplace=True
@@ -18,6 +19,7 @@ def handler_clean_hor(hor: pd.DataFrame) -> pd.DataFrame:
 
     hor = hor.loc[hor["eeh_xheuredebut"] <= hor["eeh_xheurefin"]]
     hor.reset_index(drop=True, inplace=True)
+    hor["eeh_sfkperiode"] = hor["eeh_sfkperiode"] - 1
     return hor
 
 

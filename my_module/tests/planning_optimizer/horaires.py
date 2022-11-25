@@ -9,6 +9,9 @@ class TestFindNextPlageHoraire(unittest.TestCase):
         self.df_hors = []
         self.curseurs_temps = []
 
+        # TODO : rajouter un test pour quand curseur temps = fin de la précédente plage horaire.
+        # TODO : rajouter un test pour quand heure curseur temps = début dune plage horaire
+
         self.df_hors.append(pd.DataFrame({'eeh_sfkperiode': {0: 0, 1: 0, 2: 1, 3: 1, 4: 2, 5: 2, 6: 3, 7: 3, 8: 4},
                                           'eeh_xheuredebut': {0: '06:30',
                                                               1: '11:30',

@@ -12,23 +12,26 @@ def split_tsk_utl(dict_hor: dict, df_tsk: pd.DataFrame) -> Tuple[dict, List[int]
     :param df_tsk: pd.DataFrame des taches sur la période concernée
 
     :return task_to_optimize_dict: un dictionnaire {id_utl:taches_de_utl} à optimiser ensuite pour chaque utl
-    :return utl_without_horaire: la liste des id_utl contenus dans df_tsk, pour qui on souhaiterait donc
-    potentiellement optimiser les emplois du temps, mais pour qui on ne dispose pas des horaires de travail.
+    :return missing_data_utl: la liste des id_utl pour qui l'on manque de données: soit on ne connaît pas leurs
+    horaires, soit ils n'ont pas de tâches assignées dans df_tsk.
     """
     task_to_optimize_dict = {}  # {id_utilisateur: df_tache}
 
-    utl_without_horaire = []
+    missing_data_utl = []
     for utl in df_tsk["lgl_sfkligneparent"].unique():
         if utl not in dict_hor.keys():
             # pas d'horaires dispo pour cet utilisateur -> impossible de lancer le programme
-            utl_without_horaire.append(utl)
+            missing_data_utl.append(utl)
         else:
             df_tsk_utl = df_tsk.loc[
                 df_tsk["lgl_sfkligneparent"] == utl,
             ]
-            task_to_optimize_dict[utl] = df_tsk_utl
+            if len(df_tsk_utl) > 0:
+                # si l'utilisateur a effectivement des tâches qui lui sont assignées, on va pouvoir optimizer
+                # son emploi du temps.
+                task_to_optimize_dict[utl] = df_tsk_utl
 
-    return task_to_optimize_dict, utl_without_horaire
+    return task_to_optimize_dict, missing_data_utl
 
 
 def make_clean_task(df_tsk: pd.DataFrame):
