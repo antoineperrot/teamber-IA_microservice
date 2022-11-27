@@ -27,11 +27,11 @@ def split_n_clean_taches(df_tsk: pd.DataFrame) -> dict:
         if len(df_tsk_utl) > 0:
             # si l'utilisateur a effectivement des tâches qui lui sont assignées, on va pouvoir optimizer
             # son emploi du temps.
-            taches[utl] = df_tsk_utl
+            taches[utl] = df_tsk_utl.reset_index(drop=True)
     return taches
 
 
-def map_priorite(df_tsk: pd.DataFrame, priorites_projets: dict) -> pd.DataFrame:
+def map_priorites_projets(df_tsk: pd.DataFrame, priorites_projets: dict) -> pd.DataFrame:
     """
     :param df_tsk: pd.DataFrame contenant les taches: (id, duree, id_utl, id_projet)
     :param priorites_projets: dict faisant le mapping id_projet <-> niveau de priorité du projet.

@@ -11,7 +11,7 @@ import pandas as pd
 from api.loggers import logger_planning_optimizer
 from api.back_connector.planning_optimizer.data_handlers.imperatifs import split_n_clean_impertifs
 from api.back_connector.planning_optimizer.data_handlers.horaires import split_n_clean_horaires
-from api.back_connector.planning_optimizer.data_handlers.taches import split_n_clean_taches, map_priorite
+from api.back_connector.planning_optimizer.data_handlers.taches import split_n_clean_taches, map_priorites_projets
 
 
 def filtre(df_imp: pd.DataFrame, df_hor: pd.DataFrame, df_tsk: pd.DataFrame, priorites_projets: dict) \
@@ -21,7 +21,7 @@ def filtre(df_imp: pd.DataFrame, df_hor: pd.DataFrame, df_tsk: pd.DataFrame, pri
     l'optimisation.
     """
 
-    df_tsk = map_priorite(df_tsk, priorites_projets)
+    df_tsk = map_priorites_projets(df_tsk, priorites_projets)
     taches = split_n_clean_taches(df_tsk)
     imperatifs = split_n_clean_impertifs(df_imp)
     horaires = split_n_clean_horaires(df_hor)
