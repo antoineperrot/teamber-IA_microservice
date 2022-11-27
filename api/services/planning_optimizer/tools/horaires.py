@@ -52,7 +52,6 @@ def avance_cuseur_temps(
     return curseur_temps
 
 
-# TODO: YA plus qua tester cette fonction et que ca marche bien aux bords
 def make_df_ph(
     plages_horaires_df: pd.DataFrame, date_debut: str, date_fin: str
 ) -> pd.DataFrame:
