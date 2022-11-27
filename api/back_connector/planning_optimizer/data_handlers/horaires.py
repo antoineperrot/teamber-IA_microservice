@@ -91,25 +91,25 @@ def handler_union_hor(union: pd.DataFrame) -> pd.DataFrame:
         )
 
         out = pd.concat([out, final_row_df], ignore_index=True)
-    
+
     out["eeh_sfkperiode"] = out["eeh_sfkperiode"].astype(int)
 
     return out
 
 
-def make_horaire_clean(df_hor: pd.DataFrame) -> dict:
+def split_n_clean_horaires(df_hor: pd.DataFrame) -> dict:
     """
     Prend le dataframe d'horaires envoyé par Wandeed pour en faire un dictionnaire
     propre contenant pour chaque id utilisateur ses horaires sous forme de pd.DataFrame
     nettoyé et cohérent.
     """
-    out = {}
+    horaires = {}
     for utl in df_hor["epu_sfkutilisateur"].unique():
-        list_dict_hor_utl = list(
+        list_horaires_utl = list(
             df_hor.loc[
                 df_hor["epu_sfkutilisateur"] == utl,
             ]["epl_employe_horaire"]
         )
-        list_df_hor_utl = [pd.DataFrame(_d) for _d in list_dict_hor_utl]
-        out[utl] = handler_list_hor_utl(list_df_hor_utl)
-    return out
+        list_df_hor_utl = [pd.DataFrame(_d) for _d in list_horaires_utl]
+        horaires[utl] = handler_list_hor_utl(list_df_hor_utl)
+    return horaires

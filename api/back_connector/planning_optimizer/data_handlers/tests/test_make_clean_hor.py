@@ -1,16 +1,16 @@
 """
-Test la fonction make_horaire_clean
+Test la fonction split_n_clean_horaires
 """
 import pickle
 import unittest
 from pandas.testing import assert_frame_equal
 
-from api.back_connector.planning_optimizer.data_handlers import make_horaire_clean
+from api.back_connector.planning_optimizer.data_handlers import split_n_clean_horaires
 
 
 class TestMakeCleanHor(unittest.TestCase):
     """
-    Test la fonction make_horaire_clean
+    Test la fonction split_n_clean_horaires
     """
 
     def setUp(self):
@@ -28,7 +28,7 @@ class TestMakeCleanHor(unittest.TestCase):
         )
 
     def test_make_clean_hor(self):
-        output_func = make_horaire_clean(self.input_value)
+        output_func = split_n_clean_horaires(self.input_value)
 
         set_keys_output_func = set(output_func.keys())
         set_keys_expected_result = set(self.expected_result.keys())

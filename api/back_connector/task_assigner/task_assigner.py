@@ -5,7 +5,7 @@ import pandas as pd
 from api.back_connector.tools import make_sql_requests
 
 
-def fetch_data(access_token: str, datein_isoformat: str, dateout_isoformat: str, url: str) -> dict:
+def fetch_data(access_token: str, date_start: str, date_end: str, url: str) -> dict:
     """
     Va chercher auprès du Back les données nécessaires à l'optimisation de l'assignation des tâches.
 
@@ -49,14 +49,14 @@ def fetch_data(access_token: str, datein_isoformat: str, dateout_isoformat: str,
                         "field": "evt_xdate_debut",
                         "operator": "greaterthan",
                         "type": "date",
-                        "value": f"{datein_isoformat}",
+                        "value": f"{date_start}",
                     },
                     {
                         "label": "evt_xdate_fin",
                         "field": "evt_xdate_fin",
                         "operator": "lessthan",
                         "type": "date",
-                        "value": f"{dateout_isoformat}",
+                        "value": f"{date_end}",
                     },
                     {
                         "label": "lgl_sfkligneparent",

@@ -1,12 +1,15 @@
 """
 Module de récupération des données auprès du BACK pour la fonctionnalité planning_optimizer.
 """
-from api.back_connector.tools import make_sql_requests
 import pandas as pd
+from typing import Tuple
+from api.back_connector.tools import make_sql_requests
+from api.back_connector.planning_optimizer.data_handlers.filtrage import filtre
 
 
 # TODO: corriger les ValueError
-def fetch_data(url: str, access_token: str, date_start: str, date_end: str) -> dict:
+def fetch_data(url: str, access_token: str, date_start: str, date_end: str, priorites_projets: dict)\
+        -> Tuple[dict, dict, dict, list]:
     """
     Prépare et envoie les requêtes SQL auprès du Back Wandeed qui renvoie les données demandées.
 
@@ -14,6 +17,8 @@ def fetch_data(url: str, access_token: str, date_start: str, date_end: str) -> d
     :param access_token: token d'accès à la base de données du back
     :param date_start: date de début du sprint à optimiser, au format ISO. example : "2022-10-03T06:31:00.000Z"
     :param date_end: date de FIN du sprint à optimiser, au format ISO. example : "2022-10-10T18:30:00.000Z"
+    :param priorites_projets: dictionnaire de la forme {id_projet (int):niveau_priorite_projet (int)}.
+                             Niveau le plus important: 0.
 
     :return df_imp:
         TODO: à compléter
@@ -30,7 +35,6 @@ def fetch_data(url: str, access_token: str, date_start: str, date_end: str) -> d
         "lgl_sfkligneparent"  -> utilisateur concerné # TODO: corriger clé
         "evt_sfkprojet"       -> projet de rattachement de la tâche
     """
-    data = {}
     sql_querys_dict = {
         "imperatifs": {
             "select": [
@@ -172,7 +176,6 @@ def fetch_data(url: str, access_token: str, date_start: str, date_end: str) -> d
     ).reset_index(drop=True)
     df_tsk = pd.DataFrame(data["taches"])
 
-    return df_imp, df_hor, df_tsk
-
-
-
+    imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires =\
+        filtre(df_imp, df_hor, df_tsk, priorites_projets)
+    return imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires

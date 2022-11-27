@@ -2,8 +2,8 @@ from fastapi import HTTPException
 
 
 def controller_parameters(
-    datein_isoformat,
-    dateout_isoformat,
+    date_start,
+    date_end,
     curseur,
     contrainte_etre_sur_projet,
     avantage_projet,
@@ -23,27 +23,27 @@ def controller_parameters(
             detail=f"Le paramètre 'curseur' est incorrect. Valeur spécifiée par l'utilisateur:  {curseur}.\n 'curseur' est un flottant compris entre 0 et 1.",
         )
 
-    if not isinstance(datein_isoformat, str):
+    if not isinstance(date_start, str):
         raise HTTPException(
-            status_code=422, detail="'datein_isoformat' doit être de  string."
+            status_code=422, detail="'date_start' doit être de  string."
         )
 
-    if not isinstance(dateout_isoformat, str):
+    if not isinstance(date_end, str):
         raise HTTPException(
-            status_code=422, detail="'dateout_isoformat' doit être de  string."
+            status_code=422, detail="'date_end' doit être de  string."
         )
 
     # try :
-    #     datetime.datetime.fromisoformat(datein_isoformat)
+    #     datetime.datetime.fromisoformat(date_start)
     # except:
     #     raise HTTPException(status_code=422,
-    #                             detail=f"Invalid isoformat string for 'datein_isoformat': {datein_isoformat}")
+    #                             detail=f"Invalid isoformat string for 'date_start': {date_start}")
 
     # try :
-    #     datetime.datetime.fromisoformat(dateout_isoformat)
+    #     datetime.datetime.fromisoformat(date_end)
     # except:
     #     raise HTTPException(status_code=422,
-    #                             detail=f"Invalid isoformat string for 'dateout_isoformat': {dateout_isoformat}")
+    #                             detail=f"Invalid isoformat string for 'date_end': {date_end}")
 
     if not isinstance(contrainte_etre_sur_projet, str):
         raise HTTPException(

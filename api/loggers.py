@@ -8,6 +8,10 @@ formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(messag
 file_handler.setFormatter(formatter)
 file_handler.setLevel(logging.DEBUG)
 
-root_logger = logging.getLogger("MY_API_REST")
+root_logger = logging.getLogger("API")
 root_logger.setLevel(logging.DEBUG)
 root_logger.addHandler(file_handler)
+
+
+logger_planning_optimizer = root_logger.getChild("PLANNING_OPTIMIZER")
+logger_task_assigner = root_logger.getChild("TASK_ASSIGNER")

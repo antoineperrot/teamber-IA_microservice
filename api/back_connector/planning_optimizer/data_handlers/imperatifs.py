@@ -4,7 +4,7 @@ Fonctions pour préparer les données impératifs brut de Wandeed à l'optimisat
 import pandas as pd
 
 
-def split_imp(df_imp: pd.DataFrame) -> dict:
+def split_n_clean_impertifs(df_imp: pd.DataFrame) -> dict:
     """
     Sépare le fichier d'entrée des impératifs en un dictionnaire {id_utilsateur:impératif_utilisateur}
     """

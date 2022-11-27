@@ -1,13 +1,27 @@
 """
 Module contenant les fonctions de mockage de données pour la fonctionnalité Planning Optimizer.
 """
-import pandas as pd
+from typing import List
 import numpy as np
+import pandas as pd
 from random import choices
-from module.tests.task_assigner import generate_unique_ids
 
 
-def mock_dict_priorites_projets(df_tsk: pd.DataFrame) -> dict:
+def generate_unique_ids(n: int) -> List[int]:
+    """
+    Génère des listes aléatoires d'id
+    """
+    ids = []
+    for i in range(n):
+        rdm_id = np.random.randint(1000, 10000)
+        while rdm_id in ids:
+            rdm_id = np.random.randint(10, 1000)
+        ids.append(rdm_id)
+    ids = np.sort(ids)
+    return ids
+
+
+def mock_priorites_projets_projets(df_tsk: pd.DataFrame) -> dict:
     """
     Génère un dictionnaire aléatoire et pertinent de correspondances id_projet <-> niveau de priorités.
 

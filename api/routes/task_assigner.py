@@ -16,8 +16,8 @@ from api.controllers.task_assigner.controller_parameters import controller_param
 @api_key_required
 def task_assigner(access_token: str,
                 url: str,
-                datein_isoformat: str,
-                dateout_isoformat: str,
+                date_start: str,
+                date_end: str,
                 curseur: float = 0.0,
                 contrainte_etre_sur_projet: str = "de_preference",
                 avantage_projet: float = 1.0):
@@ -33,9 +33,9 @@ def task_assigner(access_token: str,
 
         access_token: str, token pour accéder à la BDD.
 
-        datein_isoformat:  date de début au format ISO du sprint pour la sélection des tâches auprès du BACK
+        date_start:  date de début au format ISO du sprint pour la sélection des tâches auprès du BACK
 
-        dateout_isoformat: date de fin au format ISO du sprint pour la sélection des tâches auprès du BACK
+        date_end: date de fin au format ISO du sprint pour la sélection des tâches auprès du BACK
 
         curseur: float compris entre 0 et 1 (valeur par défaut 0). Pour une valeur de 0, l'algorithme tente de maximiser
         le niveau de compétence auquel est réalisé une heure de travail; à 1 il cherche à affecter la tâche à une
@@ -57,8 +57,8 @@ def task_assigner(access_token: str,
 
     """
     controller_parameters(
-        datein_isoformat,
-        dateout_isoformat,
+        date_start,
+        date_end,
         curseur,
         contrainte_etre_sur_projet,
         avantage_projet,
@@ -69,7 +69,7 @@ def task_assigner(access_token: str,
 
     # récupération des données
     data = get_data_task_assigner(
-        access_token, datein_isoformat, dateout_isoformat, url
+        access_token, date_start, date_end, url
     )
     df_prj, df_cmp, df_tsk, df_dsp = split_data_task_assigner(data)
 
