@@ -4,7 +4,7 @@ Module contenant les fonctions de mockage de données pour la fonctionnalité Pl
 import pandas as pd
 import numpy as np
 from random import choices
-from module.tests.task_assigner.data_mocker import generate_unique_ids
+from module.tests.task_assigner import generate_unique_ids
 
 
 def mock_dict_priorites_projets(df_tsk: pd.DataFrame) -> dict:

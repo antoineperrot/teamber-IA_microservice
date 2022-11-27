@@ -1,88 +1,34 @@
 """
-Module de récupération des données auprès du BACK.
+Module de récupération des données auprès du BACK pour la fonctionnalité planning_optimizer.
 """
-import requests
+from api.back_connector.tools import make_sql_requests
+import pandas as pd
+
 
 # TODO: corriger les ValueError
-
-
-def get_data_task_assigner(
-    access_token: str, datein_isoformat: str, dateout_isoformat: str, url: str
-) -> dict:
-    """
-    Va chercher auprès du Back les données nécessaires à l'optimisation de l'assignation des tâches.
-    """
-    data = {}
-    sql_querys_dict = {
-        "matrice_projet": {
-            "select": ["utl_spkutilisateur", "int_sfkprojet"],
-            "from": "lst_vprojet_utilisateur_py",
-        },
-        "dispos_utilisateurs": {
-            "select": ["utl_spkutilisateur", "utl_sdispo"],
-            "from": "lst_vdispo_py",
-        },
-        "matrice_competence": {
-            "select": ["emc_sfkutilisateur", "emc_sfkarticle", "emc_sniveau"],
-            "from": "lst_vcompetence_py",
-        },
-        "taches": {
-            "select": [
-                "evt_spkevenement",
-                "evt_sfkprojet",
-                "evt_dduree",
-                "lgl_sfkligneparent",
-            ],
-            "from": "lst_vevenement_py",
-            "where": {
-                "condition": "and",
-                "rules": [
-                    {
-                        "label": "evt_xdate_debut",
-                        "field": "evt_xdate_debut",
-                        "operator": "greaterthan",
-                        "type": "date",
-                        "value": f"{datein_isoformat}",
-                    },
-                    {
-                        "label": "evt_xdate_fin",
-                        "field": "evt_xdate_fin",
-                        "operator": "lessthan",
-                        "type": "date",
-                        "value": f"{dateout_isoformat}",
-                    },
-                    {
-                        "label": "lgl_sfkligneparent",
-                        "field": "lgl_sfkligneparent",
-                        "operator": "isnotnull",
-                        "type": "integer",
-                        "value": "none",
-                    },
-                ],
-            },
-        },
-    }
-
-    headers = {"Authorization": f"{access_token}", "Content-Type": "application/json"}
-
-    for key, sql_query in sql_querys_dict.items():
-        request = requests.post(url, headers=headers, json=sql_query)
-        if request.status_code != 200:
-            # TODO: add controller
-            # Add bonne exception
-            raise ValueError(
-                f"Erreur lors de la récupération des données auprès du BACK: {key}."
-            )
-        else:
-            data[key] = request.json()["result"]
-    return data
-
-
-def get_data_planning_optimizer(
-    access_token: str, datein_isoformat: str, dateout_isoformat: str, url: str
-) -> dict:
+def fetch_data(url: str, access_token: str, date_start: str, date_end: str) -> dict:
     """
     Prépare et envoie les requêtes SQL auprès du Back Wandeed qui renvoie les données demandées.
+
+    :param url: url de la base de données du back
+    :param access_token: token d'accès à la base de données du back
+    :param date_start: date de début du sprint à optimiser, au format ISO. example : "2022-10-03T06:31:00.000Z"
+    :param date_end: date de FIN du sprint à optimiser, au format ISO. example : "2022-10-10T18:30:00.000Z"
+
+    :return df_imp:
+        TODO: à compléter
+
+    :return df_hor: dataframe contenant les horaires des utilisateurs
+        "epu_sfkutilisateur"  -> id de l'utilisateur
+        "epl_xdebutperiode"   -> debut de période d'application de l'horaire
+        "epl_xfinperiode"     -> fin de période d'application de l'horaire
+        "epl_employe_horaire" -> horaire de l'employe
+
+    :return df_tsk:
+        "evt_dduree"          -> duree (en h) de la tâche
+        "evt_spkevenement"    -> id de la tâche
+        "lgl_sfkligneparent"  -> utilisateur concerné # TODO: corriger clé
+        "evt_sfkprojet"       -> projet de rattachement de la tâche
     """
     data = {}
     sql_querys_dict = {
@@ -104,14 +50,14 @@ def get_data_planning_optimizer(
                         "field": "evt_xdate_debut",
                         "operator": "greaterthan",
                         "type": "date",
-                        "value": f"{datein_isoformat}",
+                        "value": f"{date_start}",
                     },
                     {
                         "label": "evt_xdate_fin",
                         "field": "evt_xdate_fin",
                         "operator": "lessthan",
                         "type": "date",
-                        "value": f"{dateout_isoformat}",
+                        "value": f"{date_end}",
                     },
                     {
                         "label": "lgl_sfkligneparent",
@@ -158,14 +104,14 @@ def get_data_planning_optimizer(
                         "field": "epl_xdebutperiode",
                         "operator": "lessthan",
                         "type": "date",
-                        "value": f"{dateout_isoformat}",
+                        "value": f"{date_end}",
                     },
                     {
                         "label": "epl_xfinperiode",
                         "field": "epl_xfinperiode",
                         "operator": "greaterthan",
                         "type": "date",
-                        "value": f"{datein_isoformat}",
+                        "value": f"{date_start}",
                     },
                 ],
             },
@@ -186,14 +132,14 @@ def get_data_planning_optimizer(
                         "field": "evt_xdate_debut",
                         "operator": "greaterthan",
                         "type": "date",
-                        "value": f"{datein_isoformat}",
+                        "value": f"{date_start}",
                     },
                     {
                         "label": "evt_xdate_fin",
                         "field": "evt_xdate_fin",
                         "operator": "lessthan",
                         "type": "date",
-                        "value": f"{dateout_isoformat}",
+                        "value": f"{date_end}",
                     },
                     {
                         "label": "lgl_sfkligneparent",
@@ -207,14 +153,26 @@ def get_data_planning_optimizer(
         },
     }
 
-    headers = {"Authorization": f"{access_token}", "Content-Type": "application/json"}
+    data = make_sql_requests(sql_querys_dict, url, access_token)
 
-    for key, sql_query in sql_querys_dict.items():
-        request = requests.post(url, headers=headers, json=sql_query)
-        if request.status_code != 200:
-            raise ValueError(
-                f"Erreur lors de la récupération des données auprès du BACK: {key}."
-            )
-        else:
-            data[key] = request.json()["result"]
-    return data
+    # Mise en forme des données
+    df_imp = pd.DataFrame(data["imperatifs"])
+    df_hor = pd.DataFrame(data["horaires"]).reindex(
+        columns=[
+            "epu_sfkutilisateur",
+            "epl_xdebutperiode",
+            "epl_xfinperiode",
+            "epl_employe_horaire",
+        ]
+    )
+    df_hor.epl_xdebutperiode = pd.to_datetime(df_hor.epl_xdebutperiode).dt.date
+    df_hor.epl_xfinperiode = pd.to_datetime(df_hor.epl_xfinperiode).dt.date
+    df_hor = df_hor.sort_values(
+        by=["epu_sfkutilisateur", "epl_xdebutperiode"]
+    ).reset_index(drop=True)
+    df_tsk = pd.DataFrame(data["taches"])
+
+    return df_imp, df_hor, df_tsk
+
+
+

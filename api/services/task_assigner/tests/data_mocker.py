@@ -5,7 +5,7 @@ from typing import Tuple, List
 import numpy as np
 import pandas as pd
 from random import choices
-from module.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
+from modules.task_assigner import ContrainteEtreSurProjet
 
 
 def generate_unique_ids(n: int) -> List[int]:

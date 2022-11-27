@@ -17,6 +17,3 @@ def split_imp(df_imp: pd.DataFrame) -> dict:
         dict_imp[utl] = df_imp_utl
 
     return dict_imp
-
-
-splitted_imp = split_imp(df_imp)

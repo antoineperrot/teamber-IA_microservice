@@ -1,23 +1,26 @@
-from main import app, api_url
-from module.task_assigner.main import solveur
-from module.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
-from api.data_handling.task_assigner.handling_input_data import split_data_task_assigner
+from flask import jsonify
+
+from api.servers.base_server import app
+from api.tools import api_key_required
+
+from modules.task_assigner import solveur
+from modules.task_assigner import ContrainteEtreSurProjet
+
+from api.services.task_assigner.data_handlers.input_data import split_data_task_assigner
 from api.data_fetcher import get_data_task_assigner
 from api.controllers.task_assigner.controller_data import controller_data
 from api.controllers.task_assigner.controller_parameters import controller_parameters
-from api.tools import return_json
 
 
-@app.get("/task_assigner/")
-def task_assigner(
-    access_token: str,
-    datein_isoformat: str,
-    dateout_isoformat: str,
-    curseur: float = 0.0,
-    contrainte_etre_sur_projet: str = "de_preference",
-    avantage_projet: float = 1.0,
-    url: str = api_url,
-):
+@app.route("/task_assigner/", methods=['GET'])
+@api_key_required
+def task_assigner(access_token: str,
+                url: str,
+                datein_isoformat: str,
+                dateout_isoformat: str,
+                curseur: float = 0.0,
+                contrainte_etre_sur_projet: str = "de_preference",
+                avantage_projet: float = 1.0):
 
     """
     Fonction d'optimisation de la répartition des tâches au sein d'un groupe de collaborateurs
@@ -84,4 +87,4 @@ def task_assigner(
         avantage_projet,
     )
 
-    return return_json(solution)
+    return jsonify(solution)

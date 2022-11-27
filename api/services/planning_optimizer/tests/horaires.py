@@ -1,9 +1,9 @@
 import pandas as pd
 from pandas import Timestamp
 import unittest
-from module.planning_optimizer.tools.horaires import find_next_ph
-from module.planning_optimizer.tools.horaires import avance_cuseur_temps
-from module.planning_optimizer.tools.horaires import make_df_ph
+from modules.planning_optimizer.tools.horaires import find_next_ph
+from modules.planning_optimizer.tools.horaires import avance_cuseur_temps
+from modules.planning_optimizer.tools.horaires import make_df_ph
 
 
 class TestFindNextPlageHoraire(unittest.TestCase):

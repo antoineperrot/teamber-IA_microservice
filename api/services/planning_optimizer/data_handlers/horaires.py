@@ -91,8 +91,7 @@ def handler_union_hor(union: pd.DataFrame) -> pd.DataFrame:
         )
 
         out = pd.concat([out, final_row_df], ignore_index=True)
-    #         out = out.append(final_row, ignore_index=True)
-
+    
     out["eeh_sfkperiode"] = out["eeh_sfkperiode"].astype(int)
 
     return out

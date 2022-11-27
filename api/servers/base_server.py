@@ -17,6 +17,10 @@ app.config["SECRET_KEY"] = config["FLASK_API_KEY"]
 app.config["MODE"] = config["MODE"]
 app.logger.setLevel(logging.DEBUG)
 
+root_logger.info("Instanciation de l'application terminée.")
+
+from api.tools import api_key_required
+
 
 # Mode constant
 PRODUCTION = "PRODUCTION"
@@ -26,9 +30,7 @@ if app.config["MODE"] == DEV:
     pass
 
 
-# Import is not at the beginning of the file, because app should be declared before
-# import routes ...
-
+# import routes
 
 @app.errorhandler(Exception)
 def errorhandler(error):
@@ -81,7 +83,6 @@ def after_request(response):
         f"Request answered : {request.remote_addr} : {request.full_path}"
         f" {request.method} -> {response.status} ({duration} s)"
     )
-
     return response
 
 
@@ -91,3 +92,12 @@ def ping_route():
     Ping route
     """
     return make_response(jsonify("pong"), 200)
+
+
+@app.route("/api/ping_secure", methods=["GET"])
+@api_key_required
+def ping_route_secure():
+    """
+    Ping route
+    """
+    return make_response(jsonify(app.config['SECRET_KEY']), 200)
