@@ -5,7 +5,7 @@ import pickle
 import unittest
 from pandas.testing import assert_frame_equal
 
-from api.services.planning_optimizer.data_handlers.horaires import make_horaire_clean
+from api.back_connector.planning_optimizer.data_handlers import make_horaire_clean
 
 
 class TestMakeCleanHor(unittest.TestCase):
