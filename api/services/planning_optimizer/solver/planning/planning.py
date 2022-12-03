@@ -1,47 +1,29 @@
+"""
+Module de la classe d'optimisation des plannings.
+"""
+from datetime import datetime
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
 
-class Planning(object):
+class SimulatedAnnealingPlanningOptimizer(object):
     # Création de l'objet
-    def __init__(
-        self,
-        plages_horaire_json_file: str,
-        tasks_json_file: str,
-        imperatifs_json_file: str,
-        DATE_DEBUT: str,
-        DATE_FIN: str,
-        split_task_size: float = 1.0,
-        longueur_min_plage: float = 0.5,
-        longueur_max_plage: float = 3.0,
-        seed=None,
-    ):
+    def __init__(self,
+                 df_ph: pd.DataFrame,
+                 df_tsk: pd.DataFrame,
+                 split_task_size: float,
+                 date_start: datetime,
+                 date_end: datetime):
 
-        if seed is not None:
-            np.random.seed(seed)
+        self.df_ph = df_ph
+        self.df_tsk = df_tsk
 
-        self.plages_horaires = pd.read_json(plages_horaire_json_file)
-        self.tasks_json_file = tasks_json_file
-        self.imperatifs_json_file = imperatifs_json_file
-        self.list_df_imperatifs = []
-        self.df_imperatifs = None
-
-        self.DATE_DEBUT = DATE_DEBUT
-        self.DATE_FIN = DATE_FIN
+        self.date_start = date_start
+        self.date_end = date_end
         self.split_task_size = split_task_size  # exemple : si vaut 1 (heure), alors une tache de 3.5h est découpée en 3x 1h + 1x 0.5h, puis ces morceaux sont réarrangés
 
-        self.longueur_min_plage = longueur_min_plage
-        self.longueur_max_plage = longueur_max_plage
         self.penalties = np.array([1 / 6, 2 / 3, 1 / 6])
-        self.has_tasks = False
-        self.has_base = False
-        self.has_scores = False
-        self.initialised = False
-
-        self._load_tasks()
-        self._initialise_sprint()
-        self._load_imperatifs()
 
     # Pour changer les paramètres d'optimisation :
     def set_penalties(self, new_penalties):
@@ -68,7 +50,7 @@ class Planning(object):
     def _initialise_sprint(self):
 
         self.base = calcul_base_planning(
-            self.plages_horaires, self.DATE_DEBUT, self.DATE_FIN
+            self.plages_horaires, self.date_start, self.date_end
         )
 
         self.temps_total_dispo = self.base["Longueur"].sum()
@@ -99,7 +81,7 @@ class Planning(object):
         df["Date fin"] = pd.to_datetime(df["Date fin"], unit="ms")
 
         self.base = add_imperatifs(
-            self.base, df, self.DATE_DEBUT, self.longueur_min_plage
+            self.base, df, self.date_start, self.longueur_min_plage
         )  # enlève les moments de disponibilités correspondants aux impératifs
         self.list_df_imperatifs.append(df)
         self.df_imperatifs = pd.concat(self.list_df_imperatifs)

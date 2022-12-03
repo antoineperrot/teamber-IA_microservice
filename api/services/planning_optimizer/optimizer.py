@@ -1,4 +1,3 @@
-# TODO : corriger import solver
 from api.services.planning_optimizer.solver import solver
 
 

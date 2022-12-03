@@ -84,39 +84,3 @@ def permute_tasks(tasks):
     return y
 
 
-# Découpe des tâches en morceaux n'excédant pas une durée choisie (mod_lenght en heure)
-# ----> Avec mod_lenght = 1, une tâche de 3h30 est découpée
-#       en 3 morceaux d'une heure et 1 d'une demi-heure
-def split_tasks(df: pd.DataFrame, mod_lenght: float = 1):
-
-    df["nb Morceaux ceil"] = np.ceil(df["Durée"] / mod_lenght).astype(int)
-    df["nb Morceaux plein"] = (df["Durée"] // mod_lenght).astype(int)
-    df["Restant"] = df["Durée"] - mod_lenght * df["nb Morceaux plein"]
-
-    ilocs = np.sum(
-        [
-            [id_tache] * nb_morceau
-            for (id_tache, nb_morceau) in zip(df["id tache"], df["nb Morceaux ceil"])
-        ]
-    )
-
-    list_duree = np.array(
-        np.sum(
-            [
-                [mod_lenght] * nb_morceau_plein + (restant != 0) * [restant]
-                for duree, nb_morceau_plein, restant in zip(
-                    df["Durée"], df["nb Morceaux plein"], df["Restant"]
-                )
-            ]
-        )
-    )
-
-    new_df = df.loc[ilocs]
-    new_df["Durée"] = list_duree
-    new_df["id morceau"] = range(len(new_df))
-    new_df.drop(
-        ["nb Morceaux ceil", "nb Morceaux plein", "Restant"], axis=1, inplace=True
-    )
-
-    new_df.reset_index(drop=True, inplace=True)
-    return new_df

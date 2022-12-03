@@ -12,6 +12,9 @@ def solver(horaire: pd.DataFrame,
            date_end: str,
            duree_min_morceau: float,
            longueur_min_ph : float):
+    """
+    Prend les données d'un utilisateur et renvoie son emploi du temps optimisé.
+    """
 
     df_ph = make_df_ph(horaire, date_start, date_end, longueur_min_ph)
     df_ph = add_imperatifs(df_ph, imperatif, longueur_min_ph)
