@@ -2,21 +2,24 @@
 Module d'optimisation.
 """
 import pandas as pd
-from api.services.planning_optimizer.solver.planning.tools import make_df_ph, add_imperatifs
+from api.services.planning_optimizer.solver.planning.horaires import make_base
+from api.services.planning_optimizer.solver.tools.taches import split_tasks
 
 
-def solver(horaire: pd.DataFrame,
-           tache: pd.DataFrame,
-           imperatif: pd.DataFrame | None,
+def solver(horaires: pd.DataFrame,
+           taches: pd.DataFrame,
+           imperatifs: pd.DataFrame | None,
            date_start: str,
            date_end: str,
            duree_min_morceau: float,
-           longueur_min_ph : float):
+           longueur_min_ph: float):
     """
     Prend les données d'un utilisateur et renvoie son emploi du temps optimisé.
     """
 
-    df_ph = make_df_ph(horaire, date_start, date_end, longueur_min_ph)
-    df_ph = add_imperatifs(df_ph, imperatif, longueur_min_ph)
+    base = make_base(horaires, date_start, date_end, longueur_min_ph)
+    # base = add_imperatifs(base, imperatifs, longueur_min_ph)
+    splitted_taches = split_tasks(taches, duree_min_morceau)
+
 
 

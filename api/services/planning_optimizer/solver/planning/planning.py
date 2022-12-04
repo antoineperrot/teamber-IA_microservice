@@ -5,18 +5,19 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from .ordonnancement import Ordonnancement
 
 
 class SimulatedAnnealingPlanningOptimizer(object):
     # Création de l'objet
     def __init__(self,
-                 df_ph: pd.DataFrame,
+                 base: pd.DataFrame,
                  df_tsk: pd.DataFrame,
                  split_task_size: float,
                  date_start: datetime,
                  date_end: datetime):
 
-        self.df_ph = df_ph
+        self.base = base
         self.df_tsk = df_tsk
 
         self.date_start = date_start
@@ -24,15 +25,22 @@ class SimulatedAnnealingPlanningOptimizer(object):
         self.split_task_size = split_task_size  # exemple : si vaut 1 (heure), alors une tache de 3.5h est découpée en 3x 1h + 1x 0.5h, puis ces morceaux sont réarrangés
 
         self.penalties = np.array([1 / 6, 2 / 3, 1 / 6])
+        self.temps_total_dispo = self.base["Longueur"].sum()
+        if self.temps_total_dispo == 0:
+            print(f"L'utilisateur n'a aucune disponibilité à la période de projection indiquée.")
+
+        self.base_array = self.base[["index", "Longueur"]].values.T
+        self.temps_total_dispo = self.base["Longueur"].sum()
+
+        self.ordonnancement: Ordonnancement
 
     # Pour changer les paramètres d'optimisation :
     def set_penalties(self, new_penalties):
-        if np.sum(new_penalties) == 0:
-            self.penalties = np.array([1 / 3, 1 / 3, 1 / 3])
-        else:
-            self.penalties = np.array(new_penalties) / np.sum(new_penalties)
-        if self.has_tasks:
-            self._update_scores()
+        """
+        Permet de configurer les préférences d'optimisation.
+        """
+        self.penalties = new_penalties
+        self.update_scores()
 
     # Ajout des tâches à planifier
     def _load_tasks(self):
@@ -49,52 +57,8 @@ class SimulatedAnnealingPlanningOptimizer(object):
     # Créé la base d'une planning et initialise les scores si des tâches ont été ajoutées.
     def _initialise_sprint(self):
 
-        self.base = calcul_base_planning(
-            self.plages_horaires, self.date_start, self.date_end
-        )
-
-        self.temps_total_dispo = self.base["Longueur"].sum()
-        if self.temps_total_dispo == 0:
-            print(
-                f"L'utilisateur n'a aucune disponibilité à la période de projection indiquée."
-            )
-
-        self.base_array = self.base[["index", "Longueur"]].values.T
-
-        if self.has_tasks:
-            self._update_scores()
-            self.min_chronologie = self.chronologie
-
-        # self.prop_temps_perdu, self.chronologie = V_TempsPerdu(self.tasks, self.base_array)
-        # self.score_priorites = V_Priorites(self.tasks)
-
-        self.temps_total_dispo = self.base["Longueur"].sum()
-        self.initialised = True
-        self.has_new_imp = False
-
-    # Ajout d'impératifs à prendre en compte
-    def _load_imperatifs(self):
-        df = pd.read_json(self.imperatifs_json_file)  # reading json file
-
-        # converting time columns :
-        df["Date début"] = pd.to_datetime(df["Date début"], unit="ms")
-        df["Date fin"] = pd.to_datetime(df["Date fin"], unit="ms")
-
-        self.base = add_imperatifs(
-            self.base, df, self.date_start, self.longueur_min_plage
-        )  # enlève les moments de disponibilités correspondants aux impératifs
-        self.list_df_imperatifs.append(df)
-        self.df_imperatifs = pd.concat(self.list_df_imperatifs)
-
-        # maths : tableau numpy des plages horaires successives
-        self.base_array = self.base[["index", "Longueur"]].values.T
-        self.temps_total_dispo = self.base["Longueur"].sum()
-        if self.has_tasks:
-            self._update_scores()
-            self.min_chronologie = self.chronologie
-
     # (maths) Met à jour les potentiels s'il y eu des changements
-    def _update_scores(self):
+    def update_scores(self):
         self.score_temps_perdu, self.chronologie = V_TempsPerdu(
             self.tasks, self.base_array
         )
@@ -136,7 +100,7 @@ class SimulatedAnnealingPlanningOptimizer(object):
         )
 
     # (maths) Remplace l'arrangement courant par l'arrangement voisin
-    def _replace(self):
+    def replace(self):
         self.tasks = self.next_tasks
         self.score_temps_perdu = self.next_score_temps_perdu
         self.chronologie = self.next_chronologie
@@ -145,7 +109,7 @@ class SimulatedAnnealingPlanningOptimizer(object):
         self.score = self.next_score
 
     # (maths) Stocke l'arrangement conduisant à l'énergie totale la plus faible
-    def _replace_min(self):
+    def replace_min(self):
         self.min_tasks = self.tasks
         self.min_chronologie = self.chronologie
 
@@ -154,7 +118,7 @@ class SimulatedAnnealingPlanningOptimizer(object):
     def _apply_min(self):
         self.tasks = self.min_tasks
         self.chronologie = self.chronologie
-        self._update_scores()
+        self.update_scores()
 
     # (maths) Renvoie les potentiels de l'arrangement courant ou voisin selon la valeur
     # du paramètre voisin
@@ -267,13 +231,13 @@ class SimulatedAnnealingPlanningOptimizer(object):
             DELTA = Ey - E[i - 1]
             Proba[i] = min(1, np.exp(-DELTA / T))
             if np.random.rand() < Proba[i]:
-                self._replace()
+                self.replace()
                 E[i] = Ey
             else:
                 E[i] = E[i - 1]
 
             if E[i] < Emin[i - 1]:
-                self._replace_min()
+                self.replace_min()
                 Emin[i] = E[i]
             else:
                 Emin[i] = Emin[i - 1]

@@ -6,7 +6,7 @@ from api.services.task_assigner.tools.id_remapping import flatten_list
 def split_tasks(df: pd.DataFrame, mod_lenght: float = 1.0) -> pd.DataFrame:
     """
     Découpe des tâches en plusieurs tâches de durées plus courtes.
-    
+
     :param df: dataframe des tâches à découper.
     :param mod_lenght: float (en heures) de la durée maximales des nouvelles tâches
     :return: dataframe des tâches découpées
