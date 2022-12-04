@@ -7,287 +7,186 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from .ordonnancement import Ordonnancement
 
+import datetime
 
-class SimulatedAnnealingPlanningOptimizer(object):
-    # Création de l'objet
+
+class SimulatedAnnealingPlanningOptimizer:
     def __init__(self,
-                 base: pd.DataFrame,
-                 df_tsk: pd.DataFrame,
-                 split_task_size: float,
-                 date_start: datetime,
-                 date_end: datetime):
+                 availabilities: pd.DataFrame,
+                 df_tsk: pd.DataFrame):
 
-        self.base = base
+        self.availabilities = availabilities
         self.df_tsk = df_tsk
 
-        self.date_start = date_start
-        self.date_end = date_end
-        self.split_task_size = split_task_size  # exemple : si vaut 1 (heure), alors une tache de 3.5h est découpée en 3x 1h + 1x 0.5h, puis ces morceaux sont réarrangés
+        self.preferences = [1 / 6, 2 / 3, 1 / 6]
+        self.ordonnancement = Ordonnancement(df_tsk=df_tsk,
+                                             availabilities=list(availabilities['durée'].values),
+                                             preferences=self.preferences)
+        self.statistics = None
+        self.scheduled_tasks = None
+        self.unfilled_tasks = None
 
-        self.penalties = np.array([1 / 6, 2 / 3, 1 / 6])
-        self.temps_total_dispo = self.base["Longueur"].sum()
-        if self.temps_total_dispo == 0:
-            print(f"L'utilisateur n'a aucune disponibilité à la période de projection indiquée.")
-
-        self.base_array = self.base[["index", "Longueur"]].values.T
-        self.temps_total_dispo = self.base["Longueur"].sum()
-
-        self.ordonnancement: Ordonnancement
-
-    # Pour changer les paramètres d'optimisation :
-    def set_penalties(self, new_penalties):
+    def optimize(self,
+                 n_iterations_per_task: int = 250,
+                 initial_temperature: float = 1,
+                 min_temperature: float = 1e-5):
         """
-        Permet de configurer les préférences d'optimisation.
+        Optimise un ordonnancement des tâches par la méthode du recuit simulé.
+
+        :param n_iterations_per_task: nombre d'itérations par tâches.
+        :param initial_temperature: float, température initiale
+        :param min_temperature: float, température minimale à atteindre
         """
-        self.penalties = new_penalties
-        self.update_scores()
+        n_iterations = len(self.df_tsk) * n_iterations_per_task
 
-    # Ajout des tâches à planifier
-    def _load_tasks(self):
-        df_tasks = pd.read_json(self.tasks_json_file)
-        df_tasks = split_tasks(df_tasks, self.split_task_size)
-        self.tasks = df_tasks[["id morceau", "Durée", "Priorité", "id tache"]].values.T
-        self.df_tasks = df_tasks.set_index("id morceau")
-        self.total_time_tasks = self.tasks[1, :].sum()
-        self.has_tasks = True
-        self.min_tasks = (
-            self.tasks
-        )  # Calcul de la base de planning et des potentiels initiaux
+        ordonnancement = self.ordonnancement
+        ordonnancement_optimal = self.ordonnancement
+        temp = initial_temperature
+        statistics = {"temperature": [temp],
+                      "energy": [ordonnancement.energy],
+                      "energy_min": [ordonnancement_optimal.energy],
+                      "proba": []}
 
-    # Créé la base d'une planning et initialise les scores si des tâches ont été ajoutées.
-    def _initialise_sprint(self):
+        decay = 1 - np.exp(np.log(min_temperature / initial_temperature) / n_iterations)
+        for i in range(1, n_iterations):
+            temp = temp * (1 - decay) if temp > min_temperature else min_temperature
+            ordonnancement_voisin = ordonnancement.build_neighbour()
 
-    # (maths) Met à jour les potentiels s'il y eu des changements
-    def update_scores(self):
-        self.score_temps_perdu, self.chronologie = V_TempsPerdu(
-            self.tasks, self.base_array
-        )
-        self.score_priorites = V_Priorites(self.tasks)
-        self.score_dispersion = V_Dispersion(self.tasks)
-        self.score = np.vdot(
-            self.penalties,
-            [self.score_temps_perdu, self.score_priorites, self.score_dispersion],
-        )
+            energy_delta = ordonnancement_voisin.energy - ordonnancement.energy
+            proba_transition = min(1, np.exp(- energy_delta / temp))
 
-    # Affiche les scores pour les différents indicateurs :
-    def show_scores(self):
-        if self.has_tasks:
-            print(
-                "Pourcentage temps perdu : {:.2f}%".format(self.score_temps_perdu * 100)
-            )
-            print("Non respect priorités : {:.2f}%".format(self.score_priorites * 100))
-            print("Score dispersion : {:.2f}%".format(self.score_dispersion * 100))
-        else:
-            print(
-                "Impossible d'afficher les scores, veuillez ajouter des tâches au planning."
-            )
+            if np.random.rand() < proba_transition:
+                ordonnancement = ordonnancement_voisin
 
-    # (maths) Propose un arrangement voisin des taches et stocke ses potentiels
-    def _build_neighbour(self):
-        self.next_tasks = permute_tasks(self.tasks)
-        self.next_score_temps_perdu, self.next_chronologie = V_TempsPerdu(
-            self.next_tasks, self.base_array
-        )
-        self.next_score_priorites = V_Priorites(self.next_tasks)
-        self.next_score_dispersion = V_Dispersion(self.next_tasks)
-        self.next_score = np.vdot(
-            self.penalties,
-            [
-                self.next_score_temps_perdu,
-                self.next_score_priorites,
-                self.next_score_dispersion,
-            ],
-        )
+            if ordonnancement.energy < ordonnancement_optimal.energy:
+                ordonnancement_optimal = ordonnancement
 
-    # (maths) Remplace l'arrangement courant par l'arrangement voisin
-    def replace(self):
-        self.tasks = self.next_tasks
-        self.score_temps_perdu = self.next_score_temps_perdu
-        self.chronologie = self.next_chronologie
-        self.score_priorites = self.next_score_priorites
-        self.score_dispersion = self.next_score_dispersion
-        self.score = self.next_score
+            statistics['temperature'].append(temp)
+            statistics['energy'].append(ordonnancement.energy)
+            statistics['energy_min'].append(ordonnancement_optimal.energy)
+            statistics['proba'].append(proba_transition)
 
-    # (maths) Stocke l'arrangement conduisant à l'énergie totale la plus faible
-    def replace_min(self):
-        self.min_tasks = self.tasks
-        self.min_chronologie = self.chronologie
+        self.statistics = statistics
+        self.ordonnancement = ordonnancement_optimal
 
-    # (maths) Remplace l'arrangement courant par l'arrangement "minimal" rencontré
+    def schedule_tasks(self):
+        """
+        Construit le dataframe des tâches planifiées de manière optimale.
+        """
 
-    def _apply_min(self):
-        self.tasks = self.min_tasks
-        self.chronologie = self.chronologie
-        self.update_scores()
+        out = {"id_part": [],
+               "start": [],
+               "end": []}
 
-    # (maths) Renvoie les potentiels de l'arrangement courant ou voisin selon la valeur
-    # du paramètre voisin
-    def get_potentiels(self, voisin=False):
-        if not voisin:
-            return [self.score_temps_perdu, self.score_priorites, self.score_dispersion]
-        else:
-            return [
-                self.next_score_temps_perdu,
-                self.next_score_priorites,
-                self.next_score_dispersion,
-            ]
+        i_current_section = 0
+        no_more_sections = i_current_section == len(self.availabilities)
 
-    # Exporte le planning en fichier excel et retourne le dataframe correspondant
-    def make_planning(self):
-        df = pd.DataFrame()
-        if self.has_tasks:
-            self._apply_min()
+        i_current_part = 0
+        no_more_parts = i_current_part == len(self.df_tsk)
 
-            plages = np.unique(self.chronologie[1, :])
-            for plage in plages:
+        while not no_more_parts and not no_more_sections:
+            current_section_is_filled = False
+            current_section_start = self.availabilities.iloc[i_current_section]['timestamp_debut']
+            current_section_end = self.availabilities.iloc[i_current_section]['timestamp_fin']
+            curseur_temps = current_section_start
 
-                tmp2 = np.array(
-                    [
-                        self.chronologie[0, i]
-                        if self.chronologie[1, i] == plage
-                        else -1
-                        for i in range(self.chronologie.shape[1])
-                    ]
-                )
-                tmp2 = tmp2[tmp2 >= 0]
+            while not current_section_is_filled and not no_more_parts:
+                id_part = self.ordonnancement.ordonnancement[i_current_part]
+                part = self.df_tsk.iloc[i_current_part]
+                length_part = datetime.timedelta(hours=part['length'])
+                if curseur_temps + length_part > current_section_end:
+                    current_section_is_filled = True
+                    i_current_section += 1
+                else:
+                    out['id_part'].append(id_part)
+                    out['start'].append(curseur_temps)
+                    out['end'].append(curseur_temps + length_part)
+                    i_current_part += 1
+                    no_more_parts = i_current_part == len(self.df_tsk)
+                    curseur_temps = curseur_temps + length_part
 
-                p = self.base.loc[[plage]]
-                t = self.df_tasks.loc[tmp2]
+            no_more_sections = i_current_section == len(self.availabilities)
 
-                d = p["Date début"].values[0]
+        out = pd.DataFrame(out)
+        out = out.merge(self.df_tsk, on='id_part')
+        out = out[['start', 'end', 'evt_spkevenement', 'evt_sfkprojet', 'priorite']]
 
-                t["Durée cumulée"] = pd.to_timedelta(t["Durée"].cumsum(), unit="h")
-                t["Durée"] = pd.to_timedelta(t["Durée"], unit="h")
+        out_joined_parts = {'start': [],
+                            "end": [],
+                            "evt_spkevenement": [],
+                            "evt_sfkprojet": [],
+                            "priorite": []}
 
-                t["Date fin"] = d + t["Durée cumulée"]
+        i_current_part = 0
+        i_next_current_part = min(i_current_part + 1, len(out))
+        while i_current_part < len(out):
+            current_part = out.iloc[i_current_part]
+            if i_next_current_part - i_current_part > 1:
+                next_current_part = out.iloc[i_next_current_part]
 
-                t["Date début"] = t["Date fin"] - t["Durée"]
-                t.drop(["Durée", "Durée cumulée"], axis=1, inplace=True)
-                df = pd.concat([df, t])
+                while next_current_part['start'] == current_part['end'] and \
+                        next_current_part['evt_spkevenement'] == current_part['evt_spkevenement']:
+                    i_next_current_part = min(i_next_current_part + 1, len(out))
+                    next_current_part = out.iloc[i_next_current_part]
 
-            df = df[["Objet", "Priorité", "Date début", "Date fin"]]
-
-        DF = pd.concat([df, self.df_imperatifs])
-        DF.sort_values(by="Date début", inplace=True)
-        DF.reset_index(inplace=True)
-        DF = DF[["Objet", "Priorité", "Date début", "Date fin"]]
-
-        ### ON RECOLLE LES MORCEAUX DE TACHES SI POSSIBLE :
-        df = DF.loc[
-            [0],
-        ]
-        index_df = 0
-        index_DF = 1
-        while index_DF < len(DF):
-            while (
-                DF.loc[index_DF, "Date début"] == df.loc[index_df, "Date fin"]
-                and DF.loc[index_DF, "Objet"] == df.loc[index_df, "Objet"]
-            ):
-
-                df.loc[index_df, "Date fin"] = DF.loc[index_DF, "Date fin"]
-                index_DF += 1
-            if index_DF < len(DF):
-                df = df.append(
-                    DF.loc[
-                        [index_DF],
-                    ]
-                ).reset_index(drop=True)
-                index_df += 1
-                index_DF += 1
-
-        ###EXPORT :
-        self.result = df
-        return df
-
-    # (maths) Optimise le planning
-    def optimize(
-        self,
-        ITERATIONS_PAR_TACHE=150,
-        TEMPERATURE_INITIALE=1,
-        TEMPERATURE_MIN=1e-5,
-        show=False,
-    ):
-        N_ITERATIONS = self.tasks.shape[1] * ITERATIONS_PAR_TACHE
-        Proba = np.zeros(N_ITERATIONS)
-        E = np.zeros(N_ITERATIONS)
-        E[0] = self.score
-        Emin = np.copy(E)
-        Vp = np.zeros(N_ITERATIONS)
-        Vtp = np.zeros(N_ITERATIONS)
-        Vd = np.zeros(N_ITERATIONS)
-        Vp[0], Vtp[0], Vd[0] = (
-            self.score_priorites,
-            self.score_temps_perdu,
-            self.score_dispersion,
-        )
-        T = TEMPERATURE_INITIALE
-        decay = 1 - np.exp(
-            np.log(TEMPERATURE_MIN / TEMPERATURE_INITIALE) / N_ITERATIONS
-        )
-        for i in range(1, N_ITERATIONS):
-            T = T * (1 - decay) if T > TEMPERATURE_MIN else TEMPERATURE_MIN
-            self._build_neighbour()
-            Ey = self.next_score
-            DELTA = Ey - E[i - 1]
-            Proba[i] = min(1, np.exp(-DELTA / T))
-            if np.random.rand() < Proba[i]:
-                self.replace()
-                E[i] = Ey
+            if i_next_current_part - i_current_part > 1:
+                out_joined_parts['start'].append(current_part['start'])
+                out_joined_parts['end'].append(next_current_part['end'])
+                out_joined_parts['evt_spkevenement'].append(current_part['evt_spkevenement'])
+                out_joined_parts['evt_sfkprojet'].append(current_part['evt_sfkprojet'])
+                out_joined_parts['priorite'].append(current_part['priorite'])
+                i_current_part = min(i_next_current_part + 1, len(out))
+                i_next_current_part = min(i_current_part + 1, len(out))
             else:
-                E[i] = E[i - 1]
+                out_joined_parts['start'].append(current_part['start'])
+                out_joined_parts['end'].append(current_part['end'])
+                out_joined_parts['evt_spkevenement'].append(current_part['evt_spkevenement'])
+                out_joined_parts['evt_sfkprojet'].append(current_part['evt_sfkprojet'])
+                out_joined_parts['priorite'].append(current_part['priorite'])
+                i_current_part = i_next_current_part
+                i_next_current_part = min(i_current_part + 1, len(out))
 
-            if E[i] < Emin[i - 1]:
-                self.replace_min()
-                Emin[i] = E[i]
+        out_joined_parts = pd.DataFrame(out_joined_parts)
+        self.scheduled_tasks = out_joined_parts
+        return out_joined_parts
+
+    def get_unfilled_task(self):
+        """
+        Retourne les tâches qui n'ont pas été complètement planifiées.
+        """
+        temp = self.scheduled_tasks
+        temp['durée_effectuée'] = (self.scheduled_tasks['end'] - self.scheduled_tasks['start']) / \
+                                   datetime.timedelta(hours=1)
+        temp = temp[['evt_spkevenement', 'durée_effectuée']]
+        temp = temp.groupby('evt_spkevenement').sum()
+
+        sub_df_tsk = self.df_tsk
+        sub_df_tsk = sub_df_tsk[['evt_spkevenement', "evt_dduree", "evt_sfkprojet"]]
+        sub_df_tsk = sub_df_tsk.groupby('evt_spkevenement').sum()
+
+        completion_tasks = sub_df_tsk.join(temp, how='outer')
+        completion_tasks = completion_tasks.fillna(0.0)
+        completion_tasks['completion'] = (np.round(completion_tasks['durée_effectuée'] /
+                                                   completion_tasks['evt_dduree']*100)).astype(int)
+        completion_tasks = completion_tasks.loc[completion_tasks['completion'] < 100]
+        unfilled_tasks = completion_tasks.reset_index().sort_values(by=['completion', "evt_sfkprojet"],
+                                                                    ascending=False).reset_index(drop=True)
+        self.unfilled_tasks = unfilled_tasks
+        return unfilled_tasks
+
+    def plot_optimization_statistics(self):
+        """
+        Plot l'évolution de
+        - la température
+        - l'énergie
+        - l'énergie de la solution optimale
+        - la probabilité de transition.
+        """
+        fig, ax = plt.subplots(2, 2, figsize=(8, 8))
+
+        for i, (key_stat, stat) in enumerate(self.statistics.items()):
+            ax.flat[i].set_title(key_stat)
+            if key_stat != "proba":
+                ax.flat[i].plot(range(len(stat)), stat)
             else:
-                Emin[i] = Emin[i - 1]
-            Vp[i], Vtp[i], Vd[i] = (
-                self.score_priorites,
-                self.score_temps_perdu,
-                self.score_dispersion,
-            )
-        if show:
-            plt.figure(figsize=(16, 7))
-            col = "cornflowerblue"
-
-            ax1 = plt.subplot(121, title="Energie totale")
-            ax1.grid()
-            ax1.plot(range(N_ITERATIONS), Emin, c="magenta", label="Emin")
-            ax1.plot(range(N_ITERATIONS), E, label="Etotale", c=col)
-            ax1.legend(loc="upper right")
-            ax1.set_xlabel("Itérations")
-
-            """
-            ax2 = plt.subplot(122, title='Evolution probabilité acceptation (moving average)')
-            ax2.grid()
-            ax2.scatter(range(N_ITERATIONS),Proba,marker='.',linewidth=.5,c=col)
-            ax2.set_xlabel('Itérations')
-            plt.show()
-            """
-            ax3 = plt.subplot(122, title="Différents potentiels")
-            ax3.plot(range(N_ITERATIONS), Vp, label="Priorités")
-            ax3.plot(range(N_ITERATIONS), Vtp, label="Temps perdu")
-            ax3.plot(range(N_ITERATIONS), Vd, label="Dispersion")
-            ax3.legend()
-            ax3.grid()
-            plt.show()
-
-    # Fait l'inventaire des tâches non planifiées
-    def not_scheduled(self):
-        tasks = self.tasks[0, :]
-        c = self.chronologie[0, :]
-        not_scheduled = []
-        for t in tasks:
-            if t not in c:
-                not_scheduled.append(int(t))
-        if len(not_scheduled) > 0:
-            notScheduledTasks = self.df_tasks.loc[not_scheduled]
-            notScheduledTasks = pd.DataFrame(
-                notScheduledTasks.groupby(
-                    ["id tache", "Objet", "Priorité"], as_index=False
-                )["Durée"].sum()
-            )
-            return notScheduledTasks
-        else:
-            print("Toutes les tâches ont pu être planifiées.")
-            return None
+                ax.flat[i].scatter(range(len(stat)), stat)
