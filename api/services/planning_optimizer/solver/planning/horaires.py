@@ -160,8 +160,8 @@ def find_sections_ends(imperatifs: pd.DataFrame, date_end: pd.Timestamp) -> pd.D
 
 def compute_availabilities(horaires: pd.DataFrame,
                            imperatifs: pd.DataFrame,
-                           date_start: pd.Timestamp,
-                           date_end: pd.Timestamp,
+                           date_start: str,
+                           date_end: str,
                            longueur_min_ph: float = 0.5) -> pd.DataFrame:
     """
     A partir des horaires d'un utilisateur, de ses impératifs (événements non-replanifiables), d'une date de

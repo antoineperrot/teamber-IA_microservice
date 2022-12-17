@@ -36,11 +36,12 @@ class Ordonnancement:
 
         new_ordonnancement[index_1] = self.ordonnancement[index_2]
         new_ordonnancement[index_2] = self.ordonnancement[index_1]
-
+        neighbour_preferences = self.preferences.copy()
         neighbour = Ordonnancement(ordonnancement=new_ordonnancement,
-                                   availabilities=self.availabilities)
+                                   availabilities=self.availabilities,
+                                   preferences=neighbour_preferences)
         neighbour.tasks = np.copy(self.tasks)
-        neighbour.preferences = self.preferences.copy()
+
         return neighbour
     
     def get_fields(self):
@@ -69,5 +70,7 @@ class Ordonnancement:
             
         self.energy = np.vdot(self.preferences, energies)
 
-    
+    def get_energy(self):
+        self.compute_energy()
+        return self.energy
         

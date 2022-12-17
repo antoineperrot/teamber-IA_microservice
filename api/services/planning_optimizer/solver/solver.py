@@ -2,7 +2,8 @@
 Module d'optimisation.
 """
 import pandas as pd
-from api.services.planning_optimizer.solver.planning.horaires import make_base
+from api.services.planning_optimizer.solver.planning.horaires import compute_availabilities
+from api.services.planning_optimizer.solver.planning.planning import SimulatedAnnealingPlanningOptimizer
 from api.services.planning_optimizer.solver.tools.taches import split_tasks
 
 
@@ -17,9 +18,14 @@ def solver(horaires: pd.DataFrame,
     Prend les données d'un utilisateur et renvoie son emploi du temps optimisé.
     """
 
-    base = make_base(horaires, date_start, date_end, longueur_min_ph)
-    # base = add_imperatifs(base, imperatifs, longueur_min_ph)
-    splitted_taches = split_tasks(taches, duree_min_morceau)
+    availabilities = compute_availabilities(horaires, imperatifs, date_start, date_end, longueur_min_ph)
+    splitted_tasks = split_tasks(taches, duree_min_morceau)
 
+    optimizer = SimulatedAnnealingPlanningOptimizer(availabilities=availabilities,
+                                                    tasks=splitted_tasks)
 
+    optimizer.optimize(n_iterations_per_task=250)
+    events = optimizer.schedule_events()
+    #unfilled_tasks = optimizer.get_unfilled_task()
 
+    return events, None, availabilities
