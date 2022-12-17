@@ -2,7 +2,9 @@
 Module de traduction de la solution mathématique en une sortie DataFrame interprétable.
 """
 import datetime
+
 import pandas as pd
+
 from api.services.planning_optimizer.solver.planning.ordonnancement import Ordonnancement
 
 

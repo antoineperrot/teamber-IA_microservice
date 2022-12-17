@@ -1,10 +1,12 @@
 """
 Module de récupération des données auprès du BACK pour la fonctionnalité planning_optimizer.
 """
-import pandas as pd
 from typing import Tuple
-from api.back_connector.tools import make_sql_requests
+
+import pandas as pd
+
 from api.back_connector.planning_optimizer.data_handlers.filtrage import filtre
+from api.back_connector.tools import make_sql_requests
 
 
 # TODO: corriger les ValueError

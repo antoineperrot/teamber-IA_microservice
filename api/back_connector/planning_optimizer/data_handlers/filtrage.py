@@ -6,12 +6,13 @@ optimisé, et jeter les données inutiles. Par exemple:
 - les utilisateurs pour lesquels on a pas de tâches.
 """
 from typing import Tuple
+
 import pandas as pd
 
-from api.loggers import logger_planning_optimizer
-from api.back_connector.planning_optimizer.data_handlers.imperatifs import split_n_clean_impertifs
 from api.back_connector.planning_optimizer.data_handlers.horaires import split_n_clean_horaires
+from api.back_connector.planning_optimizer.data_handlers.imperatifs import split_n_clean_impertifs
 from api.back_connector.planning_optimizer.data_handlers.taches import split_n_clean_taches, map_priorites_projets
+from api.loggers import logger_planning_optimizer
 
 
 def filtre(df_imp: pd.DataFrame, df_hor: pd.DataFrame, df_tsk: pd.DataFrame, priorites_projets: dict) \

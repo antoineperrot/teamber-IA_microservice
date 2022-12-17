@@ -3,8 +3,10 @@ Module de test de la traduction de la solution mathématique en une sortie DataF
 """
 
 import unittest
+
 import pandas as pd
-from api.services.planning_optimizer.solver.planning.solution_interpreter import get_next_part, add_event,\
+
+from api.services.planning_optimizer.solver.planning.solution_interpreter import get_next_part, add_event, \
     move_indexes_forward, make_events
 
 

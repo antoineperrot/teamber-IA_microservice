@@ -1,5 +1,5 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 
 def make_mat_prj(df_prj: pd.DataFrame, n_prj: int, n_utl: int) -> np.ndarray:

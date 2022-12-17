@@ -3,6 +3,7 @@ Fonctions pour préparer les données horaires brut de Wandeed à l'optimisation
 """
 
 from typing import List
+
 import pandas as pd
 
 

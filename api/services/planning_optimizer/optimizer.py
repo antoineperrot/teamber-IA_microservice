@@ -2,7 +2,7 @@ from api.services.planning_optimizer.solver import solver
 
 
 def optimize_plannings(horaires: dict, taches: dict, imperatifs: dict, date_start: str, date_end: str,
-                       duree_min_morceau: float = 1.0):
+                       parts_max_length: float = 1.0, min_duration_section: float = 0.5):
     """
     Fonction optimisant les emplois du temps de chacun des utilisateurs.
     """
@@ -16,4 +16,5 @@ def optimize_plannings(horaires: dict, taches: dict, imperatifs: dict, date_star
                                           imperatifs[utl],
                                           date_start,
                                           date_end,
-                                          duree_min_morceau)
+                                          parts_max_length,
+                                          min_duration_section=min_duration_section)

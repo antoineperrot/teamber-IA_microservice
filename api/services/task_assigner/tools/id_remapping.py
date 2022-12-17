@@ -2,10 +2,10 @@
 Contient toutes les fonctions qui consistent à remapper les entrees/sorties des
 ID locaux/externes.
 """
-import pandas as pd
-import numpy as np
-
 from typing import Tuple, List
+
+import numpy as np
+import pandas as pd
 
 
 def remap_df_out(df_out: pd.DataFrame, int_to_tsk, int_to_utl, int_to_prj, int_to_cmp):

@@ -1,6 +1,7 @@
-import unittest
-import pandas as pd
 import pickle
+import unittest
+
+import pandas as pd
 
 
 class TestHandlerHor(unittest.TestCase):

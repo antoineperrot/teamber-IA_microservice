@@ -1,5 +1,7 @@
 import unittest
+
 import pandas as pd
+
 from api.back_connector.planning_optimizer.data_handlers.horaires import handler_clean_hor
 
 

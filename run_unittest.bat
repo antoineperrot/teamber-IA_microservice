@@ -5,7 +5,7 @@ echo Install path : %installpath%
 echo Removing test_venv if exists
 @RD /S /Q "%installpath%"
 
-echo Installing venv
+echo Installing test_venv
 python -m test_venv "%installpath%"
 
 echo Activating test_venv

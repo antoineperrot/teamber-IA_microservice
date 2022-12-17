@@ -1,4 +1,18 @@
-from modules.task_assigner.tools.id_remapping import (
+from typing import Tuple, List
+
+import numpy as np
+import pandas as pd
+from scipy.optimize import linprog
+
+from api.loggers import logger_task_assigner
+from api.services.task_assigner.solution_statistics.statistics import (
+    make_stat_cmp,
+    make_stat_prj,
+    make_stat_tsk,
+    make_stat_utl,
+)
+from api.services.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
+from api.services.task_assigner.tools.id_remapping import (
     make_list_ids,
     make_mapping_dicts_extern_to_local,
     make_mapping_dicts_local_to_extern,
@@ -6,28 +20,23 @@ from modules.task_assigner.tools.id_remapping import (
     make_usefull_mapping_dicts,
     remap_df_out,
 )
-from modules.task_assigner.tools.matrix_maker import (
+from api.services.task_assigner.tools.matrix_maker import (
     make_mat_cmp,
     make_mat_prj,
     make_mat_spe,
 )
-from modules.task_assigner.tools.problem_formulation import (
+from api.services.task_assigner.tools.problem_formulation import (
     make_A_and_b,
     make_arcs_and_cost_func,
 )
-from modules.task_assigner.solution_statistics.statistics import (
-    make_stat_cmp,
-    make_stat_prj,
-    make_stat_tsk,
-    make_stat_utl,
-)
-from modules.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
 
-from typing import Tuple, List
-import pandas as pd
-import numpy as np
-from scipy.optimize import linprog
-from fastapi import HTTPException
+
+class SolverCrashException(Exception):
+    def __init__(self):
+        self.msg = "Crash du solveur."
+
+    def __repr__(self):
+        return self.msg
 
 
 def solveur(
@@ -37,11 +46,10 @@ def solveur(
     df_dsp: pd.DataFrame,
     curseur: float,
     contrainte_etre_sur_projet: ContrainteEtreSurProjet,
-    avantage_projet: float,
-    data_generation=False,
+    avantage_projet: float
 ):
     """
-    Mettre data_generation=True pour générer des paire (donnees_entree, donnees_sorties) pour ensuite tester les fonctions.
+
     """
     try:
         # FAIT LA LISTE DE TOUS LES IDS (PRJ, CMP, TSK, UTL) CONTENUS DANS LES DONNEES RECUES
@@ -160,10 +168,10 @@ def solveur(
                 "prj": stat_prj.to_dict(),
             },
         }
-    except:
-        raise HTTPException(
-            status_code=500, detail="Le solveur a échoué à produire une solution."
-        )
+    except Exception as e:
+        logger_task_assigner.error("Crash du solveur", exc_info=str(e))
+        raise SolverCrashException()
+
     return solution
 
 
@@ -174,23 +182,23 @@ def solve_linear_programmation_problem(
     RESOLUTION DU PROBLEME DE PROGRAMMATION LINEAIRE
     """
     method = "simplex"
-    l = linprog(
+    linprog_solver = linprog(
         -cost_func, A_eq=A, b_eq=b, method="simplex", options={"maxiter": 10000}
     )
-    if l.status != 0:
-        l = linprog(
+    if linprog_solver.status != 0:
+        linprog_solver = linprog(
             -cost_func,
             A_eq=A,
             b_eq=b,
             method="interior-point",
             options={"maxiter": 10000},
         )
-        outcome = l.message
+        outcome = linprog_solver.message
         method = "interior-point"
     else:
-        outcome = l.message
+        outcome = linprog_solver.message
 
-    solution_vector = l.x
+    solution_vector = linprog_solver.x
     return solution_vector, outcome, method
 
 

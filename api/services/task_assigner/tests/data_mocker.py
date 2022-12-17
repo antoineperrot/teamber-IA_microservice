@@ -1,11 +1,13 @@
 """
 Fonctions pour générer des données aléatoires.
 """
+from random import choices
 from typing import Tuple, List
+
 import numpy as np
 import pandas as pd
-from random import choices
-from modules.task_assigner import ContrainteEtreSurProjet
+
+from api.services.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
 
 
 def generate_unique_ids(n: int) -> List[int]:
@@ -29,11 +31,11 @@ def mock_coherent_data() -> Tuple[
     Génère des configurations aléatoires et cohérentes de tailles d'entreprise, nombre de projets, n de cmp, n de tsk.
     """
     p = 0.7
-    N = np.random.randint(7, 70)
-    n_prj = np.random.binomial(N * 0.3, p)
-    n_utl = np.random.binomial(N, p)
-    n_tsk = 2 + np.random.binomial(N * 3, p)
-    n_cmp = np.random.binomial(N * 0.4, p)
+    nn = np.random.randint(7, 70)
+    n_prj = np.random.binomial(nn * 0.3, p)
+    n_utl = np.random.binomial(nn, p)
+    n_tsk = 2 + np.random.binomial(nn * 3, p)
+    n_cmp = np.random.binomial(nn * 0.4, p)
 
     # genere des ids unique pour chaque variable
     ids_utl = generate_unique_ids(n_utl)

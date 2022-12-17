@@ -2,10 +2,12 @@
 Classe d'un ordonnancement.
 """
 from random import choice
+
 import numpy as np
 import pandas as pd
 
-from api.services.planning_optimizer.solver.tools.energies import energy_dispersion, energy_priorites, energy_waisted_time
+from api.services.planning_optimizer.solver.tools.energies import energy_dispersion, energy_priorites, \
+    energy_waisted_time
 
 
 class Ordonnancement:

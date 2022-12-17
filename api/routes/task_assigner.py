@@ -1,15 +1,13 @@
-from flask import jsonify
-
-from api.servers.base_server import app
-from api.tools import api_key_required
-
-from modules.task_assigner import solveur
-from modules.task_assigner import ContrainteEtreSurProjet
-
-from api.services.task_assigner.data_handlers.input_data import split_data_task_assigner
 from api.data_fetcher import get_data_task_assigner
+from api.services.task_assigner.data_handlers.input_data import split_data_task_assigner
+from flask import jsonify
+from modules.task_assigner import ContrainteEtreSurProjet
+from modules.task_assigner import solveur
+
 from api.controllers.task_assigner.controller_data import controller_data
 from api.controllers.task_assigner.controller_parameters import controller_parameters
+from api.servers.base_server import app
+from api.tools import api_key_required
 
 
 @app.route("/task_assigner/", methods=['GET'])

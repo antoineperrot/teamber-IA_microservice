@@ -1,5 +1,5 @@
-from fastapi import HTTPException
 import pandas as pd
+from fastapi import HTTPException
 
 
 def controller_data(

@@ -1,5 +1,7 @@
 import unittest
+
 import pandas as pd
+
 from api.services.planning_optimizer.solver.tools.taches import split_tasks
 
 

@@ -1,15 +1,15 @@
 """
 Module de la classe d'optimisation des plannings.
 """
+import datetime
 from datetime import datetime
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from .ordonnancement import Ordonnancement
 
 from api.services.planning_optimizer.solver.planning.solution_interpreter import schedule_events
-
-import datetime
+from .ordonnancement import Ordonnancement
 
 
 class SimulatedAnnealingPlanningOptimizer:

@@ -1,32 +1,33 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
+
 from api.services.task_assigner.tools.id_remapping import flatten_list
 
 
-def split_tasks(df: pd.DataFrame, mod_lenght: float = 1.0) -> pd.DataFrame:
+def split_tasks(tasks: pd.DataFrame, parts_max_length: float = 1.0) -> pd.DataFrame:
     """
     Découpe des tâches en plusieurs tâches de durées plus courtes.
 
-    :param df: dataframe des tâches à découper.
-    :param mod_lenght: float (en heures) de la durée maximales des nouvelles tâches
-    :return: dataframe des tâches découpées
+    :param tasks: dataframe des tâches à découper.
+    :param parts_max_length: float (en heures) de la durée maximales des nouvelles tâches
+    :return tasks_parts: dataframe des tâches découpées en sous-parties
     """
-    df["n_parts"] = np.ceil(df["evt_dduree"] / mod_lenght).astype(int)
-    df["n_filled_parts"] = (df["evt_dduree"] // mod_lenght).astype(int)
-    df["length"] = df["evt_dduree"] - mod_lenght * df["n_filled_parts"]
+    tasks["n_parts"] = np.ceil(tasks["evt_dduree"] / parts_max_length).astype(int)
+    tasks["n_filled_parts"] = (tasks["evt_dduree"] // parts_max_length).astype(int)
+    tasks["length"] = tasks["evt_dduree"] - parts_max_length * tasks["n_filled_parts"]
 
-    filled_rows = [[pd.DataFrame(row[1]).T] * int(row[1]['n_filled_parts'])  for row in df.iterrows()]
+    filled_rows = [[pd.DataFrame(row[1]).T] * int(row[1]['n_filled_parts'])  for row in tasks.iterrows()]
     filled_rows = pd.concat(flatten_list(filled_rows))
-    filled_rows['length'] = mod_lenght
+    filled_rows['length'] = parts_max_length
 
-    unfilled_rows = df.loc[ (df['length'] > 0) & (df['length'] < mod_lenght)]
-    out = pd.concat([filled_rows, unfilled_rows])
-    out['evt_spkevenement'] = out['evt_spkevenement'].astype(int)
-    out['lgl_sfkligneparent'] = out['lgl_sfkligneparent'].astype(int)
-    out['evt_sfkprojet'] = out['evt_sfkprojet'].astype(int)
-    out['priorite'] = out['priorite'].astype(int)
-    out = out.drop(columns=['n_parts','n_filled_parts'])
-    out.sort_values(by=['evt_spkevenement','length'], inplace=True)
-    out.reset_index(drop=True, inplace=True)
-    out['id_part'] = list(range(len(out)))
-    return out
+    unfilled_rows = tasks.loc[ (tasks['length'] > 0) & (tasks['length'] < parts_max_length)]
+    tasks_parts = pd.concat([filled_rows, unfilled_rows])
+    tasks_parts['evt_spkevenement'] = tasks_parts['evt_spkevenement'].astype(int)
+    tasks_parts['lgl_sfkligneparent'] = tasks_parts['lgl_sfkligneparent'].astype(int)
+    tasks_parts['evt_sfkprojet'] = tasks_parts['evt_sfkprojet'].astype(int)
+    tasks_parts['priorite'] = tasks_parts['priorite'].astype(int)
+    tasks_parts = tasks_parts.drop(columns=['n_parts','n_filled_parts'])
+    tasks_parts.sort_values(by=['evt_spkevenement','length'], inplace=True)
+    tasks_parts.reset_index(drop=True, inplace=True)
+    tasks_parts['id_part'] = list(range(len(tasks_parts)))
+    return tasks_parts

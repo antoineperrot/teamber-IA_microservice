@@ -2,6 +2,7 @@
 Module de récupération des données auprès du BACK pour la fonctionnalité task_assigner.
 """
 import pandas as pd
+
 from api.back_connector.tools import make_sql_requests
 
 

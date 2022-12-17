@@ -1,10 +1,9 @@
 from flask import jsonify
 
+from api.back_connector.planning_optimizer import fetch_data
+from api.controllers.planning_optimizer import check_parameters
 from api.servers.base_server import app
 from api.tools import api_key_required
-
-from api.controllers.planning_optimizer import check_parameters
-from api.back_connector.planning_optimizer import fetch_data
 
 
 @app.route("/planning_optimizer/", methods=['GET'])
@@ -14,7 +13,7 @@ def planning_optimizer(url: str,
                        date_start: str,
                        date_end: str,
                        priorites_projets: dict,
-                       duree_min_morceau: float = 1.0):
+                       parts_max_length: float = 1.0):
     """Fonction d'optimisation des plannings utilisateurs
 
     Récupère les données (taches de 'utl' entre 'date_start' et 'date_end', horaires de travail de 'utl')
@@ -49,6 +48,6 @@ def planning_optimizer(url: str,
                                             taches,
                                             date_start,
                                             date_end,
-                                            duree_min_morceau)
+                                            parts_max_length)
 
     return jsonify(optimized_planning)

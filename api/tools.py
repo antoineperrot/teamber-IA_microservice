@@ -4,14 +4,12 @@ Tools for the api
 from flask import request, abort
 
 from api.servers.base_server import app
-from module.logger import root_logger
 
 
 def api_key_required(func):
     def wrapper_function(*args, **kwargs):
         if request.headers:
             auth_header = request.headers.get("Authorization", None)
-            root_logger.debug("Authentification header:" + str(auth_header))
 
             if not auth_header:
                 abort(401, "Missing Authorization header")

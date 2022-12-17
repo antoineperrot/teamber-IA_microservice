@@ -3,6 +3,7 @@ Test la fonction split_n_clean_horaires
 """
 import pickle
 import unittest
+
 from pandas.testing import assert_frame_equal
 
 from api.back_connector.planning_optimizer.data_handlers import split_n_clean_horaires

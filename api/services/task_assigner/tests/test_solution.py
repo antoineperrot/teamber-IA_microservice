@@ -1,9 +1,11 @@
 import unittest
+
 import pandas as pd
 
 
 class TestSolution(unittest.TestCase):
     def __init__(self, solution: dict):
+        super(TestSolution, self).__init__()
         self.solution = solution
 
     def test_validite_mathematique(self):
@@ -51,11 +53,8 @@ class TestSolution(unittest.TestCase):
         self.assertTrue(
             all(
                 stat_utl.taux_occupation.apply(
-                    lambda x: (isinstance(x, float) or isinstance(x, int))
-                    and x >= 0
-                    and x <= 1
-                )
-            ),
+                    lambda x: isinstance(x, (float, int)) and 0 <= x <= 1
+            )),
             msg="TypeError: les données de taux d'occupation sont incorrectes.",
         )
         self.assertTrue(

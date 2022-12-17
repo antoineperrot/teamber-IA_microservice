@@ -1,8 +1,9 @@
 """
 Module des fonctions servant à manipuler les horaires des utilisateurs
 """
-import pandas as pd
 import datetime
+
+import pandas as pd
 
 
 def find_next_ph(df_hor: pd.DataFrame, curseur_temps: pd.Timestamp) -> int:
@@ -55,12 +56,12 @@ def avance_cuseur_temps(
 def make_base(plages_horaires_df: pd.DataFrame,
               date_start: str,
               date_end: str,
-              longueur_min_ph: float = 0.5) -> pd.DataFrame:
+              min_duration_section: float = 0.5) -> pd.DataFrame:
     """
     :param plages_horaires_df: pd.DataFrame des horaires d'un utilisateur
     :param date_start: str au format ISO, date de début du sprint
     :param date_end: str au format ISO, date de fin du sprint
-    :param longueur_min_ph: float indiquant la durée minimale en heures d'une plage horaire sur laquelle
+    :param min_duration_section: float indiquant la durée minimale en heures d'une plage horaire sur laquelle
     on va planifier des tâches.
 
     :return df_ph: dataframe des plages horaires, chacune déterminées par un timestamp de début et de fin,
@@ -93,7 +94,7 @@ def make_base(plages_horaires_df: pd.DataFrame,
     out = out[["timestamp_debut", "timestamp_fin"]]
     out['durée'] = out['timestamp_fin'] - out['timestamp_debut']
     out['durée'] = out['durée'] / datetime.timedelta(hours=1)
-    out = out.loc[out['durée'] >= longueur_min_ph]
+    out = out.loc[out['durée'] >= min_duration_section]
     out = out.reset_index(drop=True)
     _data = [True] + list(out.iloc[1:]['timestamp_debut'].values >= out.iloc[:-1]['timestamp_fin'].values)
     _index = list(range(len(_data)))
@@ -162,7 +163,7 @@ def compute_availabilities(horaires: pd.DataFrame,
                            imperatifs: pd.DataFrame,
                            date_start: str,
                            date_end: str,
-                           longueur_min_ph: float = 0.5) -> pd.DataFrame:
+                           min_duration_section: float = 0.5) -> pd.DataFrame:
     """
     A partir des horaires d'un utilisateur, de ses impératifs (événements non-replanifiables), d'une date de
     début et de fin de sprint, retourne les créneaux sur lesquels l'utilisateur est disponible.
@@ -177,7 +178,7 @@ def compute_availabilities(horaires: pd.DataFrame,
     else:
         sections_ends = find_sections_ends(imperatifs, date_end)
 
-    bases = [make_base(horaires, section_start, section_end, longueur_min_ph)
+    bases = [make_base(horaires, section_start, section_end, min_duration_section)
              for (section_start, section_end) in sections_ends.values]
     availabilities = pd.concat(bases)
     availabilities.reset_index(inplace=True, drop=True)

@@ -1,8 +1,9 @@
 import unittest
+
 import pandas as pd
 
-from api.services.planning_optimizer.solver.planning.horaires import find_next_ph, avance_cuseur_temps,\
-                                                                     make_base, find_sections_ends, compute_availabilities
+from api.services.planning_optimizer.solver.planning.horaires import find_next_ph, avance_cuseur_temps, \
+    make_base, find_sections_ends, compute_availabilities
 
 
 class TestFindNextPlageHoraire(unittest.TestCase):
@@ -607,9 +608,9 @@ class TestFindSectionsEnds(unittest.TestCase):
 
 class TestComputeAvailabilities(unittest.TestCase):
     def setUp(self):
-        self.date_start = pd.Timestamp("2022-09-05 09:00:00+0000")
-        self.date_end = pd.Timestamp("2022-09-09 16:00:00+0000")
-        self.longueur_min_ph = 0.5
+        self.date_start = "2022-09-05 09:00:00+0000"
+        self.date_end = "2022-09-09 16:00:00+0000"
+        self.min_duration_section = 0.5
         self.horaires = pd.DataFrame({'eeh_sfkperiode': {0: 0, 1: 0, 2: 1, 3: 1, 4: 2, 5: 2, 6: 3, 7: 3, 8: 4},
                                      'eeh_xheuredebut': {0: '06:30',
                                       1: '11:30',
@@ -705,4 +706,4 @@ class TestComputeAvailabilities(unittest.TestCase):
 
     def test_compute_availabilities(self):
         output_func = compute_availabilities(self.horaires, self.imperatifs,
-                                             self.date_start, self.date_end, self.longueur_min_ph)
+                                             self.date_start, self.date_end, self.min_duration_section)

@@ -1,7 +1,6 @@
-import datetime
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+
 
 # TACHES MERE FILLE
 
@@ -94,7 +93,7 @@ def proj2(t, Is):
     proj = np.copy(t)
     for i in range(n):
         if t[i] < 0:
-            proj[i] == 0
+            proj[i] = 0
         if t[i] > Is[i].max():
             proj[i] = Is[i].max()
         else:

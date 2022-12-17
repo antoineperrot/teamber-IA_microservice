@@ -1,10 +1,11 @@
 """
 Module contenant les fonctions de mockage de données pour la fonctionnalité Planning Optimizer.
 """
+from random import choices
 from typing import List
+
 import numpy as np
 import pandas as pd
-from random import choices
 
 from api.back_connector.planning_optimizer.data_handlers.taches import split_n_clean_taches, map_priorites_projets
 from api.services.planning_optimizer.tests.test_data.default_horaires import default_horaires

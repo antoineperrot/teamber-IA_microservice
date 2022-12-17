@@ -1,14 +1,14 @@
 """
 Base server for the API
 """
-import time
 import logging
+import time
+
 from flask import Flask, make_response, jsonify, session, request
+from module.logger import root_logger
 from werkzeug.exceptions import HTTPException
 
 from api.config import config
-
-from module.logger import root_logger
 
 REQUEST_RECEIVED_TIME = "request_received_time"
 
