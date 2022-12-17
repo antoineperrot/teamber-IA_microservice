@@ -29,9 +29,7 @@ def controller_parameters(
         )
 
     if not isinstance(date_end, str):
-        raise HTTPException(
-            status_code=422, detail="'date_end' doit être de  string."
-        )
+        raise HTTPException(status_code=422, detail="'date_end' doit être de  string.")
 
     # try :
     #     datetime.datetime.fromisoformat(date_start)

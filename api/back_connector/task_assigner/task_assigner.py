@@ -88,4 +88,3 @@ def fetch_data(access_token: str, date_start: str, date_end: str, url: str) -> d
     df_dsp = pd.DataFrame(data["dispos_utilisateurs"])
 
     return df_prj, df_cmp, df_tsk, df_dsp
-

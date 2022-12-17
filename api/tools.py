@@ -19,7 +19,7 @@ def api_key_required(func):
 
             api_key = auth_header.replace("Bearer ", "")
 
-            if api_key != app.config['SECRET_KEY']:
+            if api_key != app.config["SECRET_KEY"]:
                 abort(401, "Invalid api-key")
 
         return func(*args, **kwargs)

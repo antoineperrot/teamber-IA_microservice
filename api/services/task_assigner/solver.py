@@ -46,11 +46,9 @@ def solveur(
     df_dsp: pd.DataFrame,
     curseur: float,
     contrainte_etre_sur_projet: ContrainteEtreSurProjet,
-    avantage_projet: float
+    avantage_projet: float,
 ):
-    """
-
-    """
+    """ """
     try:
         # FAIT LA LISTE DE TOUS LES IDS (PRJ, CMP, TSK, UTL) CONTENUS DANS LES DONNEES RECUES
         id_utl, id_prj, id_cmp, id_tsk = make_list_ids(df_prj, df_cmp, df_tsk, df_dsp)

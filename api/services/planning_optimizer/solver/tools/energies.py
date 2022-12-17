@@ -24,7 +24,10 @@ def energy_waisted_time(ordo_length: list[float], sections_lengths: list[float])
         current_section_is_filled = False
         total_available_time += sections_lengths[i_section]
         while j < n_tasks and not current_section_is_filled:
-            if ordo_length[j] + current_section_used_time <= sections_lengths[i_section]:
+            if (
+                ordo_length[j] + current_section_used_time
+                <= sections_lengths[i_section]
+            ):
                 current_section_used_time += ordo_length[j]
                 j += 1
             else:
@@ -44,7 +47,11 @@ def energy_waisted_time(ordo_length: list[float], sections_lengths: list[float])
 # Calcule un potentiel correspondant au non respect des priorités
 def energy_priorites(ordo_prio):
     target = np.sort(ordo_prio)
-    energy = np.linalg.norm(target - ordo_prio, ord=1) / len(np.unique(ordo_prio)) / len(ordo_prio)
+    energy = (
+        np.linalg.norm(target - ordo_prio, ord=1)
+        / len(np.unique(ordo_prio))
+        / len(ordo_prio)
+    )
     return energy
 
 

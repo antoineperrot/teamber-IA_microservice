@@ -13,9 +13,10 @@ def make_sql_requests(sql_queries: dict, url: str, access_token: str) -> dict:
         request = requests.post(url, headers=headers, json=sql_query)
         if request.status_code != 200:
             # TODO: Add bonne exception
-            raise ValueError(f"Erreur lors de la récupération des données auprès du BACK: {key}.")
+            raise ValueError(
+                f"Erreur lors de la récupération des données auprès du BACK: {key}."
+            )
         else:
             fetched_data[key] = request.json()["result"]
 
     return fetched_data
-

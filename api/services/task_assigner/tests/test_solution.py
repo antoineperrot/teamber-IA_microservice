@@ -54,7 +54,8 @@ class TestSolution(unittest.TestCase):
             all(
                 stat_utl.taux_occupation.apply(
                     lambda x: isinstance(x, (float, int)) and 0 <= x <= 1
-            )),
+                )
+            ),
             msg="TypeError: les données de taux d'occupation sont incorrectes.",
         )
         self.assertTrue(

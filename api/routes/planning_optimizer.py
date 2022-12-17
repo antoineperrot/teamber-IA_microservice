@@ -6,14 +6,16 @@ from api.servers.base_server import app
 from api.tools import api_key_required
 
 
-@app.route("/planning_optimizer/", methods=['GET'])
+@app.route("/planning_optimizer/", methods=["GET"])
 @api_key_required
-def planning_optimizer(url: str,
-                       access_token: str,
-                       date_start: str,
-                       date_end: str,
-                       priorites_projets: dict,
-                       parts_max_length: float = 1.0):
+def planning_optimizer(
+    url: str,
+    access_token: str,
+    date_start: str,
+    date_end: str,
+    priorites_projets: dict,
+    parts_max_length: float = 1.0,
+):
     """Fonction d'optimisation des plannings utilisateurs
 
     Récupère les données (taches de 'utl' entre 'date_start' et 'date_end', horaires de travail de 'utl')
@@ -39,15 +41,14 @@ def planning_optimizer(url: str,
     """
     check_parameters(date_start, date_end, priorites_projets)
 
-    imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires =\
-        fetch_data(url, access_token, date_start, date_end, priorites_projets)
+    imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires = fetch_data(
+        url, access_token, date_start, date_end, priorites_projets
+    )
 
     from api.services.planning_optimizer import optimize_plannings
-    optimized_planning = optimize_plannings(imperatifs,
-                                            horaires,
-                                            taches,
-                                            date_start,
-                                            date_end,
-                                            parts_max_length)
+
+    optimized_planning = optimize_plannings(
+        imperatifs, horaires, taches, date_start, date_end, parts_max_length
+    )
 
     return jsonify(optimized_planning)

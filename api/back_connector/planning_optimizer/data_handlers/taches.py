@@ -31,7 +31,9 @@ def split_n_clean_taches(df_tsk: pd.DataFrame) -> dict:
     return taches
 
 
-def map_priorites_projets(df_tsk: pd.DataFrame, priorites_projets: dict) -> pd.DataFrame:
+def map_priorites_projets(
+    df_tsk: pd.DataFrame, priorites_projets: dict
+) -> pd.DataFrame:
     """
     :param df_tsk: pd.DataFrame contenant les taches: (id, duree, id_utl, id_projet)
     :param priorites_projets: dict faisant le mapping id_projet <-> niveau de priorité du projet.
@@ -43,6 +45,12 @@ def map_priorites_projets(df_tsk: pd.DataFrame, priorites_projets: dict) -> pd.D
     :return df_tsk: idem que df_tsk input, avec les niveaux de priorités des tâches en plus.
     """
 
-    niveau_min_priorite = int(max(list(priorites_projets.values())) + 1) if len(priorites_projets) > 0 else 0
-    df_tsk["priorite"] = df_tsk["evt_sfkprojet"].map(priorites_projets).fillna(niveau_min_priorite)
+    niveau_min_priorite = (
+        int(max(list(priorites_projets.values())) + 1)
+        if len(priorites_projets) > 0
+        else 0
+    )
+    df_tsk["priorite"] = (
+        df_tsk["evt_sfkprojet"].map(priorites_projets).fillna(niveau_min_priorite)
+    )
     return df_tsk

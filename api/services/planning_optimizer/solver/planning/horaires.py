@@ -53,10 +53,12 @@ def avance_cuseur_temps(
     return curseur_temps
 
 
-def make_base(plages_horaires_df: pd.DataFrame,
-              date_start: str,
-              date_end: str,
-              min_duration_section: float = 0.5) -> pd.DataFrame:
+def make_base(
+    plages_horaires_df: pd.DataFrame,
+    date_start: str,
+    date_end: str,
+    min_duration_section: float = 0.5,
+) -> pd.DataFrame:
     """
     :param plages_horaires_df: pd.DataFrame des horaires d'un utilisateur
     :param date_start: str au format ISO, date de début du sprint
@@ -92,11 +94,13 @@ def make_base(plages_horaires_df: pd.DataFrame,
     out.loc[out["timestamp_fin"] > date_end, "timestamp_fin"] = date_end
 
     out = out[["timestamp_debut", "timestamp_fin"]]
-    out['durée'] = out['timestamp_fin'] - out['timestamp_debut']
-    out['durée'] = out['durée'] / datetime.timedelta(hours=1)
-    out = out.loc[out['durée'] >= min_duration_section]
+    out["durée"] = out["timestamp_fin"] - out["timestamp_debut"]
+    out["durée"] = out["durée"] / datetime.timedelta(hours=1)
+    out = out.loc[out["durée"] >= min_duration_section]
     out = out.reset_index(drop=True)
-    _data = [True] + list(out.iloc[1:]['timestamp_debut'].values >= out.iloc[:-1]['timestamp_fin'].values)
+    _data = [True] + list(
+        out.iloc[1:]["timestamp_debut"].values >= out.iloc[:-1]["timestamp_fin"].values
+    )
     _index = list(range(len(_data)))
     valid_indexes = pd.Series(data=_data, index=_index)
     out = out.loc[valid_indexes]
@@ -104,8 +108,9 @@ def make_base(plages_horaires_df: pd.DataFrame,
     return out
 
 
-def find_next_section_ends(remaining_imp: pd.DataFrame, date_end: pd.Timestamp) -> tuple[
-                           pd.Timestamp, pd.Timestamp, pd.DataFrame]:
+def find_next_section_ends(
+    remaining_imp: pd.DataFrame, date_end: pd.Timestamp
+) -> tuple[pd.Timestamp, pd.Timestamp, pd.DataFrame]:
     """
     Retourne la date de début et de fin du prochain impératifs se trouvant dans un dataframe d'impératifs restant.
     Attention, il se peut que des impératifs se chevauchent dans le temps.
@@ -122,22 +127,28 @@ def find_next_section_ends(remaining_imp: pd.DataFrame, date_end: pd.Timestamp) 
 
     :param remaining_imp: dataframe d'imperatifs restants à traiter
     """
-    arg_start_next_imp = remaining_imp['evt_xdate_debut'].argmin()
-    end_next_imp = remaining_imp.iloc[arg_start_next_imp]['evt_xdate_fin']
-    start_next_section = remaining_imp.iloc[arg_start_next_imp]['evt_xdate_fin']
+    arg_start_next_imp = remaining_imp["evt_xdate_debut"].argmin()
+    end_next_imp = remaining_imp.iloc[arg_start_next_imp]["evt_xdate_fin"]
+    start_next_section = remaining_imp.iloc[arg_start_next_imp]["evt_xdate_fin"]
     remaining_imp = remaining_imp.drop(arg_start_next_imp, axis=0)
 
-    evt_a_cheval = remaining_imp.loc[remaining_imp['evt_xdate_debut'] <= end_next_imp]
+    evt_a_cheval = remaining_imp.loc[remaining_imp["evt_xdate_debut"] <= end_next_imp]
     if len(evt_a_cheval) > 0:
-        start_next_section = evt_a_cheval['evt_xdate_fin'].max()
+        start_next_section = evt_a_cheval["evt_xdate_fin"].max()
         remaining_imp = remaining_imp.drop(evt_a_cheval.index, axis=0)
 
-    end_next_section = min(remaining_imp['evt_xdate_debut'].min(), date_end) if len(remaining_imp) > 0 else date_end
+    end_next_section = (
+        min(remaining_imp["evt_xdate_debut"].min(), date_end)
+        if len(remaining_imp) > 0
+        else date_end
+    )
     remaining_imp.reset_index(drop=True, inplace=True)
     return start_next_section, end_next_section, remaining_imp
 
 
-def find_sections_ends(imperatifs: pd.DataFrame, date_end: pd.Timestamp) -> pd.DataFrame:
+def find_sections_ends(
+    imperatifs: pd.DataFrame, date_end: pd.Timestamp
+) -> pd.DataFrame:
     """
     Découpe un sprint en plusieurs sous-sprint. Les sous-sprint sont les disponibilités d'un impératif au suivant.
     """
@@ -148,22 +159,31 @@ def find_sections_ends(imperatifs: pd.DataFrame, date_end: pd.Timestamp) -> pd.D
     sections_starts = []
     sections_ends = []
     while len(remaining_imp) > 0:
-        start_next_section, end_next_section, remaining_imp = find_next_section_ends(remaining_imp, date_end)
+        start_next_section, end_next_section, remaining_imp = find_next_section_ends(
+            remaining_imp, date_end
+        )
         sections_starts.append(start_next_section)
         sections_ends.append(end_next_section)
 
-    dict_start_next_section = {i: section_start for i, section_start in enumerate(sections_starts)}
-    dict_end_next_section = {i: section_end for i, section_end in enumerate(sections_ends)}
-    out = pd.DataFrame.from_dict({'start': dict_start_next_section,
-                                  'end': dict_end_next_section})
+    dict_start_next_section = {
+        i: section_start for i, section_start in enumerate(sections_starts)
+    }
+    dict_end_next_section = {
+        i: section_end for i, section_end in enumerate(sections_ends)
+    }
+    out = pd.DataFrame.from_dict(
+        {"start": dict_start_next_section, "end": dict_end_next_section}
+    )
     return out
 
 
-def compute_availabilities(horaires: pd.DataFrame,
-                           imperatifs: pd.DataFrame,
-                           date_start: str,
-                           date_end: str,
-                           min_duration_section: float = 0.5) -> pd.DataFrame:
+def compute_availabilities(
+    horaires: pd.DataFrame,
+    imperatifs: pd.DataFrame,
+    date_start: str,
+    date_end: str,
+    min_duration_section: float = 0.5,
+) -> pd.DataFrame:
     """
     A partir des horaires d'un utilisateur, de ses impératifs (événements non-replanifiables), d'une date de
     début et de fin de sprint, retourne les créneaux sur lesquels l'utilisateur est disponible.
@@ -178,8 +198,10 @@ def compute_availabilities(horaires: pd.DataFrame,
     else:
         sections_ends = find_sections_ends(imperatifs, date_end)
 
-    bases = [make_base(horaires, section_start, section_end, min_duration_section)
-             for (section_start, section_end) in sections_ends.values]
+    bases = [
+        make_base(horaires, section_start, section_end, min_duration_section)
+        for (section_start, section_end) in sections_ends.values
+    ]
     availabilities = pd.concat(bases)
     availabilities.reset_index(inplace=True, drop=True)
     return availabilities

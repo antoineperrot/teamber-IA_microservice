@@ -32,6 +32,7 @@ if app.config["MODE"] == DEV:
 
 # import routes
 
+
 @app.errorhandler(Exception)
 def errorhandler(error):
     """
@@ -100,4 +101,4 @@ def ping_route_secure():
     """
     Ping route
     """
-    return make_response(jsonify(app.config['SECRET_KEY']), 200)
+    return make_response(jsonify(app.config["SECRET_KEY"]), 200)

@@ -10,8 +10,9 @@ from api.back_connector.tools import make_sql_requests
 
 
 # TODO: corriger les ValueError
-def fetch_data(url: str, access_token: str, date_start: str, date_end: str, priorites_projets: dict)\
-        -> Tuple[dict, dict, dict, list]:
+def fetch_data(
+    url: str, access_token: str, date_start: str, date_end: str, priorites_projets: dict
+) -> Tuple[dict, dict, dict, list]:
     """
     Prépare et envoie les requêtes SQL auprès du Back Wandeed qui renvoie les données demandées.
 
@@ -178,6 +179,7 @@ def fetch_data(url: str, access_token: str, date_start: str, date_end: str, prio
     ).reset_index(drop=True)
     df_tsk = pd.DataFrame(data["taches"])
 
-    imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires =\
-        filtre(df_imp, df_hor, df_tsk, priorites_projets)
+    imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires = filtre(
+        df_imp, df_hor, df_tsk, priorites_projets
+    )
     return imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires

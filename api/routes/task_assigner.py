@@ -10,15 +10,17 @@ from api.servers.base_server import app
 from api.tools import api_key_required
 
 
-@app.route("/task_assigner/", methods=['GET'])
+@app.route("/task_assigner/", methods=["GET"])
 @api_key_required
-def task_assigner(access_token: str,
-                url: str,
-                date_start: str,
-                date_end: str,
-                curseur: float = 0.0,
-                contrainte_etre_sur_projet: str = "de_preference",
-                avantage_projet: float = 1.0):
+def task_assigner(
+    access_token: str,
+    url: str,
+    date_start: str,
+    date_end: str,
+    curseur: float = 0.0,
+    contrainte_etre_sur_projet: str = "de_preference",
+    avantage_projet: float = 1.0,
+):
 
     """
     Fonction d'optimisation de la répartition des tâches au sein d'un groupe de collaborateurs
@@ -66,9 +68,7 @@ def task_assigner(access_token: str,
     contrainte_etre_sur_projet = ContrainteEtreSurProjet(contrainte_etre_sur_projet)
 
     # récupération des données
-    data = get_data_task_assigner(
-        access_token, date_start, date_end, url
-    )
+    data = get_data_task_assigner(access_token, date_start, date_end, url)
     df_prj, df_cmp, df_tsk, df_dsp = split_data_task_assigner(data)
 
     # verification cohérence/qualité données
