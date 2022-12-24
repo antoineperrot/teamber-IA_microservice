@@ -548,7 +548,7 @@ class TestMakeDfPh(unittest.TestLoader):
             self.dates_debut, self.dates_fin, self.df_horaires, self.expected_results
         ):
             output_func = make_base(df_hor, date_debut, date_fin)
-            pd.testing.assert_frame_equal(output_func, expected_result)
+            pd.testing.assert_frame_equal(output_func, expected_result, check_dtype=False)
 
 
 class TestFindSectionsEnds(unittest.TestCase):
@@ -628,7 +628,7 @@ class TestFindSectionsEnds(unittest.TestCase):
     def test_find_sections_ends(self):
         output_func = find_sections_ends(self.imperatifs, self.date_end)
 
-        pd.testing.assert_frame_equal(output_func, self.expected_result)
+        pd.testing.assert_frame_equal(output_func, self.expected_result, check_dtype=False)
 
 
 class TestComputeAvailabilities(unittest.TestCase):

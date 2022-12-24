@@ -184,4 +184,4 @@ class TestSplitTasks(unittest.TestCase):
 
     def test_split_task(self):
         output_func = split_tasks(self.input_df, self.mod_length)
-        pd.testing.assert_frame_equal(output_func, self.expected_result)
+        pd.testing.assert_frame_equal(output_func, self.expected_result, check_dtype=False)

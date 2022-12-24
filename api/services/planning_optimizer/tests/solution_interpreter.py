@@ -585,7 +585,7 @@ class TestSolutionInterpreter(unittest.TestCase):
 
         output_func = add_event(self.parts, 0, 1, events=self.events)
         pd.testing.assert_frame_equal(
-            pd.DataFrame.from_dict(expected), pd.DataFrame.from_dict(output_func)
+            pd.DataFrame.from_dict(expected), pd.DataFrame.from_dict(output_func), check_dtype=False
         )
 
     def test_move_indexes_forward(self):
@@ -607,7 +607,7 @@ class TestSolutionInterpreter(unittest.TestCase):
 
     def test_make_events(self):
         output_func = make_events(self.make_events_input_1)
-        pd.testing.assert_frame_equal(self.make_events_expected_1, output_func)
+        pd.testing.assert_frame_equal(self.make_events_expected_1, output_func, check_dtype=False)
 
         output_func = make_events(self.make_events_input_2)
-        pd.testing.assert_frame_equal(self.make_events_expected_2, output_func)
+        pd.testing.assert_frame_equal(self.make_events_expected_2, output_func, check_dtype=False)
