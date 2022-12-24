@@ -1,4 +1,4 @@
-from flask import jsonify
+from flask import jsonify, make_response
 
 from api.back_connector.planning_optimizer import fetch_data
 from api.controllers.planning_optimizer import check_parameters
@@ -51,4 +51,4 @@ def planning_optimizer(
         imperatifs, horaires, taches, date_start, date_end, parts_max_length
     )
 
-    return jsonify(optimized_planning)
+    return make_response(jsonify(optimized_planning), 200)
