@@ -1,6 +1,7 @@
 """
 Module de la classe d'optimisation des plannings.
 """
+import os
 import datetime
 from datetime import datetime
 
@@ -11,11 +12,14 @@ import pandas as pd
 from api.services.planning_optimizer.solver.planning.solution_interpreter import (
     schedule_events,
 )
-from .ordonnancement import Ordonnancement
+from api.services.planning_optimizer.solver.planning.ordonnancement import Ordonnancement
+
+from api.config import config
 
 
 class SimulatedAnnealingPlanningOptimizer:
-    def __init__(self, availabilities: pd.DataFrame, tasks: pd.DataFrame):
+    def __init__(self, availabilities: pd.DataFrame, tasks: pd.DataFrame,
+                 save_for_testing: bool = False):
 
         self.availabilities = availabilities
         self.tasks = tasks
@@ -29,6 +33,7 @@ class SimulatedAnnealingPlanningOptimizer:
         self.statistics = None
         self.events = None
         self.unfilled_tasks = None
+        self.save_for_testing = save_for_testing
 
     def optimize(
         self,
@@ -48,12 +53,14 @@ class SimulatedAnnealingPlanningOptimizer:
         ordonnancement = self.ordonnancement
         ordonnancement_optimal = self.ordonnancement
         temp = initial_temperature
-        statistics = {
-            "temperature": [temp],
-            "energy": [ordonnancement.get_energy()],
-            "energy_min": [ordonnancement_optimal.get_energy()],
-            "proba": [],
-        }
+        statistics = None
+        if self.save_for_testing:
+            statistics = {
+                "temperature": [temp],
+                "energy": [ordonnancement.get_energy()],
+                "energy_min": [ordonnancement_optimal.get_energy()],
+                "proba": [],
+            }
 
         decay = 1 - np.exp(np.log(min_temperature / initial_temperature) / n_iterations)
         for i in range(1, n_iterations):
@@ -69,12 +76,16 @@ class SimulatedAnnealingPlanningOptimizer:
             if ordonnancement.energy < ordonnancement_optimal.energy:
                 ordonnancement_optimal = ordonnancement
 
-            statistics["temperature"].append(temp)
-            statistics["energy"].append(ordonnancement.energy)
-            statistics["energy_min"].append(ordonnancement_optimal.energy)
-            statistics["proba"].append(proba_transition)
+            if self.save_for_testing:
+                statistics["temperature"].append(temp)
+                statistics["energy"].append(ordonnancement.energy)
+                statistics["energy_min"].append(ordonnancement_optimal.energy)
+                statistics["proba"].append(proba_transition)
 
-        self.statistics = statistics
+        if self.save_for_testing:
+            self.statistics = statistics
+            self.save_statistic_fig()
+
         self.ordonnancement = ordonnancement_optimal
 
     def schedule_events(self) -> pd.DataFrame:
@@ -84,17 +95,19 @@ class SimulatedAnnealingPlanningOptimizer:
         self.events = schedule_events(
             self.availabilities, self.tasks, self.ordonnancement
         )
+        if self.save_for_testing:
+            make_timeline(self.availabilities, )
         return self.events
 
-    def get_unfilled_task(self):
+    def get_unfilled_task(self) -> pd.DataFrame:
         """
         Retourne les tâches qui n'ont pas été complètement planifiées.
         """
         temp = pd.DataFrame.copy(self.events)
         temp["start"] = temp["start"].apply(
-            lambda x: datetime.datetime.fromisoformat(x)
+            lambda x: datetime.fromisoformat(x)
         )
-        temp["end"] = temp["end"].apply(lambda x: datetime.datetime.fromisoformat(x))
+        temp["end"] = temp["end"].apply(lambda x: datetime.fromisoformat(x))
         temp["durée_effectuée"] = np.round(
             (temp["end"] - temp["start"]) / datetime.timedelta(hours=1), 2
         )
@@ -133,7 +146,7 @@ class SimulatedAnnealingPlanningOptimizer:
         self.unfilled_tasks = unfilled_tasks
         return unfilled_tasks
 
-    def plot_optimization_statistics(self):
+    def save_statistic_fig(self):
         """
         Plot l'évolution de
         - la température
@@ -149,3 +162,8 @@ class SimulatedAnnealingPlanningOptimizer:
                 ax.flat[i].plot(range(len(stat)), stat)
             else:
                 ax.flat[i].scatter(range(len(stat)), stat)
+
+        if self.save_for_testing:
+            now = datetime.now()
+            now_timestamp = str(now.timestamp()).split('.')[0]
+            fig.savefig(os.path.join(config["LAST_TEST_FILES_PATH"], now_timestamp + "_optimization_statistics"))

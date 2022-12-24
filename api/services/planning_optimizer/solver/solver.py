@@ -11,6 +11,8 @@ from api.services.planning_optimizer.solver.planning.planning import (
 )
 from api.services.planning_optimizer.solver.tools.taches import split_tasks
 
+from api.services.planning_optimizer.solver.planning.solution_interpreter import make_stats
+
 
 def solver(
     horaires: pd.DataFrame,
@@ -20,7 +22,8 @@ def solver(
     date_end: str,
     parts_max_length: float,
     min_duration_section: float,
-):
+    save_optimization_statistics: bool = False,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Prend les données d'un utilisateur et renvoie son emploi du temps optimisé.
     """
@@ -31,11 +34,11 @@ def solver(
     splitted_tasks = split_tasks(taches, parts_max_length)
 
     optimizer = SimulatedAnnealingPlanningOptimizer(
-        availabilities=availabilities, tasks=splitted_tasks
+        availabilities=availabilities, tasks=splitted_tasks, save_for_testing=save_optimization_statistics
     )
 
     optimizer.optimize(n_iterations_per_task=250)
-    events = optimizer.schedule_events()
-    # unfilled_tasks = optimizer.get_unfilled_task()
+    events, ordonnancement = optimizer.schedule_events()
+    stats = make_stats(events, taches)
 
-    return events, None, availabilities
+    return events, stats

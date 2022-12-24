@@ -2,7 +2,7 @@
 Module de traduction de la solution mathématique en une sortie DataFrame interprétable.
 """
 import datetime
-
+import numpy as np
 import pandas as pd
 
 from api.services.planning_optimizer.solver.planning.ordonnancement import (
@@ -163,10 +163,9 @@ def schedule_parts(
         ]
         current_section_end = availabilities.iloc[i_current_section]["timestamp_fin"]
         curseur_temps = current_section_start
-
         while not current_section_is_filled and not no_more_parts:
             id_part = ordonnancement.ordonnancement[i_current_part]
-            part = tasks.iloc[i_current_part]
+            part = tasks.iloc[id_part]
             length_part = datetime.timedelta(hours=part["length"])
             if curseur_temps + length_part > current_section_end:
                 current_section_is_filled = True
@@ -184,7 +183,7 @@ def schedule_parts(
     scheduled_tasks_parts = pd.DataFrame(scheduled_tasks_parts)
     scheduled_tasks_parts = scheduled_tasks_parts.merge(tasks, on="id_part")
     scheduled_tasks_parts = scheduled_tasks_parts[
-        ["start", "end", "evt_spkevenement", "evt_sfkprojet", "priorite"]
+        ["start", "end", "evt_spkevenement", "evt_sfkprojet", "priorite","id_part"]
     ]
     return scheduled_tasks_parts
 
@@ -203,4 +202,36 @@ def schedule_events(
     """
     scheduled_parts = schedule_parts(availabilities, tasks, ordonnancement)
     events = make_events(scheduled_parts)
-    return events
+    return scheduled_parts, events
+
+
+def make_stats(events: pd.DataFrame, tasks: pd.DataFrame) -> dict[str: pd.DataFrame]:
+    """
+    Fourni un pourcentage de planification des tâches, à partir de ce qui a pu être planifié, et des
+    tâches que l'on souhaitait initialiement planifier de manière optimale dans la période de sprint.
+
+    :param events: dataframe des tâches planifiées
+    :param tasks: dataframe des tâches à planifier de manière optimale
+    """
+
+    # stats percent completion for tasks
+    events['duree'] = events['end'] - events['start']
+    events['duree'] = events['duree'].apply(lambda x: x.total_seconds() / 3600)
+    events = events.groupby('evt_spkevenement').sum("duree").reset_index()[['evt_spkevenement', 'duree']]
+    tache_to_duree = dict(zip(events['evt_spkevenement'], events['duree']))
+    stat_tasks = pd.DataFrame.copy(tasks)
+    stat_tasks['duree_effectuee'] = stat_tasks['evt_spkevenement'].map(tache_to_duree)
+    stat_tasks.fillna(0, inplace=True)
+    stat_tasks['pct_completion'] = np.round(stat_tasks['duree_effectuee'] / stat_tasks['evt_dduree'], 2)
+    stat_tasks = stat_tasks[['evt_spkevenement',
+                             "lgl_sfkligneparent", "evt_sfkprojet", "priorite",'evt_dduree', "duree_effectuee",
+                             "pct_completion"]]
+    stat_tasks.sort_values(by="pct_completion", ascending=False)
+
+    # stats percent completion for projects
+    stat_projects = pd.DataFrame.copy(stat_tasks).groupby("evt_sfkprojet").sum()[["evt_dduree", "duree_effectuee"]]
+    stat_projects['projet_percent_completion'] = np.round(stat_projects["duree_effectuee"] / stat_projects["evt_dduree"], 2)
+    stat_projects = stat_projects.reset_index()
+
+    stats = {"tasks": stat_tasks, "projects": stat_projects}
+    return stats
