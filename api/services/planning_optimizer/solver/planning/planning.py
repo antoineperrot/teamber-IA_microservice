@@ -15,6 +15,7 @@ from api.services.planning_optimizer.solver.planning.solution_interpreter import
 from api.services.planning_optimizer.solver.planning.ordonnancement import Ordonnancement
 
 from api.config import config
+from api.string_keys import *
 
 
 class SimulatedAnnealingPlanningOptimizer:
@@ -96,7 +97,8 @@ class SimulatedAnnealingPlanningOptimizer:
             self.availabilities, self.tasks, self.ordonnancement
         )
         if self.save_for_testing:
-            make_timeline(self.availabilities, )
+            pass
+            #make_timeline(self.availabilities, )
         return self.events
 
     def get_unfilled_task(self) -> pd.DataFrame:
@@ -112,34 +114,34 @@ class SimulatedAnnealingPlanningOptimizer:
             (temp["end"] - temp["start"]) / datetime.timedelta(hours=1), 2
         )
 
-        temp = temp[["evt_spkevenement", "durée_effectuée"]]
-        temp = temp.groupby("evt_spkevenement").sum()
+        temp = temp[[key_evenement, "durée_effectuée"]]
+        temp = temp.groupby(key_evenement).sum()
 
         sub_tasks = self.tasks
-        sub_tasks = sub_tasks[["evt_spkevenement", "evt_dduree"]]
-        sub_tasks = sub_tasks.groupby("evt_spkevenement").sum()
+        sub_tasks = sub_tasks[[key_evenement, key_duree_evenement]]
+        sub_tasks = sub_tasks.groupby(key_evenement).sum()
 
         completion_tasks = sub_tasks.join(temp, how="outer")
         completion_tasks = completion_tasks.fillna(0.0)
         completion_tasks["completion"] = (
             np.round(
                 completion_tasks["durée_effectuée"]
-                / completion_tasks["evt_dduree"]
+                / completion_tasks[key_duree_evenement]
                 * 100
             )
         ).astype(int)
         completion_tasks = completion_tasks.loc[completion_tasks["completion"] < 100]
 
         sub_tasks2 = (
-            self.tasks[["evt_spkevenement", "evt_sfkprojet", "priorite"]]
-            .groupby("evt_spkevenement")
+            self.tasks[[key_evenement, key_evenement_project, key_project_priority]]
+            .groupby(key_evenement)
             .mean()
         )
 
         completion_tasks = completion_tasks.join(sub_tasks2, how="outer")
         unfilled_tasks = (
             completion_tasks.reset_index()
-            .sort_values(by=["completion", "evt_sfkprojet"], ascending=False)
+            .sort_values(by=["completion", key_evenement_project], ascending=False)
             .reset_index(drop=True)
         )
 

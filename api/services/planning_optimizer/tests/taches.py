@@ -3,13 +3,14 @@ import unittest
 import pandas as pd
 
 from api.services.planning_optimizer.solver.tools.taches import split_tasks
+from api.string_keys import *
 
 
 class TestSplitTasks(unittest.TestCase):
     def setUp(self):
         self.input_df = pd.DataFrame(
             {
-                "evt_dduree": {
+                key_duree_evenement: {
                     0: 0.75,
                     1: 3.25,
                     2: 3.25,
@@ -18,7 +19,7 @@ class TestSplitTasks(unittest.TestCase):
                     5: 1.5,
                     6: 0.75,
                 },
-                "evt_spkevenement": {
+                key_evenement: {
                     0: 1075,
                     1: 1500,
                     2: 3591,
@@ -27,7 +28,7 @@ class TestSplitTasks(unittest.TestCase):
                     5: 8501,
                     6: 9646,
                 },
-                "lgl_sfkligneparent": {
+                key_competence: {
                     0: 2871,
                     1: 2871,
                     2: 2871,
@@ -36,7 +37,7 @@ class TestSplitTasks(unittest.TestCase):
                     5: 2871,
                     6: 2871,
                 },
-                "evt_sfkprojet": {
+                key_evenement_project: {
                     0: 2842,
                     1: 9077,
                     2: 9077,
@@ -45,7 +46,7 @@ class TestSplitTasks(unittest.TestCase):
                     5: 9227,
                     6: 9077,
                 },
-                "priorite": {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 1, 6: 0},
+                key_project_priority: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 1, 6: 0},
                 "n_parts": {0: 1, 1: 4, 2: 4, 3: 1, 4: 1, 5: 2, 6: 1},
                 "n_filled_parts": {0: 0, 1: 3, 2: 3, 3: 0, 4: 1, 5: 1, 6: 0},
                 "length": {0: 0.75, 1: 0.25, 2: 0.25, 3: 0.25, 4: 0.0, 5: 0.5, 6: 0.75},
@@ -56,7 +57,7 @@ class TestSplitTasks(unittest.TestCase):
 
         self.expected_result = pd.DataFrame(
             {
-                "evt_dduree": {
+                key_duree_evenement: {
                     0: 0.75,
                     1: 3.25,
                     2: 3.25,
@@ -72,7 +73,7 @@ class TestSplitTasks(unittest.TestCase):
                     12: 1.5,
                     13: 0.75,
                 },
-                "evt_spkevenement": {
+                key_evenement: {
                     0: 1075,
                     1: 1500,
                     2: 1500,
@@ -88,7 +89,7 @@ class TestSplitTasks(unittest.TestCase):
                     12: 8501,
                     13: 9646,
                 },
-                "lgl_sfkligneparent": {
+                key_competence: {
                     0: 2871,
                     1: 2871,
                     2: 2871,
@@ -104,7 +105,7 @@ class TestSplitTasks(unittest.TestCase):
                     12: 2871,
                     13: 2871,
                 },
-                "evt_sfkprojet": {
+                key_evenement_project: {
                     0: 2842,
                     1: 9077,
                     2: 9077,
@@ -120,7 +121,7 @@ class TestSplitTasks(unittest.TestCase):
                     12: 9227,
                     13: 9077,
                 },
-                "priorite": {
+                key_project_priority: {
                     0: 0,
                     1: 0,
                     2: 0,
@@ -171,16 +172,16 @@ class TestSplitTasks(unittest.TestCase):
             }
         )
 
-        self.expected_result["evt_spkevenement"] = self.expected_result[
-            "evt_spkevenement"
+        self.expected_result[key_evenement] = self.expected_result[
+            key_evenement
         ].astype(int)
-        self.expected_result["lgl_sfkligneparent"] = self.expected_result[
-            "lgl_sfkligneparent"
+        self.expected_result[key_competence] = self.expected_result[
+            key_competence
         ].astype(int)
-        self.expected_result["evt_sfkprojet"] = self.expected_result[
-            "evt_sfkprojet"
+        self.expected_result[key_evenement_project] = self.expected_result[
+            key_evenement_project
         ].astype(int)
-        self.expected_result["priorite"] = self.expected_result["priorite"].astype(int)
+        self.expected_result[key_project_priority] = self.expected_result[key_project_priority].astype(int)
 
     def test_split_task(self):
         output_func = split_tasks(self.input_df, self.mod_length)

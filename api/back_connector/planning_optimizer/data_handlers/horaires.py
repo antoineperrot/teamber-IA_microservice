@@ -5,6 +5,7 @@ Fonctions pour préparer les données horaires brut de Wandeed à l'optimisation
 from typing import List
 
 import pandas as pd
+from api.string_keys import *
 
 
 def handler_clean_hor(hor: pd.DataFrame) -> pd.DataFrame:
@@ -13,12 +14,12 @@ def handler_clean_hor(hor: pd.DataFrame) -> pd.DataFrame:
     - retire 1 à l'index des jours de la semaine pour que le lundi corresponde au jour 0 et pas 1.
     """
     hor.sort_values(
-        by=["eeh_sfkperiode", "eeh_xheuredebut", "eeh_xheurefin"], inplace=True
+        by=[key_day_plage_horaire, key_debut_plage_horaire, key_fin_plage_horaire], inplace=True
     )
-    hor = hor[["eeh_sfkperiode", "eeh_xheuredebut", "eeh_xheurefin"]]
+    hor = hor[[key_day_plage_horaire, key_debut_plage_horaire, key_fin_plage_horaire]]
     hor.reset_index(drop=True, inplace=True)
 
-    hor = hor.loc[hor["eeh_xheuredebut"] <= hor["eeh_xheurefin"]]
+    hor = hor.loc[hor[key_debut_plage_horaire] <= hor[key_fin_plage_horaire]]
     hor.reset_index(drop=True, inplace=True)
     return hor
 
@@ -38,7 +39,7 @@ def handler_list_hor_utl(list_hor_utl: List[pd.DataFrame]) -> pd.DataFrame:
         union = handler_clean_hor(union)
         union = handler_union_hor(union)
         union = handler_clean_hor(union)
-    union["eeh_sfkperiode"] = union["eeh_sfkperiode"] - 1
+    union[key_day_plage_horaire] = union[key_day_plage_horaire] - 1
     return union
 
 
@@ -54,46 +55,46 @@ def handler_union_hor(union: pd.DataFrame) -> pd.DataFrame:
         first_index = temp.index[0]
 
         current_row = temp.iloc[first_index]
-        day = current_row["eeh_sfkperiode"]
-        heure_debut = current_row["eeh_xheuredebut"]
-        heure_fin = current_row["eeh_xheurefin"]
+        day = current_row[key_day_plage_horaire]
+        heure_debut = current_row[key_debut_plage_horaire]
+        heure_fin = current_row[key_fin_plage_horaire]
 
         to_delete = temp.loc[
-            (temp["eeh_sfkperiode"] == day)
-            & (temp["eeh_xheuredebut"] >= heure_debut)
-            & (temp["eeh_xheurefin"] <= heure_fin)
+            (temp[key_day_plage_horaire] == day)
+            & (temp[key_debut_plage_horaire] >= heure_debut)
+            & (temp[key_fin_plage_horaire] <= heure_fin)
         ]
         if len(to_delete) > 0:
             temp = temp.drop(index=to_delete.index)
             temp.reset_index(inplace=True, drop=True)
 
         kept = temp.loc[
-            (temp["eeh_sfkperiode"] == day) &
-            ( ((temp["eeh_xheurefin"] <= heure_fin) & (temp["eeh_xheuredebut"] <= heure_debut))
-            | ((temp["eeh_xheurefin"] >= heure_fin) & (temp["eeh_xheuredebut"] <= heure_fin))
-            | ((temp["eeh_xheurefin"] >= heure_fin) & (temp["eeh_xheuredebut"] <= heure_debut)))
+            (temp[key_day_plage_horaire] == day) &
+            ( ((temp[key_fin_plage_horaire] <= heure_fin) & (temp[key_debut_plage_horaire] <= heure_debut))
+            | ((temp[key_fin_plage_horaire] >= heure_fin) & (temp[key_debut_plage_horaire] <= heure_fin))
+            | ((temp[key_fin_plage_horaire] >= heure_fin) & (temp[key_debut_plage_horaire] <= heure_debut)))
         ]
 
         if len(kept) > 0:
             temp = temp.drop(index=kept.index)
             temp.reset_index(inplace=True, drop=True)
-            final_hd = min(str(heure_debut), str(kept["eeh_xheuredebut"].min()))
-            final_hf = max(str(heure_fin), str(kept["eeh_xheurefin"].max()))
+            final_hd = min(str(heure_debut), str(kept[key_debut_plage_horaire].min()))
+            final_hf = max(str(heure_fin), str(kept[key_fin_plage_horaire].max()))
         else:
             final_hd = heure_debut
             final_hf = heure_fin
 
         final_row_df = pd.DataFrame(
             {
-                "eeh_sfkperiode": [day],
-                "eeh_xheuredebut": [final_hd],
-                "eeh_xheurefin": [final_hf],
+                key_day_plage_horaire: [day],
+                key_debut_plage_horaire: [final_hd],
+                key_fin_plage_horaire: [final_hf],
             }
         )
 
         out = pd.concat([out, final_row_df], ignore_index=True)
 
-    out["eeh_sfkperiode"] = out["eeh_sfkperiode"].astype(int)
+    out[key_day_plage_horaire] = out[key_day_plage_horaire].astype(int)
     out = handler_clean_hor(out)    
     return out
 
@@ -105,11 +106,11 @@ def make_clean_hor(df_hor: pd.DataFrame) -> dict:
     nettoyé et cohérent.
     """
     horaires = {}
-    for utl in df_hor["epu_sfkutilisateur"].unique():
+    for utl in df_hor[key_epu_sfkutilisateur].unique():
         list_horaires_utl = list(
             df_hor.loc[
-                df_hor["epu_sfkutilisateur"] == utl,
-            ]["epl_employe_horaire"]
+                df_hor[key_epu_sfkutilisateur] == utl,
+            ][key_epl_employe_horaire]
         )
         list_df_hor_utl = [pd.DataFrame(_d) for _d in list_horaires_utl]
         horaires[utl] = handler_list_hor_utl(list_df_hor_utl)

@@ -7,6 +7,7 @@ from typing import Tuple, List
 import numpy as np
 import pandas as pd
 
+from api.string_keys import *
 from api.services.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
 
 
@@ -49,7 +50,7 @@ def mock_coherent_data() -> Tuple[
         mat_cmp[:, i] = np.random.binomial(3, proba, n_cmp)
 
     df_cmp = pd.DataFrame(
-        {"emc_sfkarticle": [], "emc_sniveau": [], "emc_sfkutilisateur": []}
+        {key_emc_sfkarticle: [], key_emc_sniveau: [], key_emc_sfkutilisateur: []}
     )
     for cmp in range(n_cmp):
         for utl in range(n_utl):
@@ -59,9 +60,9 @@ def mock_coherent_data() -> Tuple[
                         df_cmp,
                         pd.DataFrame(
                             {
-                                "emc_sfkarticle": [ids_cmp[cmp]],
-                                "emc_sniveau": [mat_cmp[cmp, utl]],
-                                "emc_sfkutilisateur": [ids_utl[utl]],
+                                key_emc_sfkarticle: [ids_cmp[cmp]],
+                                key_emc_sniveau: [mat_cmp[cmp, utl]],
+                                key_emc_sfkutilisateur: [ids_utl[utl]],
                             }
                         ),
                     ],
@@ -72,8 +73,8 @@ def mock_coherent_data() -> Tuple[
     mat_prj = np.random.randint(0, 2, (n_prj, n_utl))
     df_prj = pd.DataFrame(
         {
-            "utl_spkutilisateur": [],
-            "int_sfkprojet": [],
+            key_user: [],
+            key_project: [],
         }
     )
     for prj in range(n_prj):
@@ -84,8 +85,8 @@ def mock_coherent_data() -> Tuple[
                         df_prj,
                         pd.DataFrame(
                             {
-                                "utl_spkutilisateur": [ids_utl[utl]],
-                                "int_sfkprojet": [ids_prj[prj]],
+                                key_user: [ids_utl[utl]],
+                                key_project: [ids_prj[prj]],
                             }
                         ),
                     ],
@@ -95,10 +96,10 @@ def mock_coherent_data() -> Tuple[
 
     df_tsk = pd.DataFrame(
         {
-            "evt_dduree": [],
-            "evt_spkevenement": [],
-            "lgl_sfkligneparent": [],
-            "evt_sfkprojet": [],
+            key_duree_evenement: [],
+            key_evenement: [],
+            key_competence: [],
+            key_evenement_project: [],
         }
     )
     for i, tsk in enumerate(ids_tsk):
@@ -110,10 +111,10 @@ def mock_coherent_data() -> Tuple[
                 df_tsk,
                 pd.DataFrame(
                     {
-                        "evt_dduree": [duree],
-                        "evt_spkevenement": [tsk],
-                        "lgl_sfkligneparent": [choices(ids_cmp)[0]],
-                        "evt_sfkprojet": [choices(ids_prj)[0]],
+                        key_duree_evenement: [duree],
+                        key_evenement: [tsk],
+                        key_competence: [choices(ids_cmp)[0]],
+                        key_evenement_project: [choices(ids_prj)[0]],
                     },
                 ),
             ],
@@ -123,12 +124,12 @@ def mock_coherent_data() -> Tuple[
     for key in df_tsk.columns[1:]:
         df_tsk[key] = df_tsk[key].astype(int)
 
-    np_ = np.round(df_tsk["evt_dduree"].sum() / n_utl, 2) * np.random.uniform(0.8, 1.2)
+    np_ = np.round(df_tsk[key_duree_evenement].sum() / n_utl, 2) * np.random.uniform(0.8, 1.2)
 
     df_dsp = pd.DataFrame(
         {
-            "utl_spkutilisateur": [],
-            "utl_sdispo": [],
+            key_user: [],
+            key_user_dispo: [],
         }
     )
     for utl in range(n_utl):
@@ -139,7 +140,7 @@ def mock_coherent_data() -> Tuple[
             [
                 df_dsp,
                 pd.DataFrame(
-                    {"utl_spkutilisateur": [ids_utl[utl]], "utl_sdispo": [dispo]},
+                    {key_user: [ids_utl[utl]], key_user_dispo: [dispo]},
                 ),
             ],
             ignore_index=True,

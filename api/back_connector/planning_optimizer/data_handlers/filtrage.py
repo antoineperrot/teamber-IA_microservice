@@ -17,7 +17,7 @@ from api.back_connector.planning_optimizer.data_handlers.imperatifs import (
 )
 from api.back_connector.planning_optimizer.data_handlers.taches import (
     split_n_clean_taches,
-    map_priorites_projets,
+    map_key_project_prioritys_projets,
 )
 from api.loggers import logger_planning_optimizer
 
@@ -26,14 +26,14 @@ def filtre(
     df_imp: pd.DataFrame,
     df_hor: pd.DataFrame,
     df_tsk: pd.DataFrame,
-    priorites_projets: dict,
+    key_project_prioritys_projets: dict,
 ) -> Tuple[dict, dict, dict, list]:
     """
     Filtre et nettoie les données brutes reçues depuis le BACK Wandeed. Ne renvoie que le nécessaire à
     l'optimisation.
     """
 
-    df_tsk = map_priorites_projets(df_tsk, priorites_projets)
+    df_tsk = map_key_project_prioritys_projets(df_tsk, key_project_prioritys_projets)
     taches = split_n_clean_taches(df_tsk)
     imperatifs = split_n_clean_impertifs(df_imp)
     horaires = make_clean_hor(df_hor)

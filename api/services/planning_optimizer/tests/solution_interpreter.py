@@ -12,6 +12,7 @@ from api.services.planning_optimizer.solver.planning.solution_interpreter import
     move_indexes_forward,
     make_events,
 )
+from api.string_keys import *
 
 
 class TestSolutionInterpreter(unittest.TestCase):
@@ -82,7 +83,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     28: pd.Timestamp("2022-09-09 09:00:00+0000", tz="UTC"),
                     29: pd.Timestamp("2022-09-09 10:00:00+0000", tz="UTC"),
                 },
-                "evt_spkevenement": {
+                key_evenement: {
                     0: 4661,
                     1: 3620,
                     2: 3620,
@@ -114,7 +115,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     28: 1090,
                     29: 1090,
                 },
-                "evt_sfkprojet": {
+                key_evenement_project: {
                     0: 4455,
                     1: 8297,
                     2: 8297,
@@ -146,7 +147,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     28: 9348,
                     29: 9348,
                 },
-                "priorite": {
+                key_project_priority: {
                     0: 2,
                     1: 1,
                     2: 1,
@@ -241,7 +242,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     25: pd.Timestamp("2022-09-09 09:00:00+0000", tz="UTC"),
                     26: pd.Timestamp("2022-09-09 10:00:00+0000", tz="UTC"),
                 },
-                "evt_spkevenement": {
+                key_evenement: {
                     0: 2920,
                     1: 2920,
                     2: 2920,
@@ -270,7 +271,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     25: 32,
                     26: 32,
                 },
-                "evt_sfkprojet": {
+                key_evenement_project: {
                     0: 6648,
                     1: 6648,
                     2: 6648,
@@ -299,7 +300,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     25: 1805,
                     26: 1805,
                 },
-                "priorite": {
+                key_project_priority: {
                     0: 0,
                     1: 0,
                     2: 0,
@@ -376,7 +377,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     17: pd.Timestamp("2022-09-09 08:00:00+0000", tz="UTC"),
                     18: pd.Timestamp("2022-09-09 10:00:00+0000", tz="UTC"),
                 },
-                "evt_spkevenement": {
+                key_evenement: {
                     0: 4661,
                     1: 3620,
                     2: 1592,
@@ -397,7 +398,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     17: 151,
                     18: 1090,
                 },
-                "evt_sfkprojet": {
+                key_evenement_project: {
                     0: 4455,
                     1: 8297,
                     2: 8297,
@@ -418,7 +419,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     17: 6675,
                     18: 9348,
                 },
-                "priorite": {
+                key_project_priority: {
                     0: 2,
                     1: 1,
                     2: 1,
@@ -487,7 +488,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     17: pd.Timestamp("2022-09-09 08:00:00+0000", tz="UTC"),
                     18: pd.Timestamp("2022-09-09 09:00:00+0000", tz="UTC"),
                 },
-                "evt_spkevenement": {
+                key_evenement: {
                     0: 4661,
                     1: 3620,
                     2: 1592,
@@ -508,7 +509,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     17: 151,
                     18: 1090,
                 },
-                "evt_sfkprojet": {
+                key_evenement_project: {
                     0: 4455,
                     1: 8297,
                     2: 8297,
@@ -529,7 +530,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     17: 6675,
                     18: 9348,
                 },
-                "priorite": {
+                key_project_priority: {
                     0: 2,
                     1: 1,
                     2: 1,
@@ -578,9 +579,9 @@ class TestSolutionInterpreter(unittest.TestCase):
         expected = {
             "start": [pd.Timestamp("2022-09-05 09:30:00+0000", tz="UTC")],
             "end": [pd.Timestamp("2022-09-05 09:45:00+0000", tz="UTC")],
-            "evt_spkevenement": [4661],
-            "evt_sfkprojet": [4455],
-            "priorite": [2],
+            key_evenement: [4661],
+            key_evenement_project: [4455],
+            key_project_priority: [2],
         }
 
         output_func = add_event(self.parts, 0, 1, events=self.events)

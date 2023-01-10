@@ -3,6 +3,6 @@ Module contenant les controllers des données d'entrée de la fonctionnalité pl
 """
 
 
-def check_parameters(date_start: str, date_end: str, priorites_projets: dict) -> None:
+def check_parameters(date_start: str, date_end: str, key_project_prioritys_projets: dict) -> None:
     # TODO : écrire controller
     return

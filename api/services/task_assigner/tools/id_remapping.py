@@ -6,7 +6,7 @@ from typing import Tuple, List
 
 import numpy as np
 import pandas as pd
-
+from api.string_keys import *
 
 def remap_df_out(df_out: pd.DataFrame, int_to_tsk, int_to_utl, int_to_prj, int_to_cmp):
     """
@@ -29,8 +29,8 @@ def make_usefull_mapping_dicts(
     """
     d_tsk_to_cmp = {int(row["tsk"]): int(row["cmp"]) for i, row in df_tsk.iterrows()}
     d_tsk_to_prj = {int(row["tsk"]): int(row["prj"]) for i, row in df_tsk.iterrows()}
-    d_tsk_to_lgt = {int(row["tsk"]): row["evt_dduree"] for i, row in df_tsk.iterrows()}
-    d_utl_to_dsp = {int(row["utl"]): row["utl_sdispo"] for _, row in df_dsp.iterrows()}
+    d_tsk_to_lgt = {int(row["tsk"]): row[key_duree_evenement] for i, row in df_tsk.iterrows()}
+    d_utl_to_dsp = {int(row["utl"]): row[key_user_dispo] for _, row in df_dsp.iterrows()}
     d_utl_to_dsp["not assigned"] = np.sum(list(d_utl_to_dsp.values()))
     return d_tsk_to_cmp, d_tsk_to_prj, d_tsk_to_lgt, d_utl_to_dsp
 
@@ -64,26 +64,26 @@ def make_list_ids(df_prj, df_cmp, df_tsk, df_dsp):
     """
     # sauvegarde des id utilisateurs ET conservation des ids_utl uniques
     lst_utl = []
-    lst_utl.append(list(np.unique(df_prj["utl_spkutilisateur"])))
-    lst_utl.append(list(np.unique(df_cmp["emc_sfkutilisateur"])))
-    lst_utl.append(list(np.unique(df_dsp["utl_spkutilisateur"])))
+    lst_utl.append(list(np.unique(df_prj[key_user])))
+    lst_utl.append(list(np.unique(df_cmp[key_emc_sfkutilisateur])))
+    lst_utl.append(list(np.unique(df_dsp[key_user])))
     id_utl = list(np.sort(np.unique(flatten_list(lst_utl))))
 
     # sauvegarde des id projets ET conservation des ids_prj uniques
     lst_prj = []
-    lst_prj.append(list(np.unique(df_prj["int_sfkprojet"])))
-    lst_prj.append(list(np.unique(df_tsk["evt_sfkprojet"])))
+    lst_prj.append(list(np.unique(df_prj[key_project])))
+    lst_prj.append(list(np.unique(df_tsk[key_evenement_project])))
     id_prj = list(np.sort(np.unique(flatten_list(lst_prj))))
 
     # sauvegardes des ids competences ET conservation des ids_cmp uniques
     lst_cmp = []
-    lst_cmp.append(list(np.unique(df_cmp["emc_sfkarticle"])))
-    lst_cmp.append(list(np.unique(df_tsk["lgl_sfkligneparent"])))
+    lst_cmp.append(list(np.unique(df_cmp[key_emc_sfkarticle])))
+    lst_cmp.append(list(np.unique(df_tsk[key_competence])))
     id_cmp = list(np.sort(np.unique(flatten_list(lst_cmp))))
 
     # sauvegardes des ids tsk ET conservation des ids_tsk uniques
     lst_tsk = []
-    id_tsk = list(np.sort(np.unique(df_tsk["evt_spkevenement"])))
+    id_tsk = list(np.sort(np.unique(df_tsk[key_evenement])))
 
     return id_utl, id_prj, id_cmp, id_tsk
 
@@ -109,14 +109,14 @@ def add_local_ids_in_dfs(
     """
     AJOUT DES VARIABLES LOCALES DANS LES DATAFRAMES
     """
-    df_cmp["cmp"] = df_cmp["emc_sfkarticle"].map(cmp_to_int)
-    df_cmp["utl"] = df_cmp["emc_sfkutilisateur"].map(utl_to_int)
-    df_tsk["tsk"] = df_tsk["evt_spkevenement"].map(tsk_to_int)
-    df_tsk["cmp"] = df_tsk["lgl_sfkligneparent"].map(cmp_to_int)
-    df_tsk["prj"] = df_tsk["evt_sfkprojet"].map(prj_to_int)
-    df_prj["utl"] = df_prj["utl_spkutilisateur"].map(utl_to_int)
-    df_prj["prj"] = df_prj["int_sfkprojet"].map(prj_to_int)
-    df_dsp["utl"] = df_dsp["utl_spkutilisateur"].map(utl_to_int)
+    df_cmp["cmp"] = df_cmp[key_emc_sfkarticle].map(cmp_to_int)
+    df_cmp["utl"] = df_cmp[key_emc_sfkutilisateur].map(utl_to_int)
+    df_tsk["tsk"] = df_tsk[key_evenement].map(tsk_to_int)
+    df_tsk["cmp"] = df_tsk[key_competence].map(cmp_to_int)
+    df_tsk["prj"] = df_tsk[key_evenement_project].map(prj_to_int)
+    df_prj["utl"] = df_prj[key_user].map(utl_to_int)
+    df_prj["prj"] = df_prj[key_project].map(prj_to_int)
+    df_dsp["utl"] = df_dsp[key_user].map(utl_to_int)
 
     # commodités pour plus tard
     df_cmp = df_cmp.sort_values(by="utl")

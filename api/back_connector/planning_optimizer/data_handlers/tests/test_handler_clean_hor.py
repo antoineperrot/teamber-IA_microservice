@@ -5,6 +5,7 @@ import pandas as pd
 from api.back_connector.planning_optimizer.data_handlers.horaires import (
     handler_clean_hor,
 )
+from api.string_keys import *
 
 
 class TestHandlerCleanHor(unittest.TestCase):
@@ -15,18 +16,18 @@ class TestHandlerCleanHor(unittest.TestCase):
         self.list_test_input.append(
             pd.DataFrame(
                 {
-                    "eeh_xheurefin": ["10:45", "23:00"],
-                    "eeh_sfkperiode": [1, 2],
-                    "eeh_xheuredebut": ["06:30", "22:45"],
+                    key_fin_plage_horaire: ["10:45", "23:00"],
+                    key_day_plage_horaire: [1, 2],
+                    key_debut_plage_horaire: ["06:30", "22:45"],
                 }
             )
         )
         self.list_expected_result.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": [1, 2],
-                    "eeh_xheuredebut": ["06:30", "22:45"],
-                    "eeh_xheurefin": ["10:45", "23:00"],
+                    key_day_plage_horaire: [1, 2],
+                    key_debut_plage_horaire: ["06:30", "22:45"],
+                    key_fin_plage_horaire: ["10:45", "23:00"],
                 }
             )
         )
@@ -34,18 +35,18 @@ class TestHandlerCleanHor(unittest.TestCase):
         self.list_test_input.append(
             pd.DataFrame(
                 {
-                    "eeh_xheuredebut": ["06:30", "22:45"],
-                    "eeh_sfkperiode": [1, 0],
-                    "eeh_xheurefin": ["10:45", "00:30"],
+                    key_debut_plage_horaire: ["06:30", "22:45"],
+                    key_day_plage_horaire: [1, 0],
+                    key_fin_plage_horaire: ["10:45", "00:30"],
                 }
             )
         )
         self.list_expected_result.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": [1],
-                    "eeh_xheuredebut": ["06:30"],
-                    "eeh_xheurefin": ["10:45"],
+                    key_day_plage_horaire: [1],
+                    key_debut_plage_horaire: ["06:30"],
+                    key_fin_plage_horaire: ["10:45"],
                 }
             )
         )

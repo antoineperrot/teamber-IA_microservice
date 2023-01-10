@@ -1,7 +1,7 @@
 import unittest
 
 import pandas as pd
-
+from api.string_keys import *
 from api.services.planning_optimizer.solver.planning.horaires import (
     find_next_ph,
     avance_cuseur_temps,
@@ -22,7 +22,7 @@ class TestFindNextPlageHoraire(unittest.TestCase):
         self.df_hors.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": {
+                    key_day_plage_horaire: {
                         0: 0,
                         1: 0,
                         2: 1,
@@ -33,7 +33,7 @@ class TestFindNextPlageHoraire(unittest.TestCase):
                         7: 3,
                         8: 4,
                     },
-                    "eeh_xheuredebut": {
+                    key_debut_plage_horaire: {
                         0: "06:30",
                         1: "11:30",
                         2: "06:30",
@@ -44,7 +44,7 @@ class TestFindNextPlageHoraire(unittest.TestCase):
                         7: "10:30",
                         8: "07:00",
                     },
-                    "eeh_xheurefin": {
+                    key_fin_plage_horaire: {
                         0: "10:30",
                         1: "15:30",
                         2: "10:30",
@@ -64,7 +64,7 @@ class TestFindNextPlageHoraire(unittest.TestCase):
         self.df_hors.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": {
+                    key_day_plage_horaire: {
                         0: 0,
                         1: 0,
                         2: 1,
@@ -75,7 +75,7 @@ class TestFindNextPlageHoraire(unittest.TestCase):
                         7: 3,
                         8: 4,
                     },
-                    "eeh_xheuredebut": {
+                    key_debut_plage_horaire: {
                         0: "06:30",
                         1: "11:30",
                         2: "06:30",
@@ -86,7 +86,7 @@ class TestFindNextPlageHoraire(unittest.TestCase):
                         7: "10:30",
                         8: "07:00",
                     },
-                    "eeh_xheurefin": {
+                    key_fin_plage_horaire: {
                         0: "10:30",
                         1: "15:30",
                         2: "10:30",
@@ -106,7 +106,7 @@ class TestFindNextPlageHoraire(unittest.TestCase):
         self.df_hors.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": {
+                    key_day_plage_horaire: {
                         0: 0,
                         1: 0,
                         2: 1,
@@ -117,7 +117,7 @@ class TestFindNextPlageHoraire(unittest.TestCase):
                         7: 3,
                         8: 4,
                     },
-                    "eeh_xheuredebut": {
+                    key_debut_plage_horaire: {
                         0: "06:30",
                         1: "11:30",
                         2: "06:30",
@@ -128,7 +128,7 @@ class TestFindNextPlageHoraire(unittest.TestCase):
                         7: "10:30",
                         8: "07:00",
                     },
-                    "eeh_xheurefin": {
+                    key_fin_plage_horaire: {
                         0: "10:30",
                         1: "15:30",
                         2: "10:30",
@@ -165,9 +165,9 @@ class TestAvanceCurseurTemps(unittest.TestCase):
         self.phs.append(
             pd.Series(
                 {
-                    "eeh_sfkperiode": 0,
-                    "eeh_xheuredebut": "06:30",
-                    "eeh_xheurefin": "10:30",
+                    key_day_plage_horaire: 0,
+                    key_debut_plage_horaire: "06:30",
+                    key_fin_plage_horaire: "10:30",
                 }
             )
         )
@@ -179,9 +179,9 @@ class TestAvanceCurseurTemps(unittest.TestCase):
         self.phs.append(
             pd.Series(
                 {
-                    "eeh_sfkperiode": 1,
-                    "eeh_xheuredebut": "11:30",
-                    "eeh_xheurefin": "15:30",
+                    key_day_plage_horaire: 1,
+                    key_debut_plage_horaire: "11:30",
+                    key_fin_plage_horaire: "15:30",
                 }
             )
         )
@@ -210,7 +210,7 @@ class TestMakeDfPh(unittest.TestLoader):
         self.df_horaires.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": {
+                    key_day_plage_horaire: {
                         0: 0,
                         1: 0,
                         2: 1,
@@ -221,7 +221,7 @@ class TestMakeDfPh(unittest.TestLoader):
                         7: 3,
                         8: 4,
                     },
-                    "eeh_xheuredebut": {
+                    key_debut_plage_horaire: {
                         0: "06:30",
                         1: "11:30",
                         2: "06:30",
@@ -232,7 +232,7 @@ class TestMakeDfPh(unittest.TestLoader):
                         7: "10:30",
                         8: "07:00",
                     },
-                    "eeh_xheurefin": {
+                    key_fin_plage_horaire: {
                         0: "10:30",
                         1: "15:30",
                         2: "10:30",
@@ -277,7 +277,7 @@ class TestMakeDfPh(unittest.TestLoader):
         self.df_horaires.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": {
+                    key_day_plage_horaire: {
                         0: 0,
                         1: 0,
                         2: 1,
@@ -288,7 +288,7 @@ class TestMakeDfPh(unittest.TestLoader):
                         7: 3,
                         8: 4,
                     },
-                    "eeh_xheuredebut": {
+                    key_debut_plage_horaire: {
                         0: "06:30",
                         1: "11:30",
                         2: "06:30",
@@ -299,7 +299,7 @@ class TestMakeDfPh(unittest.TestLoader):
                         7: "10:30",
                         8: "07:00",
                     },
-                    "eeh_xheurefin": {
+                    key_fin_plage_horaire: {
                         0: "10:30",
                         1: "15:30",
                         2: "10:30",
@@ -344,7 +344,7 @@ class TestMakeDfPh(unittest.TestLoader):
         self.df_horaires.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": {
+                    key_day_plage_horaire: {
                         0: 0,
                         1: 0,
                         2: 1,
@@ -355,7 +355,7 @@ class TestMakeDfPh(unittest.TestLoader):
                         7: 3,
                         8: 4,
                     },
-                    "eeh_xheuredebut": {
+                    key_debut_plage_horaire: {
                         0: "06:30",
                         1: "11:30",
                         2: "06:30",
@@ -366,7 +366,7 @@ class TestMakeDfPh(unittest.TestLoader):
                         7: "10:30",
                         8: "07:00",
                     },
-                    "eeh_xheurefin": {
+                    key_fin_plage_horaire: {
                         0: "10:30",
                         1: "15:30",
                         2: "10:30",
@@ -413,7 +413,7 @@ class TestMakeDfPh(unittest.TestLoader):
         self.df_horaires.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": {
+                    key_day_plage_horaire: {
                         0: 0,
                         1: 0,
                         2: 1,
@@ -424,7 +424,7 @@ class TestMakeDfPh(unittest.TestLoader):
                         7: 3,
                         8: 4,
                     },
-                    "eeh_xheuredebut": {
+                    key_debut_plage_horaire: {
                         0: "06:30",
                         1: "11:30",
                         2: "06:30",
@@ -435,7 +435,7 @@ class TestMakeDfPh(unittest.TestLoader):
                         7: "10:30",
                         8: "07:00",
                     },
-                    "eeh_xheurefin": {
+                    key_fin_plage_horaire: {
                         0: "10:30",
                         1: "15:30",
                         2: "10:30",
@@ -480,7 +480,7 @@ class TestMakeDfPh(unittest.TestLoader):
         self.df_horaires.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": {
+                    key_day_plage_horaire: {
                         0: 0,
                         1: 0,
                         2: 1,
@@ -491,7 +491,7 @@ class TestMakeDfPh(unittest.TestLoader):
                         7: 3,
                         8: 4,
                     },
-                    "eeh_xheuredebut": {
+                    key_debut_plage_horaire: {
                         0: "06:30",
                         1: "11:30",
                         2: "06:30",
@@ -502,7 +502,7 @@ class TestMakeDfPh(unittest.TestLoader):
                         7: "10:30",
                         8: "07:00",
                     },
-                    "eeh_xheurefin": {
+                    key_fin_plage_horaire: {
                         0: "10:30",
                         1: "15:30",
                         2: "10:30",
@@ -556,7 +556,7 @@ class TestFindSectionsEnds(unittest.TestCase):
         self.date_end = pd.Timestamp("2022-09-09 16:00:00+0000")
         self.imperatifs = pd.DataFrame(
             {
-                "evt_spkevenement": {
+                key_evenement: {
                     0: 1040,
                     1: 3302,
                     2: 3449,
@@ -565,7 +565,7 @@ class TestFindSectionsEnds(unittest.TestCase):
                     5: 7105,
                     6: 9323,
                 },
-                "evt_sfkprojet": {
+                key_evenement_project: {
                     0: 1404,
                     1: 2140,
                     2: 3790,
@@ -574,7 +574,7 @@ class TestFindSectionsEnds(unittest.TestCase):
                     5: 8423,
                     6: 8534,
                 },
-                "lgl_sfkligneparent": {
+                key_competence: {
                     0: 2283,
                     1: 2283,
                     2: 2283,
@@ -638,7 +638,7 @@ class TestComputeAvailabilities(unittest.TestCase):
         self.min_duration_section = 0.5
         self.horaires = pd.DataFrame(
             {
-                "eeh_sfkperiode": {
+                key_day_plage_horaire: {
                     0: 0,
                     1: 0,
                     2: 1,
@@ -649,7 +649,7 @@ class TestComputeAvailabilities(unittest.TestCase):
                     7: 3,
                     8: 4,
                 },
-                "eeh_xheuredebut": {
+                key_debut_plage_horaire: {
                     0: "06:30",
                     1: "11:30",
                     2: "06:30",
@@ -660,7 +660,7 @@ class TestComputeAvailabilities(unittest.TestCase):
                     7: "10:30",
                     8: "07:00",
                 },
-                "eeh_xheurefin": {
+                key_fin_plage_horaire: {
                     0: "10:30",
                     1: "15:30",
                     2: "10:30",
@@ -675,7 +675,7 @@ class TestComputeAvailabilities(unittest.TestCase):
         )
         self.imperatifs = pd.DataFrame(
             {
-                "evt_spkevenement": {
+                key_evenement: {
                     0: 1040,
                     1: 3302,
                     2: 3449,
@@ -684,7 +684,7 @@ class TestComputeAvailabilities(unittest.TestCase):
                     5: 7105,
                     6: 9323,
                 },
-                "evt_sfkprojet": {
+                key_evenement_project: {
                     0: 1404,
                     1: 2140,
                     2: 3790,
@@ -693,7 +693,7 @@ class TestComputeAvailabilities(unittest.TestCase):
                     5: 8423,
                     6: 8534,
                 },
-                "lgl_sfkligneparent": {
+                key_competence: {
                     0: 2283,
                     1: 2283,
                     2: 2283,

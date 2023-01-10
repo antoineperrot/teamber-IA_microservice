@@ -4,6 +4,7 @@ Module de récupération des données auprès du BACK pour la fonctionnalité ta
 import pandas as pd
 
 from api.back_connector.tools import make_sql_requests
+from api.string_keys import *
 
 
 def fetch_data(access_token: str, date_start: str, date_end: str, url: str) -> dict:
@@ -23,23 +24,23 @@ def fetch_data(access_token: str, date_start: str, date_end: str, url: str) -> d
     """
     sql_queries = {
         "matrice_projet": {
-            "select": ["utl_spkutilisateur", "int_sfkprojet"],
+            "select": [key_user, key_project],
             "from": "lst_vprojet_utilisateur_py",
         },
         "dispos_utilisateurs": {
-            "select": ["utl_spkutilisateur", "utl_sdispo"],
+            "select": [key_user, key_user_dispo],
             "from": "lst_vdispo_py",
         },
         "matrice_competence": {
-            "select": ["emc_sfkutilisateur", "emc_sfkarticle", "emc_sniveau"],
+            "select": [key_emc_sfkutilisateur, key_emc_sfkarticle, key_emc_sniveau],
             "from": "lst_vcompetence_py",
         },
         "taches": {
             "select": [
-                "evt_spkevenement",
-                "evt_sfkprojet",
-                "evt_dduree",
-                "lgl_sfkligneparent",
+                key_evenement,
+                key_evenement_project,
+                key_duree_evenement,
+                key_competence,
             ],
             "from": "lst_vevenement_py",
             "where": {
@@ -60,8 +61,8 @@ def fetch_data(access_token: str, date_start: str, date_end: str, url: str) -> d
                         "value": f"{date_end}",
                     },
                     {
-                        "label": "lgl_sfkligneparent",
-                        "field": "lgl_sfkligneparent",
+                        "label": key_competence,
+                        "field": key_competence,
                         "operator": "isnotnull",
                         "type": "integer",
                         "value": "none",

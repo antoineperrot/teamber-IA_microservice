@@ -45,7 +45,7 @@ def energy_waisted_time(ordo_length: list[float], sections_lengths: list[float])
 
 
 # Calcule un potentiel correspondant au non respect des priorités
-def energy_priorites(ordo_prio):
+def energy_key_project_prioritys(ordo_prio):
     target = np.sort(ordo_prio)
     energy = (
         np.linalg.norm(target - ordo_prio, ord=1)

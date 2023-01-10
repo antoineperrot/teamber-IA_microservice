@@ -7,11 +7,12 @@ import pandas as pd
 
 from api.back_connector.planning_optimizer.data_handlers.filtrage import filtre
 from api.back_connector.tools import make_sql_requests
+from api.string_keys import *
 
 
 # TODO: corriger les ValueError
 def fetch_data(
-    url: str, access_token: str, date_start: str, date_end: str, priorites_projets: dict
+    url: str, access_token: str, date_start: str, date_end: str, key_project_prioritys_projets: dict
 ) -> Tuple[dict, dict, dict, list]:
     """
     Prépare et envoie les requêtes SQL auprès du Back Wandeed qui renvoie les données demandées.
@@ -20,31 +21,31 @@ def fetch_data(
     :param access_token: token d'accès à la base de données du back
     :param date_start: date de début du sprint à optimiser, au format ISO. example : "2022-10-03T06:31:00.000Z"
     :param date_end: date de FIN du sprint à optimiser, au format ISO. example : "2022-10-10T18:30:00.000Z"
-    :param priorites_projets: dictionnaire de la forme {id_projet (int):niveau_priorite_projet (int)}.
+    :param key_project_prioritys_projets: dictionnaire de la forme {id_projet (int):niveau_key_project_priority_projet (int)}.
                              Niveau le plus important: 0.
 
     :return df_imp:
         TODO: à compléter
 
     :return df_hor: dataframe contenant les horaires des utilisateurs
-        "epu_sfkutilisateur"  -> id de l'utilisateur
+        key_epu_sfkutilisateur  -> id de l'utilisateur
         "epl_xdebutperiode"   -> debut de période d'application de l'horaire
         "epl_xfinperiode"     -> fin de période d'application de l'horaire
-        "epl_employe_horaire" -> horaire de l'employe
+        key_epl_employe_horaire -> horaire de l'employe
 
     :return df_tsk:
-        "evt_dduree"          -> duree (en h) de la tâche
-        "evt_spkevenement"    -> id de la tâche
-        "lgl_sfkligneparent"  -> utilisateur concerné # TODO: corriger clé
-        "evt_sfkprojet"       -> projet de rattachement de la tâche
+        key_duree_evenement          -> duree (en h) de la tâche
+        key_evenement    -> id de la tâche
+        key_competence  -> utilisateur concerné # TODO: corriger clé
+        key_evenement_project       -> projet de rattachement de la tâche
     """
     sql_querys_dict = {
         "imperatifs": {
             "select": [
-                "evt_spkevenement",
-                "evt_sfkprojet",
-                "evt_dduree",
-                "lgl_sfkligneparent",  # TODO : à remplacer par clé utilisateur
+                key_evenement,
+                key_evenement_project,
+                key_duree_evenement,
+                key_competence,  # TODO : à remplacer par clé utilisateur
                 "evt_xdate_debut",
                 "evt_xdate_fin",
             ],
@@ -67,8 +68,8 @@ def fetch_data(
                         "value": f"{date_end}",
                     },
                     {
-                        "label": "lgl_sfkligneparent",
-                        "field": "lgl_sfkligneparent",
+                        "label": key_competence,
+                        "field": key_competence,
                         "operator": "isnotnull",
                         "type": "integer",
                         "value": "none",
@@ -97,8 +98,8 @@ def fetch_data(
         },
         "horaires": {
             "select": [
-                "epu_sfkutilisateur",
-                "epl_employe_horaire",
+                key_epu_sfkutilisateur,
+                key_epl_employe_horaire,
                 "epl_xdebutperiode",
                 "epl_xfinperiode",
             ],
@@ -125,10 +126,10 @@ def fetch_data(
         },
         "taches": {
             "select": [
-                "evt_spkevenement",
-                "evt_sfkprojet",
-                "evt_dduree",
-                "lgl_sfkligneparent",  # TODO : à remplacer par clé utilisateur
+                key_evenement,
+                key_evenement_project,
+                key_duree_evenement,
+                key_competence,  # TODO : à remplacer par clé utilisateur
             ],
             "from": "lst_vevenement_py",
             "where": {
@@ -149,8 +150,8 @@ def fetch_data(
                         "value": f"{date_end}",
                     },
                     {
-                        "label": "lgl_sfkligneparent",
-                        "field": "lgl_sfkligneparent",
+                        "label": key_competence,
+                        "field": key_competence,
                         "operator": "isnotnull",
                         "type": "integer",
                         "value": "none",
@@ -166,20 +167,20 @@ def fetch_data(
     df_imp = pd.DataFrame(data["imperatifs"])
     df_hor = pd.DataFrame(data["horaires"]).reindex(
         columns=[
-            "epu_sfkutilisateur",
+            key_epu_sfkutilisateur,
             "epl_xdebutperiode",
             "epl_xfinperiode",
-            "epl_employe_horaire",
+            key_epl_employe_horaire,
         ]
     )
     df_hor.epl_xdebutperiode = pd.to_datetime(df_hor.epl_xdebutperiode).dt.date
     df_hor.epl_xfinperiode = pd.to_datetime(df_hor.epl_xfinperiode).dt.date
     df_hor = df_hor.sort_values(
-        by=["epu_sfkutilisateur", "epl_xdebutperiode"]
+        by=[key_epu_sfkutilisateur, "epl_xdebutperiode"]
     ).reset_index(drop=True)
     df_tsk = pd.DataFrame(data["taches"])
 
     imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires = filtre(
-        df_imp, df_hor, df_tsk, priorites_projets
+        df_imp, df_hor, df_tsk, key_project_prioritys_projets
     )
     return imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires

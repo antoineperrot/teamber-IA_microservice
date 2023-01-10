@@ -1,8 +1,9 @@
+from api.string_keys import *
 import pandas as pd
 
 default_horaires = pd.DataFrame(
     {
-        "eeh_sfkperiode": {
+        key_day_plage_horaire: {
             0: 0,
             1: 0,
             2: 1,
@@ -13,7 +14,7 @@ default_horaires = pd.DataFrame(
             7: 3,
             8: 4,
         },
-        "eeh_xheuredebut": {
+        key_debut_plage_horaire: {
             0: "06:30",
             1: "11:30",
             2: "06:30",
@@ -24,7 +25,7 @@ default_horaires = pd.DataFrame(
             7: "10:30",
             8: "07:00",
         },
-        "eeh_xheurefin": {
+        key_fin_plage_horaire: {
             0: "10:30",
             1: "15:30",
             2: "10:30",

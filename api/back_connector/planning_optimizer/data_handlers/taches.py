@@ -2,6 +2,7 @@
 Fonctions pour préparer les données taches brut de Wandeed à l'optimisation
 """
 import pandas as pd
+from api.string_keys import *
 
 
 def split_n_clean_taches(df_tsk: pd.DataFrame) -> dict:
@@ -16,13 +17,13 @@ def split_n_clean_taches(df_tsk: pd.DataFrame) -> dict:
     """
 
     df_tsk.dropna(inplace=True)
-    df_tsk["evt_sfkprojet"] = df_tsk["evt_sfkprojet"].astype(int)
+    df_tsk[key_evenement_project] = df_tsk[key_evenement_project].astype(int)
     taches = {}  # {id_utilisateur: df_tache}
 
     # TODO: corriger la clé quand j'aurai la bonne
-    for utl in df_tsk["lgl_sfkligneparent"].unique():
+    for utl in df_tsk[key_competence].unique():
         df_tsk_utl = df_tsk.loc[
-            df_tsk["lgl_sfkligneparent"] == utl,
+            df_tsk[key_competence] == utl,
         ]
         if len(df_tsk_utl) > 0:
             # si l'utilisateur a effectivement des tâches qui lui sont assignées, on va pouvoir optimizer
@@ -31,12 +32,12 @@ def split_n_clean_taches(df_tsk: pd.DataFrame) -> dict:
     return taches
 
 
-def map_priorites_projets(
-    df_tsk: pd.DataFrame, priorites_projets: dict
+def map_key_project_prioritys_projets(
+    df_tsk: pd.DataFrame, key_project_prioritys_projets: dict
 ) -> pd.DataFrame:
     """
     :param df_tsk: pd.DataFrame contenant les taches: (id, duree, id_utl, id_projet)
-    :param priorites_projets: dict faisant le mapping id_projet <-> niveau de priorité du projet.
+    :param key_project_prioritys_projets: dict faisant le mapping id_projet <-> niveau de priorité du projet.
 
     -> le niveau de priorité de la tâches est alors défini comme étant celui du projet auquel la tâche se réfère.
     -> les tâches faisant référence à des projets pour lesquels aucun niveau de priorité n'est défini se verront
@@ -45,12 +46,12 @@ def map_priorites_projets(
     :return df_tsk: idem que df_tsk input, avec les niveaux de priorités des tâches en plus.
     """
 
-    niveau_min_priorite = (
-        int(max(list(priorites_projets.values())) + 1)
-        if len(priorites_projets) > 0
+    niveau_min_key_project_priority = (
+        int(max(list(key_project_prioritys_projets.values())) + 1)
+        if len(key_project_prioritys_projets) > 0
         else 0
     )
-    df_tsk["priorite"] = (
-        df_tsk["evt_sfkprojet"].map(priorites_projets).fillna(niveau_min_priorite)
+    df_tsk[key_project_priority] = (
+        df_tsk[key_evenement_project].map(key_project_prioritys_projets).fillna(niveau_min_key_project_priority)
     )
     return df_tsk

@@ -13,7 +13,7 @@ def planning_optimizer(
     access_token: str,
     date_start: str,
     date_end: str,
-    priorites_projets: dict,
+    key_project_prioritys_projets: dict,
     parts_max_length: float = 1.0,
 ):
     """Fonction d'optimisation des plannings utilisateurs
@@ -29,7 +29,7 @@ def planning_optimizer(
 
         date_end: date de fin au format ISO du sprint pour la sélection des tâches auprès du BACK
 
-        priorites_projets: dictionnaire de la forme {id_projet (int):niveau_priorite_projet (int)}.
+        key_project_prioritys_projets: dictionnaire de la forme {id_projet (int):niveau_key_project_priority_projet (int)}.
         Niveau le plus important: 0.
 
         url: adresse URL de la base de données du BACK.
@@ -39,10 +39,10 @@ def planning_optimizer(
         Un fichier json contenant une planification intelligente des tâches pour l'utilisateur 'utl'
 
     """
-    check_parameters(date_start, date_end, priorites_projets)
+    check_parameters(date_start, date_end, key_project_prioritys_projets)
 
     imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires = fetch_data(
-        url, access_token, date_start, date_end, priorites_projets
+        url, access_token, date_start, date_end, key_project_prioritys_projets
     )
 
     from api.services.planning_optimizer import optimize_plannings

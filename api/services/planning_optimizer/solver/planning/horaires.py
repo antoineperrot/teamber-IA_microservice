@@ -4,7 +4,7 @@ Module des fonctions servant à manipuler les horaires des utilisateurs
 import datetime
 
 import pandas as pd
-
+from api.string_keys import *
 
 def find_next_ph(df_hor: pd.DataFrame, curseur_temps: pd.Timestamp) -> int:
     """
@@ -18,12 +18,12 @@ def find_next_ph(df_hor: pd.DataFrame, curseur_temps: pd.Timestamp) -> int:
     while not found:
         if day0 == curseur_temps.weekday():
             premieres_plages_horaires_valides = df_hor.loc[
-                (df_hor["eeh_sfkperiode"] == day0)
-                & (str_heure_curseur < df_hor["eeh_xheurefin"])
+                (df_hor[key_day_plage_horaire] == day0)
+                & (str_heure_curseur < df_hor[key_fin_plage_horaire])
             ]
         else:
             premieres_plages_horaires_valides = df_hor.loc[
-                df_hor["eeh_sfkperiode"] == day0
+                df_hor[key_day_plage_horaire] == day0
             ]
         found = len(premieres_plages_horaires_valides) > 0
         if not found:
@@ -39,15 +39,15 @@ def avance_cuseur_temps(
     """
     Amène le curseur temps courant à la fin de la prochaine plage horaire ph utilisée.
     """
-    day_ph = ph["eeh_sfkperiode"]
+    day_ph = ph[key_day_plage_horaire]
     if curseur_temps.weekday() <= day_ph:
         diff_days = day_ph - curseur_temps.weekday()
     else:
         diff_days = 7 - (curseur_temps.weekday() - day_ph)
 
     curseur_temps = curseur_temps + datetime.timedelta(days=int(diff_days))
-    hour_ph = int(ph["eeh_xheurefin"][:2])
-    minutes_ph = int(ph["eeh_xheurefin"][-2:])
+    hour_ph = int(ph[key_fin_plage_horaire][:2])
+    minutes_ph = int(ph[key_fin_plage_horaire][-2:])
     curseur_temps = curseur_temps.replace(hour=hour_ph, minute=minutes_ph, second=0)
     curseur_temps = min(curseur_temps, date_end_sprint)
     return curseur_temps
@@ -81,8 +81,8 @@ def make_base(
         curseur_temps = avance_cuseur_temps(curseur_temps, date_end, next_ph)
         next_ph_dict["timestamp_fin"] = curseur_temps
         next_ph_dict["timestamp_debut"] = curseur_temps.replace(
-            hour=int(next_ph.eeh_xheuredebut[:2]),
-            minute=int(next_ph.eeh_xheuredebut[-2:]),
+            hour=int(next_ph.key_debut_plage_horaire[:2]),
+            minute=int(next_ph.key_debut_plage_horaire[-2:]),
             second=0,
         )
         if next_ph_dict["timestamp_debut"] < date_end:

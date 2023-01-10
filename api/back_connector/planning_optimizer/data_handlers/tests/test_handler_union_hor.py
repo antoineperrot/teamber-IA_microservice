@@ -1,6 +1,7 @@
 import unittest
 import pandas as pd
 from api.back_connector.planning_optimizer.data_handlers.horaires import handler_union_hor
+from api.string_keys import *
 
 
 class TestHandlerUnionHor(unittest.TestCase):
@@ -11,9 +12,9 @@ class TestHandlerUnionHor(unittest.TestCase):
         self.list_test_union.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": [1, 1],
-                    "eeh_xheuredebut": ["06:30", "06:45"],
-                    "eeh_xheurefin": ["10:00", "11:00"],
+                    key_day_plage_horaire: [1, 1],
+                    key_debut_plage_horaire: ["06:30", "06:45"],
+                    key_fin_plage_horaire: ["10:00", "11:00"],
                 }
             )
         )
@@ -21,9 +22,9 @@ class TestHandlerUnionHor(unittest.TestCase):
         self.list_expected_result.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": [1],
-                    "eeh_xheuredebut": ["06:30"],
-                    "eeh_xheurefin": ["11:00"],
+                    key_day_plage_horaire: [1],
+                    key_debut_plage_horaire: ["06:30"],
+                    key_fin_plage_horaire: ["11:00"],
                 }
             )
         )
@@ -31,9 +32,9 @@ class TestHandlerUnionHor(unittest.TestCase):
         self.list_test_union.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": [1, 1, 2, 2],
-                    "eeh_xheuredebut": ["07:30", "06:45", "07:00", "07:30"],
-                    "eeh_xheurefin": ["10:00", "11:00", "08:00", "08:30"],
+                    key_day_plage_horaire: [1, 1, 2, 2],
+                    key_debut_plage_horaire: ["07:30", "06:45", "07:00", "07:30"],
+                    key_fin_plage_horaire: ["10:00", "11:00", "08:00", "08:30"],
                 }
             )
         )
@@ -41,9 +42,9 @@ class TestHandlerUnionHor(unittest.TestCase):
         self.list_expected_result.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": [1, 2],
-                    "eeh_xheuredebut": ["06:45", "07:00"],
-                    "eeh_xheurefin": ["11:00", "08:30"],
+                    key_day_plage_horaire: [1, 2],
+                    key_debut_plage_horaire: ["06:45", "07:00"],
+                    key_fin_plage_horaire: ["11:00", "08:30"],
                 }
             )
         )
@@ -51,9 +52,9 @@ class TestHandlerUnionHor(unittest.TestCase):
         self.list_test_union.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": [1, 2],
-                    "eeh_xheuredebut": ["06:30", "06:45"],
-                    "eeh_xheurefin": ["10:00", "11:00"],
+                    key_day_plage_horaire: [1, 2],
+                    key_debut_plage_horaire: ["06:30", "06:45"],
+                    key_fin_plage_horaire: ["10:00", "11:00"],
                 }
             )
         )
@@ -61,9 +62,9 @@ class TestHandlerUnionHor(unittest.TestCase):
         self.list_expected_result.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": [1, 2],
-                    "eeh_xheuredebut": ["06:30", "06:45"],
-                    "eeh_xheurefin": ["10:00", "11:00"],
+                    key_day_plage_horaire: [1, 2],
+                    key_debut_plage_horaire: ["06:30", "06:45"],
+                    key_fin_plage_horaire: ["10:00", "11:00"],
                 }
             )
         )
@@ -71,9 +72,9 @@ class TestHandlerUnionHor(unittest.TestCase):
         self.list_test_union.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": [1, 1],
-                    "eeh_xheuredebut": ["06:50", "06:30"],
-                    "eeh_xheurefin": ["10:00", "11:00"],
+                    key_day_plage_horaire: [1, 1],
+                    key_debut_plage_horaire: ["06:50", "06:30"],
+                    key_fin_plage_horaire: ["10:00", "11:00"],
                 }
             )
         )
@@ -81,9 +82,9 @@ class TestHandlerUnionHor(unittest.TestCase):
         self.list_expected_result.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": [1],
-                    "eeh_xheuredebut": ["06:30"],
-                    "eeh_xheurefin": ["11:00"],
+                    key_day_plage_horaire: [1],
+                    key_debut_plage_horaire: ["06:30"],
+                    key_fin_plage_horaire: ["11:00"],
                 }
             )
         )
@@ -91,9 +92,9 @@ class TestHandlerUnionHor(unittest.TestCase):
         self.list_test_union.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": [1, 1, 1],
-                    "eeh_xheuredebut": ["06:50", "06:30", "07:00"],
-                    "eeh_xheurefin": ["10:00", "11:00", "08:00"],
+                    key_day_plage_horaire: [1, 1, 1],
+                    key_debut_plage_horaire: ["06:50", "06:30", "07:00"],
+                    key_fin_plage_horaire: ["10:00", "11:00", "08:00"],
                 }
             )
         )
@@ -101,30 +102,9 @@ class TestHandlerUnionHor(unittest.TestCase):
         self.list_expected_result.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": [1],
-                    "eeh_xheuredebut": ["06:30"],
-                    "eeh_xheurefin": ["11:00"],
-                }
-            )
-        )
-
-        ########################################
-        self.list_test_union.append(
-            pd.DataFrame(
-                {
-                    "eeh_sfkperiode": [1, 1, 1],
-                    "eeh_xheuredebut": ["06:50", "06:30", "10:00"],
-                    "eeh_xheurefin": ["10:00", "11:00", "12:00"],
-                }
-            )
-        )
-
-        self.list_expected_result.append(
-            pd.DataFrame(
-                {
-                    "eeh_sfkperiode": [1],
-                    "eeh_xheuredebut": ["06:30"],
-                    "eeh_xheurefin": ["12:00"],
+                    key_day_plage_horaire: [1],
+                    key_debut_plage_horaire: ["06:30"],
+                    key_fin_plage_horaire: ["11:00"],
                 }
             )
         )
@@ -133,9 +113,9 @@ class TestHandlerUnionHor(unittest.TestCase):
         self.list_test_union.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": [1, 1, 1],
-                    "eeh_xheuredebut": ["06:30", "11:30", "06:30"],
-                    "eeh_xheurefin": ["10:30", "15:30", "10:45"],
+                    key_day_plage_horaire: [1, 1, 1],
+                    key_debut_plage_horaire: ["06:50", "06:30", "10:00"],
+                    key_fin_plage_horaire: ["10:00", "11:00", "12:00"],
                 }
             )
         )
@@ -143,9 +123,30 @@ class TestHandlerUnionHor(unittest.TestCase):
         self.list_expected_result.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": [1, 1],
-                    "eeh_xheuredebut": ["06:30", "11:30"],
-                    "eeh_xheurefin": ["10:45", "15:30"],
+                    key_day_plage_horaire: [1],
+                    key_debut_plage_horaire: ["06:30"],
+                    key_fin_plage_horaire: ["12:00"],
+                }
+            )
+        )
+
+        ########################################
+        self.list_test_union.append(
+            pd.DataFrame(
+                {
+                    key_day_plage_horaire: [1, 1, 1],
+                    key_debut_plage_horaire: ["06:30", "11:30", "06:30"],
+                    key_fin_plage_horaire: ["10:30", "15:30", "10:45"],
+                }
+            )
+        )
+
+        self.list_expected_result.append(
+            pd.DataFrame(
+                {
+                    key_day_plage_horaire: [1, 1],
+                    key_debut_plage_horaire: ["06:30", "11:30"],
+                    key_fin_plage_horaire: ["10:45", "15:30"],
                 }
             )
         )

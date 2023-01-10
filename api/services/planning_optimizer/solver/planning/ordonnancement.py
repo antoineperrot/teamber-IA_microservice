@@ -8,9 +8,11 @@ import pandas as pd
 
 from api.services.planning_optimizer.solver.tools.energies import (
     energy_dispersion,
-    energy_priorites,
+    energy_key_project_prioritys,
     energy_waisted_time,
 )
+
+from api.string_keys import *
 
 
 class Ordonnancement:
@@ -27,7 +29,7 @@ class Ordonnancement:
     ):
         if ordonnancement is None and df_tsk is not None:
             self.tasks = df_tsk[
-                ["id_part", "length", "priorite", "evt_spkevenement"]
+                ["id_part", "length", key_project_priority, key_evenement]
             ].values
             self.ordonnancement = list(df_tsk["id_part"].values.astype(int))
         else:
@@ -66,28 +68,28 @@ class Ordonnancement:
         """
         Retourne les durées, priorités et événements succéssifs lié à l'ordonnancement.
         """
-        length, priorite, evt = self.tasks[:, [1, 2, 3]].T
-        ordo_length, ordo_priorite, ordo_evt = (
+        length, key_project_priority, evt = self.tasks[:, [1, 2, 3]].T
+        ordo_length, ordo_key_project_priority, ordo_evt = (
             length[self.ordonnancement],
-            priorite[self.ordonnancement],
+            key_project_priority[self.ordonnancement],
             evt[self.ordonnancement],
         )
-        return ordo_length, ordo_priorite, ordo_evt
+        return ordo_length, ordo_key_project_priority, ordo_evt
 
     def compute_energy(self):
         """
         Calcule les différentes energies associées à l'ordonancement
         """
-        ordo_length, ordo_priorite, ordo_evt = self.get_fields()
+        ordo_length, ordo_key_project_priority, ordo_evt = self.get_fields()
 
         e_dispersion = energy_dispersion(ordo_evt)
-        e_priorite = energy_priorites(ordo_priorite)
+        e_key_project_priority = energy_key_project_prioritys(ordo_key_project_priority)
         e_wasted_time = energy_waisted_time(ordo_length, self.availabilities)
-        energies = [e_dispersion, e_priorite, e_wasted_time]
+        energies = [e_dispersion, e_key_project_priority, e_wasted_time]
 
         self.energies["dispersion"] = (e_dispersion,)
-        self.energies["priorités"] = (e_priorite,)
-        self.energies["temps_perdu"] = e_priorite
+        self.energies["priorités"] = (e_key_project_priority,)
+        self.energies["temps_perdu"] = e_key_project_priority
 
         self.energy = np.vdot(self.preferences, energies)
 

@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from api.string_keys import *
 
 
 def make_mat_prj(df_prj: pd.DataFrame, n_prj: int, n_utl: int) -> np.ndarray:
@@ -38,7 +39,7 @@ def make_mat_cmp(df_cmp: pd.DataFrame, n_cmp: int, n_utl: int) -> np.ndarray:
         ]
         for i, row in df_cmp_tmp.iterrows():
             cmp = row["cmp"]
-            lvl = row["emc_sniveau"]
+            lvl = row[key_emc_sniveau]
             d_utl_to_cmp_to_lvl[utl][cmp] = lvl
 
     for utl in d_utl_to_cmp_to_lvl:

@@ -8,6 +8,7 @@ import pandas as pd
 from api.services.planning_optimizer.solver.planning.ordonnancement import (
     Ordonnancement,
 )
+from api.string_keys import *
 
 
 def get_next_part(i_current_part: int, parts: pd.DataFrame) -> int:
@@ -25,7 +26,7 @@ def get_next_part(i_current_part: int, parts: pd.DataFrame) -> int:
 
     while (
         next_part["start"] == current_part["end"]
-        and next_part["evt_spkevenement"] == current_part["evt_spkevenement"]
+        and next_part[key_evenement] == current_part[key_evenement]
         and i_next_part < len(parts)
     ):
         i_next_part = i_next_part + 1
@@ -61,9 +62,9 @@ def add_event(
         events = {
             "start": [],
             "end": [],
-            "evt_spkevenement": [],
-            "evt_sfkprojet": [],
-            "priorite": [],
+            key_evenement: [],
+            key_evenement_project: [],
+            key_project_priority: [],
         }
         return events
 
@@ -73,15 +74,15 @@ def add_event(
     if i_next_part > i_current_part + 1:
         events["start"].append(current_part["start"])
         events["end"].append(end_part["end"])
-        events["evt_spkevenement"].append(current_part["evt_spkevenement"])
-        events["evt_sfkprojet"].append(current_part["evt_sfkprojet"])
-        events["priorite"].append(current_part["priorite"])
+        events[key_evenement].append(current_part[key_evenement])
+        events[key_evenement_project].append(current_part[key_evenement_project])
+        events[key_project_priority].append(current_part[key_project_priority])
     else:
         events["start"].append(current_part["start"])
         events["end"].append(current_part["end"])
-        events["evt_spkevenement"].append(current_part["evt_spkevenement"])
-        events["evt_sfkprojet"].append(current_part["evt_sfkprojet"])
-        events["priorite"].append(current_part["priorite"])
+        events[key_evenement].append(current_part[key_evenement])
+        events[key_evenement_project].append(current_part[key_evenement_project])
+        events[key_project_priority].append(current_part[key_project_priority])
 
     return events
 
@@ -183,7 +184,7 @@ def schedule_parts(
     scheduled_tasks_parts = pd.DataFrame(scheduled_tasks_parts)
     scheduled_tasks_parts = scheduled_tasks_parts.merge(tasks, on="id_part")
     scheduled_tasks_parts = scheduled_tasks_parts[
-        ["start", "end", "evt_spkevenement", "evt_sfkprojet", "priorite", "id_part"]
+        ["start", "end", key_evenement, key_evenement_project, key_project_priority, "id_part"]
     ]
     return scheduled_tasks_parts
 
@@ -217,21 +218,21 @@ def make_stats(events: pd.DataFrame, tasks: pd.DataFrame) -> dict[str: pd.DataFr
     # stats percent completion for tasks
     events["duree"] = events["end"] - events["start"]
     events["duree"] = events["duree"].apply(lambda x: x.total_seconds() / 3600)
-    events = events.groupby("evt_spkevenement").sum().reset_index()[["evt_spkevenement" "duree"]]
-    tache_to_duree = dict(zip(events["evt_spkevenement"], events["duree"]))
+    events = events.groupby(key_evenement).sum().reset_index()[[key_evenement, "duree"]]
+    tache_to_duree = dict(zip(events[key_evenement], events["duree"]))
     stat_tasks = pd.DataFrame.copy(tasks)
-    stat_tasks["duree_effectuee"] = stat_tasks["evt_spkevenement"].map(tache_to_duree)
+    stat_tasks["duree_effectuee"] = stat_tasks[key_evenement].map(tache_to_duree)
     stat_tasks.fillna(0, inplace=True)
-    stat_tasks["pct_completion"] = np.round(stat_tasks["duree_effectuee"] / stat_tasks["evt_dduree"], 2)
-    stat_tasks = stat_tasks[["evt_spkevenement",
-                             "lgl_sfkligneparent", "evt_sfkprojet", "priorite", "evt_dduree", "duree_effectuee",
+    stat_tasks["pct_completion"] = np.round(stat_tasks["duree_effectuee"] / stat_tasks[key_duree_evenement], 2)
+    stat_tasks = stat_tasks[[key_evenement,
+                             key_competence, key_evenement_project, key_project_priority, key_duree_evenement, "duree_effectuee",
                              "pct_completion"]]
     stat_tasks.sort_values(by="pct_completion", ascending=False)
 
     # stats percent completion for projects
-    stat_projects = pd.DataFrame.copy(stat_tasks).groupby("evt_sfkprojet").sum()[["evt_dduree", "duree_effectuee"]]
+    stat_projects = pd.DataFrame.copy(stat_tasks).groupby(key_evenement_project).sum()[[key_duree_evenement, "duree_effectuee"]]
     stat_projects["projet_percent_completion"] = np.round(stat_projects["duree_effectuee"] /
-                                                          stat_projects["evt_dduree"], 2)
+                                                          stat_projects[key_duree_evenement], 2)
     stat_projects = stat_projects.reset_index()
 
     stats = {"tasks": stat_tasks, "projects": stat_projects}

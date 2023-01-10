@@ -7,9 +7,10 @@ from typing import List
 import numpy as np
 import pandas as pd
 
+from api.string_keys import *
 from api.back_connector.planning_optimizer.data_handlers.taches import (
     split_n_clean_taches,
-    map_priorites_projets,
+    map_key_project_prioritys_projets,
 )
 from api.services.planning_optimizer.tests.test_data.default_horaires import (
     default_horaires,
@@ -30,29 +31,29 @@ def mock_back_data(
     n_users = int(np.random.normal(avg_n_users, avg_n_users / 5))
     utls = generate_unique_ids(n_users)
     df_tsk = mock_df_tsk(utls, avg_n_tasks)
-    priorites_projets = mock_priorites_projets(df_tsk)
-    df_tsk = map_priorites_projets(df_tsk, priorites_projets)
+    key_project_prioritys_projets = mock_key_project_prioritys_projets(df_tsk)
+    df_tsk = map_key_project_prioritys_projets(df_tsk, key_project_prioritys_projets)
     taches = split_n_clean_taches(df_tsk)
     horaires = {utl: default_horaires for utl in utls}
     imperatifs = {utl: mock_imperatifs(utl, date_start, date_end) for utl in utls}
     return taches, horaires, imperatifs
 
 
-def mock_priorites_projets(df_tsk: pd.DataFrame) -> dict:
+def mock_key_project_prioritys_projets(df_tsk: pd.DataFrame) -> dict:
     """
     Génère un dictionnaire aléatoire et pertinent de correspondances id_projet <-> niveau de priorités.
 
     :param df_tsk: DataFrame contenant les tâches à planifier.
 
     """
-    liste_projets = df_tsk["evt_sfkprojet"].unique().astype(int)
+    liste_projets = df_tsk[key_evenement_project].unique().astype(int)
     n_projets = len(liste_projets)
     n_prio = np.random.randint(n_projets // 2, n_projets)
-    priorites_projets = {
+    key_project_prioritys_projets = {
         id_projet: np.random.randint(0, n_prio) for id_projet in liste_projets
     }
 
-    return priorites_projets
+    return key_project_prioritys_projets
 
 
 def mock_df_tsk(liste_utl: List[int], avg_n_tasks: int = 25) -> pd.DataFrame:
@@ -60,7 +61,7 @@ def mock_df_tsk(liste_utl: List[int], avg_n_tasks: int = 25) -> pd.DataFrame:
     Prend une liste d'utilisateurs liste_utl et génère des tâches aléatoire sur des projets aléatoires.
 
     Exemple de sortie :
-        evt_dduree	evt_spkevenement	 lgl_sfkligneparent	evt_sfkprojet
+        key_duree_evenement	key_evenement	 key_competence	key_evenement_project
     0	0.25	    476	                 24	                3668
     1	0.50	    496	                 3	                3211
     2	2.75	    570	                 1	                3778
@@ -86,10 +87,10 @@ def mock_df_tsk(liste_utl: List[int], avg_n_tasks: int = 25) -> pd.DataFrame:
     # TODO: corriger la clé quand j'aurai la bonne
     out = pd.DataFrame(
         {
-            "evt_dduree": duree_tasks,
-            "evt_spkevenement": ids_tasks,
-            "lgl_sfkligneparent": task_utl,
-            "evt_sfkprojet": task_prj,
+            key_duree_evenement: duree_tasks,
+            key_evenement: ids_tasks,
+            key_competence: task_utl,
+            key_evenement_project: task_prj,
         }
     )
 
@@ -114,9 +115,9 @@ def mock_imperatifs(utl: int, date_start, date_fin: str):
     n_evt = 7
     out = pd.DataFrame(
         {
-            "evt_spkevenement": generate_unique_ids(n_evt),
-            "evt_sfkprojet": generate_unique_ids(n_evt),
-            "lgl_sfkligneparent": [utl] * n_evt,
+            key_evenement: generate_unique_ids(n_evt),
+            key_evenement_project: generate_unique_ids(n_evt),
+            key_competence: [utl] * n_evt,
             "evt_xdate_debut": [
                 pd.Timestamp("2022-09-05 08:30:00+0000"),
                 pd.Timestamp("2022-09-05 15:00:00+0000"),
