@@ -92,7 +92,7 @@ def move_indexes_forward(
     i_next_part: int | None = None,
 ) -> tuple[int, int]:
     """
-    Incrémente ou initialise les indexs s'ils ne sont pas précisés.
+    Incrémente ou initialise les indexs s"ils ne sont pas précisés.
 
     :param parts: dataframe contenant les parties à regrouper en événement.
     :param i_current_part: index de la partie courante dans le dataframe
@@ -183,7 +183,7 @@ def schedule_parts(
     scheduled_tasks_parts = pd.DataFrame(scheduled_tasks_parts)
     scheduled_tasks_parts = scheduled_tasks_parts.merge(tasks, on="id_part")
     scheduled_tasks_parts = scheduled_tasks_parts[
-        ["start", "end", "evt_spkevenement", "evt_sfkprojet", "priorite","id_part"]
+        ["start", "end", "evt_spkevenement", "evt_sfkprojet", "priorite", "id_part"]
     ]
     return scheduled_tasks_parts
 
@@ -192,7 +192,7 @@ def schedule_events(
     availabilities: pd.DataFrame, tasks: pd.DataFrame, ordonnancement: Ordonnancement
 ):
     """
-    Planifie les événements correspondant à l'ordonnancement quasi-optimal des tâches calculé lors de l'optimisation,
+    Planifie les événements correspondant à l"ordonnancement quasi-optimal des tâches calculé lors de l"optimisation,
     à partir des disponibilités et des tâches.
     :param availabilities: dataframe des plages horaires de disponibilités
     :param tasks: dataframe des tâches contenant les parties de tâches
@@ -208,29 +208,30 @@ def schedule_events(
 def make_stats(events: pd.DataFrame, tasks: pd.DataFrame) -> dict[str: pd.DataFrame]:
     """
     Fourni un pourcentage de planification des tâches, à partir de ce qui a pu être planifié, et des
-    tâches que l'on souhaitait initialiement planifier de manière optimale dans la période de sprint.
+    tâches que l"on souhaitait initialiement planifier de manière optimale dans la période de sprint.
 
     :param events: dataframe des tâches planifiées
     :param tasks: dataframe des tâches à planifier de manière optimale
     """
 
     # stats percent completion for tasks
-    events['duree'] = events['end'] - events['start']
-    events['duree'] = events['duree'].apply(lambda x: x.total_seconds() / 3600)
-    events = events.groupby('evt_spkevenement').sum("duree").reset_index()[['evt_spkevenement', 'duree']]
-    tache_to_duree = dict(zip(events['evt_spkevenement'], events['duree']))
+    events["duree"] = events["end"] - events["start"]
+    events["duree"] = events["duree"].apply(lambda x: x.total_seconds() / 3600)
+    events = events.groupby("evt_spkevenement").sum().reset_index()[["evt_spkevenement" "duree"]]
+    tache_to_duree = dict(zip(events["evt_spkevenement"], events["duree"]))
     stat_tasks = pd.DataFrame.copy(tasks)
-    stat_tasks['duree_effectuee'] = stat_tasks['evt_spkevenement'].map(tache_to_duree)
+    stat_tasks["duree_effectuee"] = stat_tasks["evt_spkevenement"].map(tache_to_duree)
     stat_tasks.fillna(0, inplace=True)
-    stat_tasks['pct_completion'] = np.round(stat_tasks['duree_effectuee'] / stat_tasks['evt_dduree'], 2)
-    stat_tasks = stat_tasks[['evt_spkevenement',
-                             "lgl_sfkligneparent", "evt_sfkprojet", "priorite",'evt_dduree', "duree_effectuee",
+    stat_tasks["pct_completion"] = np.round(stat_tasks["duree_effectuee"] / stat_tasks["evt_dduree"], 2)
+    stat_tasks = stat_tasks[["evt_spkevenement",
+                             "lgl_sfkligneparent", "evt_sfkprojet", "priorite", "evt_dduree", "duree_effectuee",
                              "pct_completion"]]
     stat_tasks.sort_values(by="pct_completion", ascending=False)
 
     # stats percent completion for projects
     stat_projects = pd.DataFrame.copy(stat_tasks).groupby("evt_sfkprojet").sum()[["evt_dduree", "duree_effectuee"]]
-    stat_projects['projet_percent_completion'] = np.round(stat_projects["duree_effectuee"] / stat_projects["evt_dduree"], 2)
+    stat_projects["projet_percent_completion"] = np.round(stat_projects["duree_effectuee"] /
+                                                          stat_projects["evt_dduree"], 2)
     stat_projects = stat_projects.reset_index()
 
     stats = {"tasks": stat_tasks, "projects": stat_projects}

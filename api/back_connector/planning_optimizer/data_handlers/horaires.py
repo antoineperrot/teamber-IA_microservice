@@ -20,7 +20,6 @@ def handler_clean_hor(hor: pd.DataFrame) -> pd.DataFrame:
 
     hor = hor.loc[hor["eeh_xheuredebut"] <= hor["eeh_xheurefin"]]
     hor.reset_index(drop=True, inplace=True)
-    hor["eeh_sfkperiode"] = hor["eeh_sfkperiode"] - 1
     return hor
 
 
@@ -39,6 +38,7 @@ def handler_list_hor_utl(list_hor_utl: List[pd.DataFrame]) -> pd.DataFrame:
         union = handler_clean_hor(union)
         union = handler_union_hor(union)
         union = handler_clean_hor(union)
+    union["eeh_sfkperiode"] = union["eeh_sfkperiode"] - 1
     return union
 
 
@@ -68,10 +68,10 @@ def handler_union_hor(union: pd.DataFrame) -> pd.DataFrame:
             temp.reset_index(inplace=True, drop=True)
 
         kept = temp.loc[
-            (temp["eeh_sfkperiode"] == day)
-            & (temp["eeh_xheuredebut"] <= heure_fin)
-            & (temp["eeh_xheuredebut"] >= heure_debut)
-            & (temp["eeh_xheurefin"] >= heure_fin)
+            (temp["eeh_sfkperiode"] == day) &
+            ( ((temp["eeh_xheurefin"] <= heure_fin) & (temp["eeh_xheuredebut"] <= heure_debut))
+            | ((temp["eeh_xheurefin"] >= heure_fin) & (temp["eeh_xheuredebut"] <= heure_fin))
+            | ((temp["eeh_xheurefin"] >= heure_fin) & (temp["eeh_xheuredebut"] <= heure_debut)))
         ]
 
         if len(kept) > 0:
@@ -94,11 +94,11 @@ def handler_union_hor(union: pd.DataFrame) -> pd.DataFrame:
         out = pd.concat([out, final_row_df], ignore_index=True)
 
     out["eeh_sfkperiode"] = out["eeh_sfkperiode"].astype(int)
-
+    out = handler_clean_hor(out)    
     return out
 
 
-def split_n_clean_horaires(df_hor: pd.DataFrame) -> dict:
+def make_clean_hor(df_hor: pd.DataFrame) -> dict:
     """
     Prend le dataframe d'horaires envoyé par Wandeed pour en faire un dictionnaire
     propre contenant pour chaque id utilisateur ses horaires sous forme de pd.DataFrame

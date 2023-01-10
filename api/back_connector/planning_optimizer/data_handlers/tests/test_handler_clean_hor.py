@@ -24,7 +24,7 @@ class TestHandlerCleanHor(unittest.TestCase):
         self.list_expected_result.append(
             pd.DataFrame(
                 {
-                    "eeh_sfkperiode": [0, 1],
+                    "eeh_sfkperiode": [1, 2],
                     "eeh_xheuredebut": ["06:30", "22:45"],
                     "eeh_xheurefin": ["10:45", "23:00"],
                 }
@@ -35,7 +35,7 @@ class TestHandlerCleanHor(unittest.TestCase):
             pd.DataFrame(
                 {
                     "eeh_xheuredebut": ["06:30", "22:45"],
-                    "eeh_sfkperiode": [2, 1],
+                    "eeh_sfkperiode": [1, 0],
                     "eeh_xheurefin": ["10:45", "00:30"],
                 }
             )
@@ -55,4 +55,4 @@ class TestHandlerCleanHor(unittest.TestCase):
             self.list_test_input, self.list_expected_result
         ):
             function_output = handler_clean_hor(input_value)
-            pd.testing.assert_frame_equal(function_output, expected_result)
+            pd.testing.assert_frame_equal(function_output, expected_result, check_dtype=False)

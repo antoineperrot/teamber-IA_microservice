@@ -10,7 +10,7 @@ from typing import Tuple
 import pandas as pd
 
 from api.back_connector.planning_optimizer.data_handlers.horaires import (
-    split_n_clean_horaires,
+    make_clean_hor,
 )
 from api.back_connector.planning_optimizer.data_handlers.imperatifs import (
     split_n_clean_impertifs,
@@ -36,7 +36,7 @@ def filtre(
     df_tsk = map_priorites_projets(df_tsk, priorites_projets)
     taches = split_n_clean_taches(df_tsk)
     imperatifs = split_n_clean_impertifs(df_imp)
-    horaires = split_n_clean_horaires(df_hor)
+    horaires = make_clean_hor(df_hor)
 
     logger_planning_optimizer.info("filtrage des données du back.")
 

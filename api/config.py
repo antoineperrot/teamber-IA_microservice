@@ -20,8 +20,8 @@ config = dotenv_values(".env")
 required_fields = ["FLASK_API_KEY", "MODE", "LAST_TEST_FILES_PATH"]
 missing_fields_in_config = [field for field in required_fields if field not in config]
 
-if not os.path.exists(config["LAST_TEST_FILES_PATH"]):
-    os.mkdir(config["LAST_TEST_FILES_PATH"])
+#if not os.path.exists(config["LAST_TEST_FILES_PATH"]):
+#    os.mkdir(config["LAST_TEST_FILES_PATH"])
 
 if len(missing_fields_in_config) != 0:
     raise MissingDotenvFieldsException(missing_fields_in_config)
