@@ -14,7 +14,6 @@ from api.services.planning_optimizer.solver.planning.solution_interpreter import
 )
 from api.services.planning_optimizer.solver.planning.ordonnancement import Ordonnancement
 
-from api.config import config
 from api.string_keys import *
 
 
@@ -168,4 +167,3 @@ class SimulatedAnnealingPlanningOptimizer:
         if self.save_for_testing:
             now = datetime.now()
             now_timestamp = str(now.timestamp()).split('.')[0]
-            fig.savefig(os.path.join(config["LAST_TEST_FILES_PATH"], now_timestamp + "_optimization_statistics"))

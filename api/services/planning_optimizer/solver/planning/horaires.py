@@ -81,8 +81,8 @@ def make_base(
         curseur_temps = avance_cuseur_temps(curseur_temps, date_end, next_ph)
         next_ph_dict["timestamp_fin"] = curseur_temps
         next_ph_dict["timestamp_debut"] = curseur_temps.replace(
-            hour=int(next_ph.key_debut_plage_horaire[:2]),
-            minute=int(next_ph.key_debut_plage_horaire[-2:]),
+            hour=int(next_ph[key_debut_plage_horaire][:2]),
+            minute=int(next_ph[key_debut_plage_horaire][-2:]),
             second=0,
         )
         if next_ph_dict["timestamp_debut"] < date_end:

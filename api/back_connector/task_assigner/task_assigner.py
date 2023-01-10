@@ -7,7 +7,7 @@ from api.back_connector.tools import make_sql_requests
 from api.string_keys import *
 
 
-def fetch_data(access_token: str, date_start: str, date_end: str, url: str) -> dict:
+def fetch_task_assigner_data_to_back(access_token: str, date_start: str, date_end: str, url: str) -> dict:
     """
     Va chercher auprès du Back les données nécessaires à l'optimisation de l'assignation des tâches.
 

@@ -11,7 +11,7 @@ from api.string_keys import *
 
 
 # TODO: corriger les ValueError
-def fetch_data(
+def fetch_data_to_wandeed_backend(
     url: str, access_token: str, date_start: str, date_end: str, key_project_prioritys_projets: dict
 ) -> Tuple[dict, dict, dict, list]:
     """
@@ -28,16 +28,16 @@ def fetch_data(
         TODO: à compléter
 
     :return df_hor: dataframe contenant les horaires des utilisateurs
-        key_epu_sfkutilisateur  -> id de l'utilisateur
+        epu_sfkutilisateur  -> id de l'utilisateur
         "epl_xdebutperiode"   -> debut de période d'application de l'horaire
         "epl_xfinperiode"     -> fin de période d'application de l'horaire
         key_epl_employe_horaire -> horaire de l'employe
 
     :return df_tsk:
-        key_duree_evenement          -> duree (en h) de la tâche
-        key_evenement    -> id de la tâche
-        key_competence  -> utilisateur concerné # TODO: corriger clé
-        key_evenement_project       -> projet de rattachement de la tâche
+        duree_evenement          -> duree (en h) de la tâche
+        evenement    -> id de la tâche
+        competence  -> utilisateur concerné # TODO: corriger clé
+        evenement_project       -> projet de rattachement de la tâche
     """
     sql_querys_dict = {
         "imperatifs": {

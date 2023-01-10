@@ -1,1 +1,1 @@
-from .planning_optimizer import fetch_data
+from .planning_optimizer import fetch_data_to_wandeed_backend

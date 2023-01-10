@@ -1,12 +1,12 @@
 from flask import jsonify, make_response
 
-from api.back_connector.planning_optimizer import fetch_data
+from api.back_connector.planning_optimizer import fetch_data_to_wandeed_backend
 from api.controllers.planning_optimizer import check_parameters
 from api.servers.base_server import app
 from api.tools import api_key_required
 
 
-@app.route("/planning_optimizer/", methods=["GET"])
+@app.route("/api/planning_optimizer", methods=["GET"])
 @api_key_required
 def planning_optimizer(
     url: str,
@@ -41,7 +41,7 @@ def planning_optimizer(
     """
     check_parameters(date_start, date_end, key_project_prioritys_projets)
 
-    imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires = fetch_data(
+    imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires = fetch_data_to_wandeed_backend(
         url, access_token, date_start, date_end, key_project_prioritys_projets
     )
 

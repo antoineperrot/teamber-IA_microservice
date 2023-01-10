@@ -1,20 +1,15 @@
-from api.data_fetcher import get_data_task_assigner
-from api.services.task_assigner.data_handlers.input_data import split_data_task_assigner
-from flask import jsonify
-from modules.task_assigner import ContrainteEtreSurProjet
-from modules.task_assigner import solveur
+from flask import jsonify, request, make_response
 
-from api.controllers.task_assigner.controller_data import controller_data
-from api.controllers.task_assigner.controller_parameters import controller_parameters
+from api.controllers.task_assigner import task_assigner_controller
 from api.servers.base_server import app
 from api.tools import api_key_required
 
 
-@app.route("/task_assigner/", methods=["GET"])
+@app.route("/api/task_assigner", methods=["GET"])
 @api_key_required
-def task_assigner(
-    access_token: str,
-    url: str,
+def task_assigner_route(
+    backed_access_token: str,
+    backend_url: str,
     date_start: str,
     date_end: str,
     curseur: float = 0.0,
@@ -31,7 +26,9 @@ def task_assigner(
 
     Arguments :
 
-        access_token: str, token pour accéder à la BDD.
+        backed_access_token: str, token pour accéder à la BDD.
+
+        backend_url: str, url du backend / BDD où récupérer les données utilisateurs
 
         date_start:  date de début au format ISO du sprint pour la sélection des tâches auprès du BACK
 
@@ -56,33 +53,5 @@ def task_assigner(
         Un fichier json contenant une solution de répartition optimale des tâches entre les utilisateurs.
 
     """
-    controller_parameters(
-        date_start,
-        date_end,
-        curseur,
-        contrainte_etre_sur_projet,
-        avantage_projet,
-    )
-
-    # conversion au type Enum
-    contrainte_etre_sur_projet = ContrainteEtreSurProjet(contrainte_etre_sur_projet)
-
-    # récupération des données
-    data = get_data_task_assigner(access_token, date_start, date_end, url)
-    df_prj, df_cmp, df_tsk, df_dsp = split_data_task_assigner(data)
-
-    # verification cohérence/qualité données
-    controller_data(df_prj, df_cmp, df_tsk, df_dsp)
-
-    # calcul d'une solution
-    solution = solveur(
-        df_prj,
-        df_cmp,
-        df_tsk,
-        df_dsp,
-        curseur,
-        contrainte_etre_sur_projet,
-        avantage_projet,
-    )
-
-    return jsonify(solution)
+    json_file = request.get_json()
+    return make_response(jsonify(task_assigner_controller(json_file)))
