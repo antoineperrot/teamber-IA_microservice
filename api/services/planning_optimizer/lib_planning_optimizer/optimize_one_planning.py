@@ -3,18 +3,18 @@ Module d'optimisation.
 """
 import pandas as pd
 
-from api.services.planning_optimizer.solver.planning.horaires import (
+from api.services.planning_optimizer.lib_planning_optimizer.planning.horaires import (
     compute_availabilities,
 )
-from api.services.planning_optimizer.solver.planning.planning import (
+from api.services.planning_optimizer.lib_planning_optimizer.planning.planning import (
     SimulatedAnnealingPlanningOptimizer,
 )
-from api.services.planning_optimizer.solver.tools.taches import split_tasks
+from api.services.planning_optimizer.lib_planning_optimizer.tools import split_tasks
 
-from api.services.planning_optimizer.solver.planning.solution_interpreter import make_stats
+from api.services.planning_optimizer.lib_planning_optimizer.planning.solution_interpreter import make_stats
 
 
-def solver(
+def optimize_one_planning(
     horaires: pd.DataFrame,
     taches: pd.DataFrame,
     imperatifs: pd.DataFrame | None,
@@ -29,12 +29,18 @@ def solver(
     """
 
     availabilities = compute_availabilities(
-        horaires, imperatifs, date_start, date_end, min_duration_section
+        horaires=horaires,
+        imperatifs=imperatifs,
+        date_start=date_start,
+        date_end=date_end,
+        min_duration_section=min_duration_section
     )
     splitted_tasks = split_tasks(taches, parts_max_length)
 
     optimizer = SimulatedAnnealingPlanningOptimizer(
-        availabilities=availabilities, tasks=splitted_tasks, save_for_testing=save_optimization_statistics
+        availabilities=availabilities,
+        tasks=splitted_tasks,
+        save_for_testing=save_optimization_statistics
     )
 
     optimizer.optimize(n_iterations_per_task=250)

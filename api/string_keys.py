@@ -1,3 +1,4 @@
+"""Contient les noms des champs utilisés en BDD Wandeed"""
 key_competence = "key_competence"
 key_evenement = "evt_spkevenement"
 key_duree_evenement = "evt_dduree"

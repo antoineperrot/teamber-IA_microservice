@@ -9,10 +9,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from api.services.planning_optimizer.solver.planning.solution_interpreter import (
+from api.services.planning_optimizer.lib_planning_optimizer.planning.solution_interpreter import (
     schedule_events,
 )
-from api.services.planning_optimizer.solver.planning.ordonnancement import Ordonnancement
+from api.services.planning_optimizer.lib_planning_optimizer.planning.ordonnancement import Ordonnancement
 
 from api.string_keys import *
 

@@ -182,7 +182,7 @@ def compute_availabilities(
     imperatifs: pd.DataFrame,
     date_start: str,
     date_end: str,
-    min_duration_section: float = 0.5,
+    min_duration_section: float,
 ) -> pd.DataFrame:
     """
     A partir des horaires d'un utilisateur, de ses impératifs (événements non-replanifiables), d'une date de
@@ -199,7 +199,10 @@ def compute_availabilities(
         sections_ends = find_sections_ends(imperatifs, date_end)
 
     bases = [
-        make_base(horaires, section_start, section_end, min_duration_section)
+        make_base(plages_horaires_df=horaires,
+                  date_start=section_start,
+                  date_end=section_end,
+                  min_duration_section=min_duration_section)
         for (section_start, section_end) in sections_ends.values
     ]
     availabilities = pd.concat(bases)

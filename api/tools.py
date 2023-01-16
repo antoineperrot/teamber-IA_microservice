@@ -3,11 +3,13 @@ Tools for the api
 """
 from flask import request, abort
 
-from api.servers.base_server import app
+from api.config import config
 
 
 def api_key_required(func):
+    """Décorateur clé API"""
     def wrapper_function(*args, **kwargs):
+        """wrapper"""
         if request.headers:
             auth_header = request.headers.get("Authorization", None)
 
@@ -19,7 +21,7 @@ def api_key_required(func):
 
             api_key = auth_header.replace("Bearer ", "")
 
-            if api_key != app.config["SECRET_KEY"]:
+            if api_key != config["SECRET_KEY"]:
                 abort(401, "Invalid api-key")
 
         return func(*args, **kwargs)

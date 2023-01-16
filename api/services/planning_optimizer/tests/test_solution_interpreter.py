@@ -6,7 +6,7 @@ import unittest
 
 import pandas as pd
 
-from api.services.planning_optimizer.solver.planning.solution_interpreter import (
+from api.services.planning_optimizer.lib_planning_optimizer.planning.solution_interpreter import (
     get_next_part,
     add_event,
     move_indexes_forward,

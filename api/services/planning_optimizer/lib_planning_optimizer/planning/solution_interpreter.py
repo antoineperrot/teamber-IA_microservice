@@ -5,7 +5,7 @@ import datetime
 import numpy as np
 import pandas as pd
 
-from api.services.planning_optimizer.solver.planning.ordonnancement import (
+from api.services.planning_optimizer.lib_planning_optimizer.planning.ordonnancement import (
     Ordonnancement,
 )
 from api.string_keys import *

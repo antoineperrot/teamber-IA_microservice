@@ -2,7 +2,7 @@ import unittest
 
 import pandas as pd
 from api.string_keys import *
-from api.services.planning_optimizer.solver.planning.horaires import (
+from api.services.planning_optimizer.lib_planning_optimizer.planning.horaires import (
     find_next_ph,
     avance_cuseur_temps,
     make_base,

@@ -27,7 +27,7 @@ def make_stat_cmp(df_out: pd.DataFrame) -> pd.DataFrame:
 
 
 def make_stat_utl(
-    df_out: pd.DataFrame, d_utl_to_dsp: dict, utl_to_int: dict
+    df_out: pd.DataFrame, mapping_utl_to_dsp: dict, mapping_utl_to_int: dict
 ) -> pd.DataFrame:
     """
     Production de statistiques par utilisateur
@@ -49,8 +49,8 @@ def make_stat_utl(
         .rename("total_h_assignees")
     )
     stat_utl = pd.DataFrame([avg_lvl_exe_tsk, tot_h]).T
-    stat_utl["utl_int"] = stat_utl.index.map(utl_to_int)
-    stat_utl["dsp_utl"] = stat_utl.utl_int.map(d_utl_to_dsp)
+    stat_utl["utl_int"] = stat_utl.index.map(mapping_utl_to_int)
+    stat_utl["dsp_utl"] = stat_utl.utl_int.map(mapping_utl_to_dsp)
     stat_utl["taux_occupation"] = np.round(
         stat_utl["total_h_assignees"] / stat_utl["dsp_utl"], 2
     )
@@ -59,7 +59,7 @@ def make_stat_utl(
 
 
 def make_stat_tsk(
-    df_out: pd.DataFrame, d_tsk_to_lgt: dict, int_to_tsk: dict
+    df_out: pd.DataFrame, mapping_tsk_to_lgt: dict, mapping_int_to_tsk: dict
 ) -> pd.DataFrame:
     """
     Production de statistiques par tache
@@ -71,8 +71,8 @@ def make_stat_tsk(
         .rename("n_utl_per_tsk")
         .astype(int)
     )
-    tmp = pd.Series(d_tsk_to_lgt).sort_index()
-    tmp = tmp.set_axis(list(int_to_tsk.values()), copy=False)
+    tmp = pd.Series(mapping_tsk_to_lgt).sort_index()
+    tmp = tmp.set_axis(list(mapping_int_to_tsk.values()), copy=False)
     pct_per_tsk = (
         (
             df_out.loc[df_out["utl"] != "not assigned"]

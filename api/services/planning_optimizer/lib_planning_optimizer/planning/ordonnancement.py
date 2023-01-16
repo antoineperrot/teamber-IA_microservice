@@ -6,7 +6,7 @@ from random import choice
 import numpy as np
 import pandas as pd
 
-from api.services.planning_optimizer.solver.tools.energies import (
+from api.services.planning_optimizer.lib_planning_optimizer.tools import (
     energy_dispersion,
     energy_key_project_prioritys,
     energy_waisted_time,

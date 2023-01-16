@@ -1,13 +1,15 @@
+"""Module de test des handlers de manipulation des tâches utilisateurs."""
 import unittest
 
 import pandas as pd
 
-from api.services.planning_optimizer.solver.tools.taches import split_tasks
+from api.services.planning_optimizer.lib_planning_optimizer.tools import split_tasks
 from api.string_keys import *
 
 
 class TestSplitTasks(unittest.TestCase):
     def setUp(self):
+        """setup"""
         self.input_df = pd.DataFrame(
             {
                 key_duree_evenement: {

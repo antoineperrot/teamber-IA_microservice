@@ -1,18 +1,26 @@
+"""
+Controller du task assigner
+"""
+import pandas as pd
+
 from datetime import datetime
 from werkzeug.exceptions import UnprocessableEntity
 from api.back_connector.task_assigner.task_assigner import fetch_task_assigner_data_to_back
+from api.services.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
+from api.services.task_assigner.solver import solveur, SolverCrashException
+from api.loggers import logger_task_assigner
 
 
-class FrontEndRequestContent:
+class FrontEndTaskAssignerRequestContent:
     """Classe contenant ce les infos que doit faire parvenir le front lors d'un appel à TaskAssigner"""
     def __init__(self,
                  backend_access_token: str,
                  backend_url: str,
                  date_start: str,
                  date_end: str,
-                 curseur: float = 0.0,
-                 contrainte_etre_sur_projet: str = "de_preference",
-                 avantage_projet: float = 1.0):
+                 curseur: float,
+                 contrainte_etre_sur_projet: ContrainteEtreSurProjet,
+                 avantage_projet: float):
         self.backend_access_token = backend_access_token
         self.backend_url = backend_url
         self.date_start = date_start
@@ -21,29 +29,35 @@ class FrontEndRequestContent:
         self.contrainte_etre_sur_projet = contrainte_etre_sur_projet
         self.avantage_projet = avantage_projet
 
-    @staticmethod
+        self._cast_values()
+        self._check_values()
+
+    @classmethod
     def deserialize(cls, json: dict):
         """Méthode de désérialisation"""
-        out = FrontEndRequestContent(backend_access_token=json["backend_access_token"],
-                                     backend_url=json["backend_url"],
-                                     date_start=json["date_start"],
-                                     date_end=json["date_end"],
-                                     curseur=json["curseur"],
-                                     contrainte_etre_sur_projet=json["contrainte_etre_sur_projet"],
-                                     avantage_projet=json["avantage_projet"])
 
-        # TODO : assertion des paramètres
+        logger_task_assigner.info("Désérialisation de la demande du front")
+        out = cls(backend_access_token=json["backend_access_token"],
+                  backend_url=json["backend_url"],
+                  date_start=json["date_start"],
+                  date_end=json["date_end"],
+                  curseur=json["curseur"],
+                  contrainte_etre_sur_projet=json["contrainte_etre_sur_projet"],
+                  avantage_projet=json["avantage_projet"])
 
+        out._cast_values()
+        out._check_values()
         return out
 
     def _cast_values(self):
         try:
+            logger_task_assigner.info("Typage des valeurs de la demande du front")
             self.backend_access_token = str(self.backend_access_token)
             self.backend_url = str(self.backend_url)
             self.date_start = str(self.date_start)
             self.date_end = str(self.date_end)
             self.curseur = float(self.curseur)
-            self.contrainte_etre_sur_projet = str(self.contrainte_etre_sur_projet)
+            self.contrainte_etre_sur_projet = ContrainteEtreSurProjet(self.contrainte_etre_sur_projet)
             self.avantage_projet = float(self.avantage_projet)
         except Exception:
             raise UnprocessableEntity(description="Les valeurs ne sont pas castables dans les bons types. "
@@ -58,6 +72,7 @@ class FrontEndRequestContent:
         
     def _check_values(self):
         """Vérifie la correctitude des paramètres"""
+        logger_task_assigner.info("Vérification de la validité des paramètres d'optimisation choisie")
         try:
             datetime.fromisoformat(self.date_start)
         except Exception:
@@ -71,7 +86,12 @@ class FrontEndRequestContent:
         except AssertionError:
             raise UnprocessableEntity(description="'curseur' doit être entre 0 et 1.")
 
-
+        available_values = [ContrainteEtreSurProjet.OUI.value,
+                            ContrainteEtreSurProjet.NON.value,
+                            ContrainteEtreSurProjet.DE_PREFERENCE.value]
+        if self.contrainte_etre_sur_projet not in available_values:
+            raise UnprocessableEntity(description="'contrainte_etre_sur_projet' doit être choisi parmi"
+                                                  f"{available_values}.")
 
 
 def task_assigner_controller(json_file: dict):
@@ -80,29 +100,36 @@ def task_assigner_controller(json_file: dict):
     - vérifie le contenue du json en entrée
     -
     """
-    front_end_request_content = FrontEndRequestContent.deserialize(json_file)
-    front_end_request_content.check()
+    logger_task_assigner.info("Appel du controller")
+    front_end_request_content = FrontEndTaskAssignerRequestContent.deserialize(json_file)
 
-    data_task_assigner = fetch_task_assigner_data_to_back(backend_access_token, date_start, date_end, backend_url)
+    df_prj, df_cmp, df_tsk, df_dsp = fetch_task_assigner_data_to_back(
+        backend_url=front_end_request_content.backend_url,
+        backend_access_token=front_end_request_content.backend_access_token,
+        date_start=front_end_request_content.date_start,
+        date_end=front_end_request_content.date_end)
 
-    df_prj, df_cmp, df_tsk, df_dsp = split_data_task_assigner(data_task_assigner)
-
-    check_validity_data_assigner(df_prj, df_cmp, df_tsk, df_dsp)
+    check_data_consistency(df_prj, df_cmp, df_tsk, df_dsp)
 
     # calcul d'une solution
-    solution = solveur(
-        df_prj,
-        df_cmp,
-        df_tsk,
-        df_dsp,
-        curseur,
-        contrainte_etre_sur_projet,
-        avantage_projet,
-    )
-    pass
+    try:
+        solution = solveur(
+            df_prj=df_prj,
+            df_cmp=df_cmp,
+            df_tsk=df_tsk,
+            df_dsp=df_dsp,
+            curseur=front_end_request_content.curseur,
+            contrainte_etre_sur_projet=front_end_request_content.contrainte_etre_sur_projet,
+            avantage_projet=front_end_request_content.avantage_projet,
+        )
+        return solution
+
+    except Exception as e:
+        logger_task_assigner.error("Crash du solveur", exc_info=str(e))
+        raise SolverCrashException()
 
 
-def check_validity_data_assigner(
+def check_data_consistency(
         df_prj: pd.DataFrame,
         df_cmp: pd.DataFrame,
         df_tsk: pd.DataFrame,
@@ -111,6 +138,7 @@ def check_validity_data_assigner(
     """
     Vérifie que les données reçues sont cohérentes.
     """
+    logger_task_assigner.info("Vérification de la consistence des données récupérées dans le BACK.")
     if len(df_cmp) == 0:
         raise UnprocessableEntity(description="Pas de matrice de compétence disponible.")
     if len(df_tsk) == 0:

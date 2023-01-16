@@ -5,10 +5,10 @@ import logging
 import time
 
 from flask import Flask, make_response, jsonify, session, request
-from module.logger import root_logger
+from api.loggers import root_logger
 from werkzeug.exceptions import HTTPException
-
 from api.config import config
+from api.tools import api_key_required
 
 REQUEST_RECEIVED_TIME = "request_received_time"
 
@@ -19,9 +19,6 @@ app.logger.setLevel(logging.DEBUG)
 
 root_logger.info("Instanciation de l'application terminée.")
 
-from api.tools import api_key_required
-
-
 # Mode constant
 PRODUCTION = "PRODUCTION"
 DEV = "DEV"
@@ -31,6 +28,8 @@ if app.config["MODE"] == DEV:
 
 
 # import routes
+from api.routes.task_assigner import task_assigner_route
+from api.routes.planning_optimizer import planning_optimizer_route
 
 
 @app.errorhandler(Exception)
@@ -102,3 +101,7 @@ def ping_route_secure():
     Ping route
     """
     return make_response(jsonify(app.config["SECRET_KEY"]), 200)
+
+
+if __name__ == "main":
+    app.run(host=config["FLASK_HOST"], port=config["FLASK_PORT"], debug=True)
