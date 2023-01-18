@@ -4,10 +4,17 @@ Tools for the api
 from flask import request, abort
 
 from api.config import config
+from functools import wraps
 
 
 def api_key_required(func):
-    """Décorateur clé API"""
+    """
+    View decorator - require valid api key
+    Extract api-key information from authorization header
+    authorization header has the following form: Bearer key
+    """
+
+    @wraps(func)
     def wrapper_function(*args, **kwargs):
         """wrapper"""
         if request.headers:
@@ -21,7 +28,7 @@ def api_key_required(func):
 
             api_key = auth_header.replace("Bearer ", "")
 
-            if api_key != config["SECRET_KEY"]:
+            if api_key != config["FLASK_API_KEY"]:
                 abort(401, "Invalid api-key")
 
         return func(*args, **kwargs)

@@ -3,7 +3,7 @@ Module des fonctions tools de formulation du problèmes linéaire à partir des 
 """
 from typing import Tuple, List
 import numpy as np
-from api.services.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
+from api.services.task_assigner.lib_task_assigner.tools import ContrainteEtreSurProjet
 
 
 def make_arcs_and_cost_func(

@@ -6,7 +6,7 @@ import pandas as pd
 from datetime import datetime
 from werkzeug.exceptions import UnprocessableEntity
 from api.back_connector.task_assigner.task_assigner import fetch_task_assigner_data_to_back
-from api.services.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
+from api.services.task_assigner.lib_task_assigner.tools import ContrainteEtreSurProjet
 from api.services.task_assigner.solver import solveur, SolverCrashException
 from api.loggers import logger_task_assigner
 

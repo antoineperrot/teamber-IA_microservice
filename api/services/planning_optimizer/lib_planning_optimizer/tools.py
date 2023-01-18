@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.collections import PolyCollection
 
-from api.services.task_assigner.tools.id_remapping import flatten_list
+from api.services.task_assigner.lib_task_assigner.tools.id_remapping import flatten_list
 from api.string_keys import *
 
 

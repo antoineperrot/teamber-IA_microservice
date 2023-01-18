@@ -3,12 +3,15 @@ Base server for the API
 """
 import logging
 import time
-
-from flask import Flask, make_response, jsonify, session, request
+import traceback
+from flask import Flask, jsonify, session, request
 from api.loggers import root_logger
 from werkzeug.exceptions import HTTPException
 from api.config import config
-from api.tools import api_key_required
+from api.routes.task_assigner import bp_task_assigner
+from api.routes.planning_optimizer import bp_planning_optimizer
+from api.routes.ping import bp_ping
+
 
 REQUEST_RECEIVED_TIME = "request_received_time"
 
@@ -16,20 +19,9 @@ app = Flask("API")
 app.config["SECRET_KEY"] = config["FLASK_API_KEY"]
 app.config["MODE"] = config["MODE"]
 app.logger.setLevel(logging.DEBUG)
-
-root_logger.info("Instanciation de l'application terminée.")
-
-# Mode constant
-PRODUCTION = "PRODUCTION"
-DEV = "DEV"
-
-if app.config["MODE"] == DEV:
-    pass
-
-
-# import routes
-from api.routes.task_assigner import task_assigner_route
-from api.routes.planning_optimizer import planning_optimizer_route
+app.register_blueprint(bp_task_assigner)
+app.register_blueprint(bp_planning_optimizer)
+app.register_blueprint(bp_ping)
 
 
 @app.errorhandler(Exception)
@@ -38,6 +30,8 @@ def errorhandler(error):
     Custom error handler for readability
     """
     app.logger.error(error)
+
+    app.logger.error("error traceback:\n" + traceback.format_exc())
     if isinstance(error, HTTPException):
         return (
             jsonify(
@@ -86,22 +80,9 @@ def after_request(response):
     return response
 
 
-@app.route("/api/ping", methods=["GET"])
-def ping_route():
-    """
-    Ping route
-    """
-    return make_response(jsonify("pong"), 200)
-
-
-@app.route("/api/ping_secure", methods=["GET"])
-@api_key_required
-def ping_route_secure():
-    """
-    Ping route
-    """
-    return make_response(jsonify(app.config["SECRET_KEY"]), 200)
-
-
-if __name__ == "main":
-    app.run(host=config["FLASK_HOST"], port=config["FLASK_PORT"], debug=True)
+if __name__ == "__main__":
+    app.logger.info("Routes are imported")
+    root_logger.error("ICI")
+    app.run(host=config["FLASK_HOST"],
+            port=config["FLASK_PORT"],
+            debug=config["FLASK_DEBUG"])

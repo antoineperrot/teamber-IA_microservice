@@ -1,7 +1,6 @@
 """
 Module de la classe d'optimisation des plannings.
 """
-import os
 import datetime
 from datetime import datetime
 

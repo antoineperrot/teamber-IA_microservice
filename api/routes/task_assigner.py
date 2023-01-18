@@ -1,12 +1,14 @@
 """Route du service task_assigner"""
-from flask import jsonify, request, make_response
+from flask import jsonify, request, make_response, Blueprint
 
 from api.controllers.task_assigner import task_assigner_controller
-from api.servers.base_server import app
 from api.tools import api_key_required
 
 
-@app.route("/api/task_assigner", methods=["GET"])
+bp_task_assigner = Blueprint("routes_task_assigner", __name__)
+
+
+@bp_task_assigner.route("/api/task_assigner", methods=["GET"])
 @api_key_required
 def task_assigner_route():
     """Route du service task_assigner"""

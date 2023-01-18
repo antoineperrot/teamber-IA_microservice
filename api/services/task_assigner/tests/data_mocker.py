@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 from api.string_keys import *
-from api.services.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
+from api.services.task_assigner.lib_task_assigner.tools import ContrainteEtreSurProjet
 
 
 def generate_unique_ids(n: int) -> List[int]:
