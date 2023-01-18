@@ -2,8 +2,6 @@
 Contient toutes les fonctions qui consistent à remapper les entrees/sorties des
 ID locaux/externes.
 """
-from typing import Tuple, List
-
 import numpy as np
 import pandas as pd
 from api.string_keys import *
@@ -28,7 +26,7 @@ def remap_df_out(df_out: pd.DataFrame,
 
 def make_usefull_mapping_dicts(
     df_tsk: pd.DataFrame, df_dsp: pd.DataFrame
-) -> Tuple[dict, dict, dict, dict]:
+) -> tuple[dict, dict, dict, dict]:
     """
     FABRICATION DE DICTIONNAIRE UTILES PAR LA SUITE
     """
@@ -92,7 +90,7 @@ def make_list_ids(df_prj, df_cmp, df_tsk, df_dsp):
     return id_utl, id_prj, id_cmp, id_tsk
 
 
-def flatten_list(list_of_list: List[list]) -> list:
+def flatten_list(list_of_list: list[list]) -> list:
     """Met à place une liste de liste"""
     out = list()
     for sublist in list_of_list:
@@ -110,7 +108,7 @@ def add_local_ids_in_dfs(
     mapping_utl_to_int: dict,
     mapping_tsk_to_int: dict,
     mapping_prj_to_int: dict,
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     AJOUT DES VARIABLES LOCALES DANS LES DATAFRAMES
     """

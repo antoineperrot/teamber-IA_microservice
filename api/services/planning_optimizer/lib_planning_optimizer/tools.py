@@ -8,6 +8,9 @@ from matplotlib.collections import PolyCollection
 from api.services.task_assigner.lib_task_assigner.tools.id_remapping import flatten_list
 from api.string_keys import *
 
+KEY_AVAILABILITIES = "AVAILABILITIES"
+KEY_WORK = "WORK"
+
 
 def energy_waisted_time(ordo_length: list[float], sections_lengths: list[float]):
     """
@@ -90,29 +93,29 @@ def split_tasks(tasks: pd.DataFrame, parts_max_length: float = 1.0) -> pd.DataFr
     :param parts_max_length: float (en heures) de la durée maximales des nouvelles tâches
     :return tasks_parts: dataframe des tâches découpées en sous-parties
     """
-    tasks["n_parts"] = np.ceil(tasks[key_duree_evenement] / parts_max_length).astype(int)
-    tasks["n_filled_parts"] = (tasks[key_duree_evenement] // parts_max_length).astype(int)
-    tasks["length"] = tasks[key_duree_evenement] - parts_max_length * tasks["n_filled_parts"]
+    tasks[KEY_NUMBER_PARTS] = np.ceil(tasks[key_duree_evenement] / parts_max_length).astype(int)
+    tasks[KEY_NUMBER_FILLED_PARTS] = (tasks[key_duree_evenement] // parts_max_length).astype(int)
+    tasks[KEY_DUREE_PART] = tasks[key_duree_evenement] - parts_max_length * tasks[KEY_NUMBER_FILLED_PARTS]
 
     filled_rows = [
-        [pd.DataFrame(row[1]).T] * int(row[1]["n_filled_parts"])
+        [pd.DataFrame(row[1]).T] * int(row[1][KEY_NUMBER_FILLED_PARTS])
         for row in tasks.iterrows()
     ]
     filled_rows = pd.concat(flatten_list(filled_rows))
-    filled_rows["length"] = parts_max_length
+    filled_rows[KEY_DUREE_PART] = parts_max_length
 
     unfilled_rows = tasks.loc[
-        (tasks["length"] > 0) & (tasks["length"] < parts_max_length)
+        (tasks[KEY_DUREE_PART] > 0) & (tasks[KEY_DUREE_PART] < parts_max_length)
     ]
     tasks_parts = pd.concat([filled_rows, unfilled_rows])
     tasks_parts[key_evenement] = tasks_parts[key_evenement].astype(int)
     tasks_parts[key_competence] = tasks_parts[key_competence].astype(int)
     tasks_parts[key_evenement_project] = tasks_parts[key_evenement_project].astype(int)
-    tasks_parts[key_project_priority] = tasks_parts[key_project_priority].astype(int)
-    tasks_parts = tasks_parts.drop(columns=["n_parts", "n_filled_parts"])
-    tasks_parts.sort_values(by=[key_evenement, "length"], inplace=True)
+    tasks_parts[KEY_PROJECT_PRIORITY] = tasks_parts[KEY_PROJECT_PRIORITY].astype(int)
+    tasks_parts = tasks_parts.drop(columns=[KEY_NUMBER_PARTS, KEY_NUMBER_FILLED_PARTS])
+    tasks_parts.sort_values(by=[key_evenement, KEY_DUREE_PART], inplace=True)
     tasks_parts.reset_index(drop=True, inplace=True)
-    tasks_parts["id_part"] = list(range(len(tasks_parts)))
+    tasks_parts[KEY_ID_PART] = list(range(len(tasks_parts)))
     return tasks_parts
 
 
@@ -126,33 +129,33 @@ def make_timeline(availabilities: pd.DataFrame,
 
     for i, row in availabilities.iterrows():
         data_availabilities.append(
-            (row['timestamp_debut'].to_pydatetime(),
-             row['timestamp_fin'].to_pydatetime(),
-             'availabilities'
+            (row[KEY_TIMESTAMP_DEBUT].to_pydatetime(),
+             row[KEY_TIMESTAMP_FIN].to_pydatetime(),
+             KEY_AVAILABILITIES
              ))
 
     data_imperatifs = []
 
     for i, row in imperatifs.iterrows():
         data_imperatifs.append(
-            (row['evt_xdate_debut'].to_pydatetime(),
-             row['evt_xdate_fin'].to_pydatetime(),
-             'imperatif'
+            (row[KEY_TIMESTAMP_DEBUT].to_pydatetime(),
+             row[KEY_TIMESTAMP_FIN].to_pydatetime(),
+             MY_KEY_IMPERATIFS
              ))
 
     data_work = []
 
     for i, row in events.iterrows():
         data_work.append(
-            (row['start'].to_pydatetime(),
-             row['end'].to_pydatetime(),
-             'work'
+            (row[KEY_TIMESTAMP_DEBUT].to_pydatetime(),
+             row[KEY_TIMESTAMP_FIN].to_pydatetime(),
+             KEY_WORK
              ))
 
     data = data_work + data_imperatifs + data_availabilities
 
-    cats = {"imperatif": 1, "availabilities": 2, "work": 3}
-    colormapping = {"availabilities": "C0", "imperatif": "C1", "work": "C2"}
+    cats = {MY_KEY_IMPERATIFS: 1, KEY_AVAILABILITIES: 2, KEY_WORK: 3}
+    colormapping = {KEY_AVAILABILITIES: "C0", MY_KEY_IMPERATIFS: "C1", KEY_WORK: "C2"}
 
     verts = []
     colors = []
@@ -175,7 +178,7 @@ def make_timeline(availabilities: pd.DataFrame,
     ax.xaxis.set_major_formatter(mdates.AutoDateFormatter(loc))
 
     ax.set_yticks([1, 2, 3])
-    ax.set_yticklabels(["imperatif", "availabilities", "work"])
+    ax.set_yticklabels([MY_KEY_IMPERATIFS, KEY_AVAILABILITIES, KEY_WORK])
 
     fig.tight_layout()
     return fig

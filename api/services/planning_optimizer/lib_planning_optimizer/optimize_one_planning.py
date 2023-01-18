@@ -1,10 +1,12 @@
 """
 Module d'optimisation.
 """
+import datetime
+
 import pandas as pd
 
 from api.services.planning_optimizer.lib_planning_optimizer.planning.horaires import (
-    compute_availabilities,
+    compute_availabilities, NoAvailabilitiesException
 )
 from api.services.planning_optimizer.lib_planning_optimizer.planning.planning import (
     SimulatedAnnealingPlanningOptimizer,
@@ -14,27 +16,51 @@ from api.services.planning_optimizer.lib_planning_optimizer.tools import split_t
 from api.services.planning_optimizer.lib_planning_optimizer.planning.solution_interpreter import make_stats
 
 
+class ResultatCalcul:
+    """Classe stockant un résultat de calcul"""
+
+    def __init__(self,
+                 events: pd.DataFrame | None,
+                 stats: pd.DataFrame | None,
+                 success: bool,
+                 message: str = ""):
+        self.events = events
+        self.stats = stats
+        self.success = success
+        self.message = message
+
+    def serialize(self) -> dict:
+        """Méthode de sérialisation"""
+        out = {"events": self.events.to_dict() if self.events is not None else None,
+               "stats": self.stats.to_dict() if self.stats is not None else None,
+               "success": str(self.success),
+               "message": str(self.message)}
+        return out
+
+
 def optimize_one_planning(
-    horaires: pd.DataFrame,
+    working_times: pd.DataFrame,
     taches: pd.DataFrame,
     imperatifs: pd.DataFrame | None,
-    date_start: str,
-    date_end: str,
+    date_start: datetime.datetime,
+    date_end: datetime.datetime,
     parts_max_length: float,
     min_duration_section: float,
     save_optimization_statistics: bool = False,
-) -> tuple[pd.DataFrame, pd.DataFrame]:
+) -> ResultatCalcul:
     """
     Prend les données d'un utilisateur et renvoie son emploi du temps optimisé.
     """
-
     availabilities = compute_availabilities(
-        horaires=horaires,
+        working_times=working_times,
         imperatifs=imperatifs,
         date_start=date_start,
         date_end=date_end,
         min_duration_section=min_duration_section
     )
+
+    if len(availabilities) == 0:
+        raise NoAvailabilitiesException()
     splitted_tasks = split_tasks(taches, parts_max_length)
 
     optimizer = SimulatedAnnealingPlanningOptimizer(
@@ -47,4 +73,5 @@ def optimize_one_planning(
     events, ordonnancement = optimizer.schedule_events()
     stats = make_stats(events, taches)
 
-    return events, stats
+    out = ResultatCalcul(success=True, events=events, stats=stats)
+    return out

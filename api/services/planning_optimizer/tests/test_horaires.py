@@ -249,7 +249,7 @@ class TestMakeDfPh(unittest.TestLoader):
         self.expected_results.append(
             pd.DataFrame(
                 {
-                    "timestamp_debut": {
+                    KEY_TIMESTAMP_DEBUT: {
                         0: pd.Timestamp("2022-10-03 06:30:00+0000", tz="UTC"),
                         1: pd.Timestamp("2022-10-03 11:30:00+0000", tz="UTC"),
                         2: pd.Timestamp("2022-10-04 06:30:00+0000", tz="UTC"),
@@ -258,7 +258,7 @@ class TestMakeDfPh(unittest.TestLoader):
                         5: pd.Timestamp("2022-10-05 11:30:00+0000", tz="UTC"),
                         6: pd.Timestamp("2022-10-06 06:30:00+0000", tz="UTC"),
                     },
-                    "timestamp_fin": {
+                    KEY_TIMESTAMP_FIN: {
                         0: pd.Timestamp("2022-10-03 10:30:00+0000", tz="UTC"),
                         1: pd.Timestamp("2022-10-03 15:30:00+0000", tz="UTC"),
                         2: pd.Timestamp("2022-10-04 10:30:00+0000", tz="UTC"),
@@ -316,7 +316,7 @@ class TestMakeDfPh(unittest.TestLoader):
         self.expected_results.append(
             pd.DataFrame(
                 {
-                    "timestamp_debut": {
+                    KEY_TIMESTAMP_DEBUT: {
                         0: pd.Timestamp("2022-10-03 06:31:00+0000", tz="UTC"),
                         1: pd.Timestamp("2022-10-03 11:30:00+0000", tz="UTC"),
                         2: pd.Timestamp("2022-10-04 06:30:00+0000", tz="UTC"),
@@ -325,7 +325,7 @@ class TestMakeDfPh(unittest.TestLoader):
                         5: pd.Timestamp("2022-10-05 11:30:00+0000", tz="UTC"),
                         6: pd.Timestamp("2022-10-06 06:30:00+0000", tz="UTC"),
                     },
-                    "timestamp_fin": {
+                    KEY_TIMESTAMP_FIN: {
                         0: pd.Timestamp("2022-10-03 10:30:00+0000", tz="UTC"),
                         1: pd.Timestamp("2022-10-03 15:30:00+0000", tz="UTC"),
                         2: pd.Timestamp("2022-10-04 10:30:00+0000", tz="UTC"),
@@ -383,7 +383,7 @@ class TestMakeDfPh(unittest.TestLoader):
         self.expected_results.append(
             pd.DataFrame(
                 {
-                    "timestamp_debut": {
+                    KEY_TIMESTAMP_DEBUT: {
                         0: pd.Timestamp("2022-10-03 06:31:00+0000", tz="UTC"),
                         1: pd.Timestamp("2022-10-03 11:30:00+0000", tz="UTC"),
                         2: pd.Timestamp("2022-10-04 06:30:00+0000", tz="UTC"),
@@ -393,7 +393,7 @@ class TestMakeDfPh(unittest.TestLoader):
                         6: pd.Timestamp("2022-10-06 06:30:00+0000", tz="UTC"),
                         7: pd.Timestamp("2022-10-06 10:30:00+0000", tz="UTC"),
                     },
-                    "timestamp_fin": {
+                    KEY_TIMESTAMP_FIN: {
                         0: pd.Timestamp("2022-10-03 10:30:00+0000", tz="UTC"),
                         1: pd.Timestamp("2022-10-03 15:30:00+0000", tz="UTC"),
                         2: pd.Timestamp("2022-10-04 10:30:00+0000", tz="UTC"),
@@ -452,7 +452,7 @@ class TestMakeDfPh(unittest.TestLoader):
         self.expected_results.append(
             pd.DataFrame(
                 {
-                    "timestamp_debut": {
+                    KEY_TIMESTAMP_DEBUT: {
                         0: pd.Timestamp("2022-10-03 06:31:00+0000", tz="UTC"),
                         1: pd.Timestamp("2022-10-03 11:30:00+0000", tz="UTC"),
                         2: pd.Timestamp("2022-10-04 06:30:00+0000", tz="UTC"),
@@ -461,7 +461,7 @@ class TestMakeDfPh(unittest.TestLoader):
                         5: pd.Timestamp("2022-10-05 11:30:00+0000", tz="UTC"),
                         6: pd.Timestamp("2022-10-06 06:30:00+0000", tz="UTC"),
                     },
-                    "timestamp_fin": {
+                    KEY_TIMESTAMP_FIN: {
                         0: pd.Timestamp("2022-10-03 10:30:00+0000", tz="UTC"),
                         1: pd.Timestamp("2022-10-03 15:30:00+0000", tz="UTC"),
                         2: pd.Timestamp("2022-10-04 10:30:00+0000", tz="UTC"),
@@ -519,7 +519,7 @@ class TestMakeDfPh(unittest.TestLoader):
         self.expected_results.append(
             pd.DataFrame(
                 {
-                    "timestamp_debut": {
+                    KEY_TIMESTAMP_DEBUT: {
                         0: pd.Timestamp("2022-10-03 06:31:00+0000", tz="UTC"),
                         1: pd.Timestamp("2022-10-03 11:30:00+0000", tz="UTC"),
                         2: pd.Timestamp("2022-10-04 06:30:00+0000", tz="UTC"),
@@ -529,7 +529,7 @@ class TestMakeDfPh(unittest.TestLoader):
                         6: pd.Timestamp("2022-10-06 06:30:00+0000", tz="UTC"),
                         7: pd.Timestamp("2022-10-06 10:30:00+0000", tz="UTC"),
                     },
-                    "timestamp_fin": {
+                    KEY_TIMESTAMP_FIN: {
                         0: pd.Timestamp("2022-10-03 10:30:00+0000", tz="UTC"),
                         1: pd.Timestamp("2022-10-03 15:30:00+0000", tz="UTC"),
                         2: pd.Timestamp("2022-10-04 10:30:00+0000", tz="UTC"),
@@ -583,7 +583,7 @@ class TestFindSectionsEnds(unittest.TestCase):
                     5: 2283,
                     6: 2283,
                 },
-                "evt_xdate_debut": {
+                key_evenement_date_debut: {
                     0: pd.Timestamp("2022-09-05 08:30:00+0000", tz="UTC"),
                     1: pd.Timestamp("2022-09-05 15:00:00+0000", tz="UTC"),
                     2: pd.Timestamp("2022-09-06 09:00:00+0000", tz="UTC"),
@@ -592,7 +592,7 @@ class TestFindSectionsEnds(unittest.TestCase):
                     5: pd.Timestamp("2022-09-07 13:00:00+0000", tz="UTC"),
                     6: pd.Timestamp("2022-09-08 14:30:00+0000", tz="UTC"),
                 },
-                "evt_xdate_fin": {
+                key_evenement_date_fin: {
                     0: pd.Timestamp("2022-09-05 09:30:00+0000", tz="UTC"),
                     1: pd.Timestamp("2022-09-05 17:00:00+0000", tz="UTC"),
                     2: pd.Timestamp("2022-09-06 10:00:00+0000", tz="UTC"),
@@ -702,7 +702,7 @@ class TestComputeAvailabilities(unittest.TestCase):
                     5: 2283,
                     6: 2283,
                 },
-                "evt_xdate_debut": {
+                key_evenement_date_debut: {
                     0: pd.Timestamp("2022-09-05 08:30:00+0000", tz="UTC"),
                     1: pd.Timestamp("2022-09-05 15:00:00+0000", tz="UTC"),
                     2: pd.Timestamp("2022-09-06 09:00:00+0000", tz="UTC"),
@@ -711,7 +711,7 @@ class TestComputeAvailabilities(unittest.TestCase):
                     5: pd.Timestamp("2022-09-07 13:00:00+0000", tz="UTC"),
                     6: pd.Timestamp("2022-09-08 14:30:00+0000", tz="UTC"),
                 },
-                "evt_xdate_fin": {
+                key_evenement_date_fin: {
                     0: pd.Timestamp("2022-09-05 09:30:00+0000", tz="UTC"),
                     1: pd.Timestamp("2022-09-05 17:00:00+0000", tz="UTC"),
                     2: pd.Timestamp("2022-09-06 10:00:00+0000", tz="UTC"),
@@ -725,7 +725,7 @@ class TestComputeAvailabilities(unittest.TestCase):
 
         self.expected_result = pd.DataFrame(
             {
-                "timestamp_debut": {
+                KEY_TIMESTAMP_DEBUT: {
                     0: pd.Timestamp("2022-09-05 09:30:00+0000", tz="UTC"),
                     1: pd.Timestamp("2022-09-05 11:30:00+0000", tz="UTC"),
                     2: pd.Timestamp("2022-09-06 06:30:00+0000", tz="UTC"),
@@ -739,7 +739,7 @@ class TestComputeAvailabilities(unittest.TestCase):
                     10: pd.Timestamp("2022-09-08 10:30:00+0000", tz="UTC"),
                     11: pd.Timestamp("2022-09-09 07:00:00+0000", tz="UTC"),
                 },
-                "timestamp_fin": {
+                KEY_TIMESTAMP_FIN: {
                     0: pd.Timestamp("2022-09-05 10:30:00+0000", tz="UTC"),
                     1: pd.Timestamp("2022-09-05 15:00:00+0000", tz="UTC"),
                     2: pd.Timestamp("2022-09-06 09:00:00+0000", tz="UTC"),
@@ -753,7 +753,7 @@ class TestComputeAvailabilities(unittest.TestCase):
                     10: pd.Timestamp("2022-09-08 14:30:00+0000", tz="UTC"),
                     11: pd.Timestamp("2022-09-09 10:00:00+0000", tz="UTC"),
                 },
-                "durée": {
+                KEY_DUREE: {
                     0: 1.0,
                     1: 3.5,
                     2: 2.5,

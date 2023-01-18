@@ -11,6 +11,13 @@ from api.services.planning_optimizer.lib_planning_optimizer.planning.ordonnancem
 from api.string_keys import *
 
 
+# ma clé locale pour ce fichier
+KEY_START = "START"
+KEY_END = "END"
+KEY_DUREE_EFFECTUEE = "DUREE_EFFECTUEE"
+KEY_PCT_COMPLETION = "PERCENT_COMPLETION"
+
+
 def get_next_part(i_current_part: int, parts: pd.DataFrame) -> int:
     """
     :param i_current_part: index de la ligne courante dans le dataframe
@@ -25,7 +32,7 @@ def get_next_part(i_current_part: int, parts: pd.DataFrame) -> int:
     next_part = parts.iloc[i_next_part if i_next_part < len(parts) else len(parts) - 1]
 
     while (
-        next_part["start"] == current_part["end"]
+        next_part[KEY_START] == current_part[KEY_END]
         and next_part[key_evenement] == current_part[key_evenement]
         and i_next_part < len(parts)
     ):
@@ -60,11 +67,11 @@ def add_event(
         and parts is None
     ):
         events = {
-            "start": [],
-            "end": [],
+            KEY_START: [],
+            KEY_END: [],
             key_evenement: [],
             key_evenement_project: [],
-            key_project_priority: [],
+            KEY_PROJECT_PRIORITY: [],
         }
         return events
 
@@ -72,17 +79,17 @@ def add_event(
     i_end_part = i_next_part - 1 if i_next_part > i_current_part else len(parts) - 1
     end_part = parts.iloc[i_end_part]
     if i_next_part > i_current_part + 1:
-        events["start"].append(current_part["start"])
-        events["end"].append(end_part["end"])
+        events[KEY_START].append(current_part[KEY_START])
+        events[KEY_END].append(end_part[KEY_END])
         events[key_evenement].append(current_part[key_evenement])
         events[key_evenement_project].append(current_part[key_evenement_project])
-        events[key_project_priority].append(current_part[key_project_priority])
+        events[KEY_PROJECT_PRIORITY].append(current_part[KEY_PROJECT_PRIORITY])
     else:
-        events["start"].append(current_part["start"])
-        events["end"].append(current_part["end"])
+        events[KEY_START].append(current_part[KEY_START])
+        events[KEY_END].append(current_part[KEY_END])
         events[key_evenement].append(current_part[key_evenement])
         events[key_evenement_project].append(current_part[key_evenement_project])
-        events[key_project_priority].append(current_part[key_project_priority])
+        events[KEY_PROJECT_PRIORITY].append(current_part[KEY_PROJECT_PRIORITY])
 
     return events
 
@@ -149,7 +156,7 @@ def schedule_parts(
 
     :return scheduled_tasks_parts: dataframe contenant les parties de tâches planifiées.
     """
-    scheduled_tasks_parts = {"id_part": [], "start": [], "end": []}
+    scheduled_tasks_parts = {KEY_ID_PART: [], KEY_START: [], KEY_END: []}
 
     i_current_section = 0
     no_more_sections = i_current_section == len(availabilities)
@@ -160,21 +167,21 @@ def schedule_parts(
     while not no_more_parts and not no_more_sections:
         current_section_is_filled = False
         current_section_start = availabilities.iloc[i_current_section][
-            "timestamp_debut"
+            KEY_TIMESTAMP_DEBUT
         ]
-        current_section_end = availabilities.iloc[i_current_section]["timestamp_fin"]
+        current_section_end = availabilities.iloc[i_current_section][KEY_TIMESTAMP_FIN]
         curseur_temps = current_section_start
         while not current_section_is_filled and not no_more_parts:
             id_part = ordonnancement.ordonnancement[i_current_part]
             part = tasks.iloc[id_part]
-            length_part = datetime.timedelta(hours=part["length"])
+            length_part = datetime.timedelta(hours=part[KEY_DUREE_PART])
             if curseur_temps + length_part > current_section_end:
                 current_section_is_filled = True
                 i_current_section += 1
             else:
-                scheduled_tasks_parts["id_part"].append(id_part)
-                scheduled_tasks_parts["start"].append(curseur_temps)
-                scheduled_tasks_parts["end"].append(curseur_temps + length_part)
+                scheduled_tasks_parts[KEY_ID_PART].append(id_part)
+                scheduled_tasks_parts[KEY_START].append(curseur_temps)
+                scheduled_tasks_parts[KEY_END].append(curseur_temps + length_part)
                 i_current_part += 1
                 no_more_parts = i_current_part == len(tasks)
                 curseur_temps = curseur_temps + length_part
@@ -182,9 +189,9 @@ def schedule_parts(
         no_more_sections = i_current_section == len(availabilities)
 
     scheduled_tasks_parts = pd.DataFrame(scheduled_tasks_parts)
-    scheduled_tasks_parts = scheduled_tasks_parts.merge(tasks, on="id_part")
+    scheduled_tasks_parts = scheduled_tasks_parts.merge(tasks, on=KEY_ID_PART)
     scheduled_tasks_parts = scheduled_tasks_parts[
-        ["start", "end", key_evenement, key_evenement_project, key_project_priority, "id_part"]
+        [KEY_START, KEY_END, key_evenement, key_evenement_project, KEY_PROJECT_PRIORITY, KEY_ID_PART]
     ]
     return scheduled_tasks_parts
 
@@ -216,22 +223,22 @@ def make_stats(events: pd.DataFrame, tasks: pd.DataFrame) -> dict[str: pd.DataFr
     """
 
     # stats percent completion for tasks
-    events["duree"] = events["end"] - events["start"]
-    events["duree"] = events["duree"].apply(lambda x: x.total_seconds() / 3600)
-    events = events.groupby(key_evenement).sum().reset_index()[[key_evenement, "duree"]]
-    tache_to_duree = dict(zip(events[key_evenement], events["duree"]))
+    events[KEY_DUREE] = events[KEY_END] - events[KEY_START]
+    events[KEY_DUREE] = events[KEY_DUREE].apply(lambda x: x.total_seconds() / 3600)
+    events = events.groupby(key_evenement).sum().reset_index()[[key_evenement, KEY_DUREE]]
+    tache_to_duree = dict(zip(events[key_evenement], events[KEY_DUREE]))
     stat_tasks = pd.DataFrame.copy(tasks)
-    stat_tasks["duree_effectuee"] = stat_tasks[key_evenement].map(tache_to_duree)
+    stat_tasks[KEY_DUREE_EFFECTUEE] = stat_tasks[key_evenement].map(tache_to_duree)
     stat_tasks.fillna(0, inplace=True)
-    stat_tasks["pct_completion"] = np.round(stat_tasks["duree_effectuee"] / stat_tasks[key_duree_evenement], 2)
-    stat_tasks = stat_tasks[[key_evenement,
-                             key_competence, key_evenement_project, key_project_priority, key_duree_evenement, "duree_effectuee",
-                             "pct_completion"]]
-    stat_tasks.sort_values(by="pct_completion", ascending=False)
+    stat_tasks[KEY_PCT_COMPLETION] = np.round(stat_tasks[KEY_DUREE_EFFECTUEE] / stat_tasks[key_duree_evenement], 2)
+    stat_tasks = stat_tasks[[key_evenement, key_competence, key_evenement_project,
+                             KEY_PROJECT_PRIORITY, key_duree_evenement, KEY_DUREE_EFFECTUEE, KEY_PCT_COMPLETION]]
+    stat_tasks.sort_values(by=KEY_PCT_COMPLETION, ascending=False)
 
     # stats percent completion for projects
-    stat_projects = pd.DataFrame.copy(stat_tasks).groupby(key_evenement_project).sum()[[key_duree_evenement, "duree_effectuee"]]
-    stat_projects["projet_percent_completion"] = np.round(stat_projects["duree_effectuee"] /
+    stat_projects = pd.DataFrame.copy(stat_tasks).groupby(key_evenement_project).sum()[[key_duree_evenement,
+                                                                                        KEY_DUREE_EFFECTUEE]]
+    stat_projects["projet_percent_completion"] = np.round(stat_projects[KEY_DUREE_EFFECTUEE] /
                                                           stat_projects[key_duree_evenement], 2)
     stat_projects = stat_projects.reset_index()
 

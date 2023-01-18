@@ -6,23 +6,35 @@ from werkzeug.exceptions import UnprocessableEntity
 from api.loggers import logger_planning_optimizer
 from api.back_connector.planning_optimizer import fetch_data_to_wandeed_backend
 from api.services.planning_optimizer import solver_planning_optimizer
+from api.config import config
+from api.services.planning_optimizer.tests.data_mocker import mock_back_data
 
 
 def planning_optimizer_controller(json: dict):
     """Controller du service planning_optimizer"""
     logger_planning_optimizer.info("Appel du controller")
+
     front_end_request = FrontEndPlanningOptimizerRequestContent.deserialize(json=json)
-    imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires = fetch_data_to_wandeed_backend(
-         url=front_end_request.backend_url,
-         access_token=front_end_request.backend_access_token,
-         date_start=front_end_request.date_start,
-         date_end=front_end_request.date_end,
-         key_project_prioritys_projets=front_end_request.key_project_prioritys_projets
-    )
+
+    if config["MODE"] == "PRODUCTION":
+        imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires = fetch_data_to_wandeed_backend(
+             url=front_end_request.backend_url,
+             access_token=front_end_request.backend_access_token,
+             date_start=front_end_request.date_start.isoformat(),
+             date_end=front_end_request.date_end.isoformat(),
+             key_project_prioritys_projets=front_end_request.key_project_prioritys_projets
+        )
+    else:
+        imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires = mock_back_data(
+            date_start=front_end_request.date_start,
+            date_end=front_end_request.date_end,
+            avg_n_tasks=10,
+            avg_n_users=2
+        )
 
     optimized_planning = solver_planning_optimizer(
         imperatifs=imperatifs,
-        horaires=horaires,
+        working_times=horaires,
         taches=taches,
         date_start=front_end_request.date_start,
         date_end=front_end_request.date_end,
@@ -38,20 +50,19 @@ class FrontEndPlanningOptimizerRequestContent:
     def __init__(self,
                  backend_url: str,
                  backend_access_token: str,
-                 date_start: str,
-                 date_end: str,
+                 date_start: datetime,
+                 date_end: datetime,
                  key_project_prioritys_projets: dict,
                  parts_max_length: float,
                  min_duration_section: float):
-        self.backend_url = backend_url
-        self.backend_access_token = backend_access_token
+        self.backend_url = str(backend_url)
+        self.backend_access_token = str(backend_access_token)
         self.date_start = date_start
         self.date_end = date_end
         self.key_project_prioritys_projets = key_project_prioritys_projets
-        self.parts_max_length = parts_max_length
-        self.min_duration_section = min_duration_section
-
-        self._cast_values()
+        self.parts_max_length = float(parts_max_length)
+        self.min_duration_section = float(min_duration_section)
+        
         self._check_values()
 
     @classmethod
@@ -59,30 +70,21 @@ class FrontEndPlanningOptimizerRequestContent:
         """Méthode de désérialisation"""
 
         logger_planning_optimizer.info("Désérialisation de la demande du front")
-        out = cls(backend_access_token=json["backend_access_token"],
-                  backend_url=json["backend_url"],
-                  date_start=json["date_start"],
-                  date_end=json["date_end"],
-                  key_project_prioritys_projets=json["key_project_prioritys_projets"],
-                  parts_max_length=json["parts_max_length"],
-                  min_duration_section=json["min_duration_section"])
-
-        out._cast_values()
-        out._check_values()
-        return out
-
-    def _cast_values(self):
         try:
-            logger_planning_optimizer.info("Typage des valeurs de la demande du front")
-            self.backend_access_token = str(self.backend_access_token)
-            self.backend_url = str(self.backend_url)
-            self.date_start = str(self.date_start)
-            self.date_end = str(self.date_end)
-            self.parts_max_length = float(self.parts_max_length)
-            self.min_duration_section = float(self.min_duration_section)
-
-        except Exception:
-            raise UnprocessableEntity(description="Les valeurs ne sont pas castables dans les bons types. "
+            out = cls(backend_access_token=json["backend_access_token"],
+                      backend_url=json["backend_url"],
+                      date_start=datetime.fromisoformat(json["date_start"]),
+                      date_end=datetime.fromisoformat(json["date_end"]),
+                      key_project_prioritys_projets=json["key_project_prioritys_projets"],
+                      parts_max_length=json["parts_max_length"],
+                      min_duration_section=json["min_duration_section"])
+        except KeyError as ke:
+            raise UnprocessableEntity(description="Missing key:" + str(ke))
+        except ValueError as ve:
+            raise UnprocessableEntity(description="Value error:" + str(ve))
+        except Exception as e:
+            raise UnprocessableEntity(description=f"Message d'erreur: {e}\n"
+                                                  "Aide : Les valeurs ne sont pas castables dans les bons types. "
                                                   "Vérifier les valeurs entrées. Types attendus:\n "
                                                   "'backend_access_token': str\n"
                                                   "'backend_url': str (URL)\n"
@@ -92,17 +94,13 @@ class FrontEndPlanningOptimizerRequestContent:
                                                   "'parts_max_length': float\n"
                                                   "'min_duration_section': float\n")
 
+        out._check_values()
+        return out
+
     def _check_values(self):
         """Vérifie la correctitude des paramètres"""
         logger_planning_optimizer.info("Vérification de la validité des paramètres d'optimisation choisie")
-        try:
-            datetime.fromisoformat(self.date_start)
-        except Exception:
-            raise UnprocessableEntity(description="'date_start' is not an isoformat date")
-        try:
-            datetime.fromisoformat(self.date_end)
-        except Exception:
-            raise UnprocessableEntity(description="'date_end' is not an isoformat date")
+
         try:
             assert 0 < self.parts_max_length
         except AssertionError:
@@ -111,3 +109,33 @@ class FrontEndPlanningOptimizerRequestContent:
             assert 0 < self.min_duration_section
         except AssertionError:
             raise UnprocessableEntity(description="'min_duration_section' doit être strictement positif")
+
+        if not (self.date_end - self.date_start).total_seconds() > 60 * 60:
+            raise UnprocessableEntity(description="La période de sprint indiquée est trop courte. Minimum 1h.")
+        self.key_project_prioritys_projets = self._assert_and_type_mapping_priority_structure()
+
+    def _assert_and_type_mapping_priority_structure(self):
+        """Vérifie la validité du dictionnaire de priorités envoyé"""
+        try:
+            self.key_project_prioritys_projets = dict(self.key_project_prioritys_projets)
+        except ValueError:
+            raise ValueError("key_project_prioritys_projets n'a pas le bon format.\nFormat attendu : {int: int}.")
+
+        for key, value in self.key_project_prioritys_projets.items():
+            try:
+                key_float = float(key)
+            except ValueError:
+                raise TypeError(f"key_project_prioritys_projets: la clé '{key}' n'est pas un float.")
+            if int(key) != key_float:
+                raise TypeError(f"key_project_prioritys_projets: la clé '{key}' n'est pas un entier.")
+            self.key_project_prioritys_projets[key] = value
+
+            try:
+                value_float = float(value)
+            except ValueError:
+                raise TypeError(f"key_project_prioritys_projets: la valeur '{value}' n'est pas un float.")
+            if int(value) != value_float:
+                raise TypeError(f"key_project_prioritys_projets: la valeur '{value}' n'est pas un entier.")
+            self.key_project_prioritys_projets[key] = int(value)
+
+            return self.key_project_prioritys_projets

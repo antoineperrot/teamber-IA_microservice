@@ -1,8 +1,6 @@
 """
 Module du solveur de task assigner
 """
-from typing import Tuple, List
-
 import numpy as np
 import pandas as pd
 from scipy.optimize import linprog
@@ -207,7 +205,7 @@ def solveur(
 
 def solve_linear_programmation_problem(
     matrix_a: np.ndarray, b: np.ndarray, cost_func: np.ndarray
-) -> Tuple[np.ndarray, str, str]:
+) -> tuple[np.ndarray, str, str]:
     """
     RESOLUTION DU PROBLEME DE PROGRAMMATION LINEAIRE
     """
@@ -251,7 +249,7 @@ class NoSolutionFoundException(Exception):
 
 def make_output_dataframe(
     solution_vector: np.ndarray,
-    arcs: List[tuple],
+    arcs: list[tuple],
     cost_func: np.ndarray,
     mapping_tsk_to_lgt: dict,
     mapping_tsk_to_cmp: dict,

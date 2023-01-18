@@ -147,7 +147,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     28: 9348,
                     29: 9348,
                 },
-                key_project_priority: {
+                KEY_PROJECT_PRIORITY: {
                     0: 2,
                     1: 1,
                     2: 1,
@@ -300,7 +300,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     25: 1805,
                     26: 1805,
                 },
-                key_project_priority: {
+                KEY_PROJECT_PRIORITY: {
                     0: 0,
                     1: 0,
                     2: 0,
@@ -419,7 +419,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     17: 6675,
                     18: 9348,
                 },
-                key_project_priority: {
+                KEY_PROJECT_PRIORITY: {
                     0: 2,
                     1: 1,
                     2: 1,
@@ -530,7 +530,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     17: 6675,
                     18: 9348,
                 },
-                key_project_priority: {
+                KEY_PROJECT_PRIORITY: {
                     0: 2,
                     1: 1,
                     2: 1,
@@ -581,7 +581,7 @@ class TestSolutionInterpreter(unittest.TestCase):
             "end": [pd.Timestamp("2022-09-05 09:45:00+0000", tz="UTC")],
             key_evenement: [4661],
             key_evenement_project: [4455],
-            key_project_priority: [2],
+            KEY_PROJECT_PRIORITY: [2],
         }
 
         output_func = add_event(self.parts, 0, 1, events=self.events)

@@ -1,7 +1,6 @@
 """
 Module des fonctions tools de formulation du problèmes linéaire à partir des données entrantes.
 """
-from typing import Tuple, List
 import numpy as np
 from api.services.task_assigner.lib_task_assigner.tools import ContrainteEtreSurProjet
 
@@ -17,7 +16,7 @@ def make_arcs_and_cost_func(
     contrainte_etre_sur_projet: ContrainteEtreSurProjet,
     avantage_projet: float,
     penalty=-100,
-) -> Tuple[List[tuple], np.ndarray, int]:
+) -> tuple[list[tuple], np.ndarray, int]:
     """
     FABRICATION DES ARCS RELIANT TACHES A UTILISATEURS POTENTIELS, AINSI QUE FONCTION DE COUT
     """
@@ -64,8 +63,8 @@ def make_matrix_a_and_b(
     n_arcs: int,
     mapping_tsk_to_lgt: dict,
     mapping_utl_to_dsp: dict,
-    arcs: List[tuple],
-) -> Tuple[np.ndarray, np.ndarray]:
+    arcs: list[tuple],
+) -> tuple[np.ndarray, np.ndarray]:
     """
     FABRICATION DES MATRICES A et B POUR RESOUDRE AX<=B
     """

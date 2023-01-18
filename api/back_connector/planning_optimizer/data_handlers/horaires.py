@@ -1,9 +1,6 @@
 """
 Fonctions pour préparer les données horaires brut de Wandeed à l'optimisation
 """
-
-from typing import List
-
 import pandas as pd
 from api.string_keys import *
 
@@ -24,7 +21,7 @@ def handler_clean_hor(hor: pd.DataFrame) -> pd.DataFrame:
     return hor
 
 
-def handler_list_hor_utl(list_hor_utl: List[pd.DataFrame]) -> pd.DataFrame:
+def handler_list_hor_utl(list_hor_utl: list[pd.DataFrame]) -> pd.DataFrame:
     """
     Concatène un ensemble de dataframe d'horaires utilisateurs en un seul dataframe (appelé union dans la fonction suivante) et le nettoie.
     """

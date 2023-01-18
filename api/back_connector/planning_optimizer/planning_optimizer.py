@@ -1,8 +1,6 @@
 """
 Module de récupération des données auprès du BACK pour la fonctionnalité planning_optimizer.
 """
-from typing import Tuple
-
 import pandas as pd
 
 from api.back_connector.planning_optimizer.data_handlers.filtrage import filtre
@@ -13,7 +11,10 @@ from api.string_keys import *
 # TODO: corriger les ValueError
 def fetch_data_to_wandeed_backend(
     url: str, access_token: str, date_start: str, date_end: str, key_project_prioritys_projets: dict
-) -> Tuple[dict, dict, dict, list]:
+) -> tuple[dict[int: pd.DataFrame],
+           dict[int: pd.DataFrame],
+           dict[int: pd.DataFrame],
+           list[int]]:
     """
     Prépare et envoie les requêtes SQL auprès du Back Wandeed qui renvoie les données demandées.
 
@@ -29,8 +30,8 @@ def fetch_data_to_wandeed_backend(
 
     :return df_hor: dataframe contenant les horaires des utilisateurs
         epu_sfkutilisateur  -> id de l'utilisateur
-        "epl_xdebutperiode"   -> debut de période d'application de l'horaire
-        "epl_xfinperiode"     -> fin de période d'application de l'horaire
+        key_debut_periode_horaire_utilisateur   -> debut de période d'application de l'horaire
+        key_fin_periode_horaire_utilisateur     -> fin de période d'application de l'horaire
         key_epl_employe_horaire -> horaire de l'employe
 
     :return df_tsk:
@@ -40,29 +41,22 @@ def fetch_data_to_wandeed_backend(
         evenement_project       -> projet de rattachement de la tâche
     """
     sql_querys_dict = {
-        "imperatifs": {
-            "select": [
-                key_evenement,
-                key_evenement_project,
-                key_duree_evenement,
-                key_competence,  # TODO : à remplacer par clé utilisateur
-                "evt_xdate_debut",
-                "evt_xdate_fin",
-            ],
-            "from": "lst_vevenement_py",
+        MY_KEY_IMPERATIFS: {
+            "select": LIST_FIELD_KEYS_IMPERATIFS_REQUEST,
+            "from": key_table_evenements,
             "where": {
                 "condition": "and",
                 "rules": [
                     {
-                        "label": "evt_xdate_debut",
-                        "field": "evt_xdate_debut",
+                        "label": key_evenement_date_debut,
+                        "field": key_evenement_date_debut,
                         "operator": "greaterthan",
                         "type": "date",
                         "value": f"{date_start}",
                     },
                     {
-                        "label": "evt_xdate_fin",
-                        "field": "evt_xdate_fin",
+                        "label": key_evenement_date_fin,
+                        "field": key_evenement_date_fin,
                         "operator": "lessthan",
                         "type": "date",
                         "value": f"{date_end}",
@@ -96,27 +90,22 @@ def fetch_data_to_wandeed_backend(
                 ],
             },
         },
-        "horaires": {
-            "select": [
-                key_epu_sfkutilisateur,
-                key_epl_employe_horaire,
-                "epl_xdebutperiode",
-                "epl_xfinperiode",
-            ],
-            "from": "lst_vutilisateur_horaires_py",
+        MY_KEY_HORAIRES: {
+            "select": LIST_FIELD_KEYS_HORAIRES_REQUEST,
+            "from": key_table_horaires_utilisateurs,
             "where": {
                 "condition": "and",
                 "rules": [
                     {
-                        "label": "epl_xdebutperiode",
-                        "field": "epl_xdebutperiode",
+                        "label": key_debut_periode_horaire_utilisateur,
+                        "field": key_debut_periode_horaire_utilisateur,
                         "operator": "lessthan",
                         "type": "date",
                         "value": f"{date_end}",
                     },
                     {
-                        "label": "epl_xfinperiode",
-                        "field": "epl_xfinperiode",
+                        "label": key_fin_periode_horaire_utilisateur,
+                        "field": key_fin_periode_horaire_utilisateur,
                         "operator": "greaterthan",
                         "type": "date",
                         "value": f"{date_start}",
@@ -124,27 +113,22 @@ def fetch_data_to_wandeed_backend(
                 ],
             },
         },
-        "taches": {
-            "select": [
-                key_evenement,
-                key_evenement_project,
-                key_duree_evenement,
-                key_competence,  # TODO : à remplacer par clé utilisateur
-            ],
-            "from": "lst_vevenement_py",
+        MY_KEY_TACHES: {
+            "select": LIST_FIELD_KEYS_TACHES_REQUEST,
+            "from": key_table_evenements,
             "where": {
                 "condition": "and",
                 "rules": [
                     {
-                        "label": "evt_xdate_debut",
-                        "field": "evt_xdate_debut",
+                        "label": key_evenement_date_debut,
+                        "field": key_evenement_date_debut,
                         "operator": "greaterthan",
                         "type": "date",
                         "value": f"{date_start}",
                     },
                     {
-                        "label": "evt_xdate_fin",
-                        "field": "evt_xdate_fin",
+                        "label": key_evenement_date_fin,
+                        "field": key_evenement_date_fin,
                         "operator": "lessthan",
                         "type": "date",
                         "value": f"{date_end}",
@@ -164,21 +148,21 @@ def fetch_data_to_wandeed_backend(
     data = make_sql_requests(sql_querys_dict, url, access_token)
 
     # Mise en forme des données
-    df_imp = pd.DataFrame(data["imperatifs"])
-    df_hor = pd.DataFrame(data["horaires"]).reindex(
+    df_imp = pd.DataFrame(data[MY_KEY_IMPERATIFS])
+    df_hor = pd.DataFrame(data[MY_KEY_HORAIRES]).reindex(
         columns=[
             key_epu_sfkutilisateur,
-            "epl_xdebutperiode",
-            "epl_xfinperiode",
+            key_debut_periode_horaire_utilisateur,
+            key_fin_periode_horaire_utilisateur,
             key_epl_employe_horaire,
         ]
     )
     df_hor.epl_xdebutperiode = pd.to_datetime(df_hor.epl_xdebutperiode).dt.date
     df_hor.epl_xfinperiode = pd.to_datetime(df_hor.epl_xfinperiode).dt.date
     df_hor = df_hor.sort_values(
-        by=[key_epu_sfkutilisateur, "epl_xdebutperiode"]
+        by=[key_epu_sfkutilisateur, key_debut_periode_horaire_utilisateur]
     ).reset_index(drop=True)
-    df_tsk = pd.DataFrame(data["taches"])
+    df_tsk = pd.DataFrame(data[MY_KEY_TACHES])
 
     imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires = filtre(
         df_imp, df_hor, df_tsk, key_project_prioritys_projets
