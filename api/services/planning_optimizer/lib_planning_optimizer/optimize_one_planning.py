@@ -14,6 +14,7 @@ from api.services.planning_optimizer.lib_planning_optimizer.planning.planning im
 from api.services.planning_optimizer.lib_planning_optimizer.tools import split_tasks
 
 from api.services.planning_optimizer.lib_planning_optimizer.planning.solution_interpreter import make_stats
+from api.string_keys import *
 
 
 class ResultatCalcul:
@@ -21,9 +22,9 @@ class ResultatCalcul:
 
     def __init__(self,
                  events: pd.DataFrame | None,
-                 stats: pd.DataFrame | None,
+                 stats: dict[int:pd.DataFrame] | None,
                  success: bool,
-                 message: str = ""):
+                 message: str | None = None):
         self.events = events
         self.stats = stats
         self.success = success
@@ -32,7 +33,7 @@ class ResultatCalcul:
     def serialize(self) -> dict:
         """Méthode de sérialisation"""
         out = {"events": self.events.to_dict() if self.events is not None else None,
-               "stats": self.stats.to_dict() if self.stats is not None else None,
+               "stats": self.stats,
                "success": str(self.success),
                "message": str(self.message)}
         return out
@@ -72,6 +73,9 @@ def optimize_one_planning(
     optimizer.optimize(n_iterations_per_task=250)
     events, ordonnancement = optimizer.schedule_events()
     stats = make_stats(events, taches)
+    events = events.drop(KEY_ID_PART, axis="columns")
+    keys = [key_evenement, key_evenement_project, KEY_PROJECT_PRIORITY, KEY_START, KEY_END]
+    events = events[keys]
 
     out = ResultatCalcul(success=True, events=events, stats=stats)
     return out

@@ -28,7 +28,7 @@ def mock_key_project_prioritys_projets(df_tsk: pd.DataFrame) -> dict:
     logger_planning_optimizer.debug("mock priorités projets")
     liste_projets = df_tsk[key_evenement_project].unique().astype(int)
     n_projets = len(liste_projets)
-    n_prio = np.random.randint(n_projets // 2, n_projets)
+    n_prio = max(np.random.randint(n_projets // 2, n_projets), 1)
     key_project_prioritys_projets = {
         id_projet: np.random.randint(0, n_prio) for id_projet in liste_projets
     }

@@ -16,7 +16,7 @@ def solver_planning_optimizer(
     date_end: datetime.datetime,
     parts_max_length: float,
     min_duration_section: float,
-) -> dict[int:DataFrame]:
+) -> dict[int: ResultatCalcul]:
     """
     Fonction optimisant les emplois du temps de chacun des utilisateurs.
 
@@ -34,8 +34,9 @@ def solver_planning_optimizer(
 
     optimized_plannings = {}
     for utl in utilisateurs:
+        int_utl = int(utl)
         try:
-            optimized_plannings[utl] = optimize_one_planning(
+            optimized_plannings[int_utl] = optimize_one_planning(
                 working_times=working_times[utl],
                 taches=taches[utl],
                 imperatifs=imperatifs[utl],
@@ -45,11 +46,11 @@ def solver_planning_optimizer(
                 min_duration_section=min_duration_section,
             )
         except NoAvailabilitiesException:
-            optimized_plannings[utl] = ResultatCalcul(success=False,
-                                                      message="No availibilities were found for this user given the "
-                                                              "sprint dates, the user working times and compulsory"
-                                                              " agenda events.",
-                                                      stats=None,
-                                                      events=None)
+            optimized_plannings[int_utl] = ResultatCalcul(success=False,
+                                                          message="No availibilities were found for this user given"
+                                                                  " the sprint dates, the user working times and "
+                                                                  "compulsory agenda events.",
+                                                          stats=None,
+                                                          events=None)
 
     return optimized_plannings

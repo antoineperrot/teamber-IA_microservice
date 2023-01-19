@@ -8,6 +8,7 @@ from flask import Flask, jsonify, session, request
 from api.loggers import root_logger
 from werkzeug.exceptions import HTTPException
 from api.config import config
+from api.custom_json_encoder import CustomJsonEncoder
 from api.routes.task_assigner import bp_task_assigner
 from api.routes.planning_optimizer import bp_planning_optimizer
 from api.routes.ping import bp_ping
@@ -18,6 +19,7 @@ REQUEST_RECEIVED_TIME = "request_received_time"
 app = Flask("API")
 app.config["SECRET_KEY"] = config["FLASK_API_KEY"]
 app.config["MODE"] = config["MODE"]
+app.json_encoder = CustomJsonEncoder
 app.logger.setLevel(logging.DEBUG)
 app.register_blueprint(bp_task_assigner)
 app.register_blueprint(bp_planning_optimizer)

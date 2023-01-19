@@ -6,11 +6,12 @@ from werkzeug.exceptions import UnprocessableEntity
 from api.loggers import logger_planning_optimizer
 from api.back_connector.planning_optimizer import fetch_data_to_wandeed_backend
 from api.services.planning_optimizer import solver_planning_optimizer
+from api.services.planning_optimizer.lib_planning_optimizer import ResultatCalcul
 from api.config import config
 from api.services.planning_optimizer.tests.data_mocker import mock_back_data
 
 
-def planning_optimizer_controller(json: dict):
+def planning_optimizer_controller(json: dict) -> dict[int: ResultatCalcul]:
     """Controller du service planning_optimizer"""
     logger_planning_optimizer.info("Appel du controller")
 
@@ -62,7 +63,7 @@ class FrontEndPlanningOptimizerRequestContent:
         self.key_project_prioritys_projets = key_project_prioritys_projets
         self.parts_max_length = float(parts_max_length)
         self.min_duration_section = float(min_duration_section)
-        
+
         self._check_values()
 
     @classmethod

@@ -12,8 +12,6 @@ from api.string_keys import *
 
 
 # ma clé locale pour ce fichier
-KEY_START = "START"
-KEY_END = "END"
 KEY_DUREE_EFFECTUEE = "DUREE_EFFECTUEE"
 KEY_PCT_COMPLETION = "PERCENT_COMPLETION"
 
@@ -223,10 +221,12 @@ def make_stats(events: pd.DataFrame, tasks: pd.DataFrame) -> dict[str: pd.DataFr
     """
 
     # stats percent completion for tasks
-    events[KEY_DUREE] = events[KEY_END] - events[KEY_START]
-    events[KEY_DUREE] = events[KEY_DUREE].apply(lambda x: x.total_seconds() / 3600)
-    events = events.groupby(key_evenement).sum().reset_index()[[key_evenement, KEY_DUREE]]
-    tache_to_duree = dict(zip(events[key_evenement], events[KEY_DUREE]))
+    copy_events = pd.DataFrame.copy(events)
+
+    copy_events[KEY_DUREE] = copy_events[KEY_END] - copy_events[KEY_START]
+    copy_events[KEY_DUREE] = copy_events[KEY_DUREE].apply(lambda x: x.total_seconds() / 3600)
+    copy_events = copy_events.groupby(key_evenement).sum().reset_index()[[key_evenement, KEY_DUREE]]
+    tache_to_duree = dict(zip(copy_events[key_evenement], copy_events[KEY_DUREE]))
     stat_tasks = pd.DataFrame.copy(tasks)
     stat_tasks[KEY_DUREE_EFFECTUEE] = stat_tasks[key_evenement].map(tache_to_duree)
     stat_tasks.fillna(0, inplace=True)
