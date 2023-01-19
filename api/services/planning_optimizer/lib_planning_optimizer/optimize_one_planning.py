@@ -1,8 +1,8 @@
 """
 Module d'optimisation.
 """
+from json import loads
 import datetime
-
 import pandas as pd
 
 from api.services.planning_optimizer.lib_planning_optimizer.planning.horaires import (
@@ -32,7 +32,8 @@ class ResultatCalcul:
 
     def serialize(self) -> dict:
         """Méthode de sérialisation"""
-        out = {"events": self.events.to_dict() if self.events is not None else None,
+        out = {"events": loads(self.events.to_json(date_format="iso", date_unit="s")) if \
+            self.events is not None else None,
                "stats": self.stats,
                "success": str(self.success),
                "message": str(self.message)}

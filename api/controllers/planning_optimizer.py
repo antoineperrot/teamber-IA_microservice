@@ -11,7 +11,7 @@ from api.config import config
 from api.services.planning_optimizer.tests.data_mocker import mock_back_data
 
 
-def planning_optimizer_controller(json: dict) -> dict[int: ResultatCalcul]:
+def planning_optimizer_controller(json: dict) -> dict[str: dict[int: ResultatCalcul]]:
     """Controller du service planning_optimizer"""
     logger_planning_optimizer.info("Appel du controller")
 
@@ -21,8 +21,8 @@ def planning_optimizer_controller(json: dict) -> dict[int: ResultatCalcul]:
         imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires = fetch_data_to_wandeed_backend(
              url=front_end_request.backend_url,
              access_token=front_end_request.backend_access_token,
-             date_start=front_end_request.date_start.isoformat(),
-             date_end=front_end_request.date_end.isoformat(),
+             date_start=front_end_request.date_start.isoformat(timespec="seconds"),
+             date_end=front_end_request.date_end.isoformat(timespec="seconds"),
              key_project_prioritys_projets=front_end_request.key_project_prioritys_projets
         )
     else:

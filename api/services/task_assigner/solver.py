@@ -41,7 +41,7 @@ class SolverCrashException(Exception):
         return self.msg
 
 
-def solveur(
+def solveur_task_assigner(
     df_prj: pd.DataFrame,
     df_cmp: pd.DataFrame,
     df_tsk: pd.DataFrame,

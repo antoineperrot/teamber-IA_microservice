@@ -16,7 +16,7 @@ def solver_planning_optimizer(
     date_end: datetime.datetime,
     parts_max_length: float,
     min_duration_section: float,
-) -> dict[int: ResultatCalcul]:
+) -> dict[str: dict[int: ResultatCalcul]]:
     """
     Fonction optimisant les emplois du temps de chacun des utilisateurs.
 
@@ -53,4 +53,4 @@ def solver_planning_optimizer(
                                                           stats=None,
                                                           events=None)
 
-    return optimized_plannings
+    return {"solution": optimized_plannings}

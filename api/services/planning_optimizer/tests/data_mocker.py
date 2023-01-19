@@ -57,7 +57,7 @@ def mock_df_tsk(liste_utl: list[int], avg_n_tasks: int = 25) -> pd.DataFrame:
     logger_planning_optimizer.debug("mock taches")
     n_utl = len(liste_utl)
     n_tasks = int(np.random.normal(avg_n_tasks, avg_n_tasks / 5))
-    n_projets = n_utl // 2 + 1
+    n_projets = n_utl * 3 + 1
     ids_tasks = generate_unique_ids(n_tasks)
     ids_prj = generate_unique_ids(n_projets)
     duree_tasks = np.round(np.random.randint(1, 4 * 4, n_tasks) / 4, 2)
@@ -81,7 +81,7 @@ def mock_back_data(
     date_start: datetime.datetime,
     date_end: datetime.datetime,
     avg_n_users: int = 5,
-    avg_n_tasks: int = 25
+    avg_n_tasks: int = 25,
 ) -> tuple[dict[int: pd.DataFrame], dict[int: pd.DataFrame], dict[int: pd.DataFrame], list]:
     """
     Mock toutes les données censées provenir du front/du back Teamber.
@@ -157,5 +157,6 @@ def mock_imperatifs(utl: int,
     out = out.loc[
         (out[key_evenement_date_fin] >= date_start) & (out[key_evenement_date_debut] <= date_fin)
         ]
+    out = out.sort_values(by=key_evenement_date_debut)
     out.reset_index(drop=True, inplace=True)
     return out

@@ -211,7 +211,7 @@ def schedule_events(
     return scheduled_parts, events
 
 
-def make_stats(events: pd.DataFrame, tasks: pd.DataFrame) -> dict[str: pd.DataFrame]:
+def make_stats(events: pd.DataFrame, tasks: pd.DataFrame) -> dict[str: dict]:
     """
     Fourni un pourcentage de planification des tâches, à partir de ce qui a pu être planifié, et des
     tâches que l"on souhaitait initialiement planifier de manière optimale dans la période de sprint.
@@ -225,7 +225,7 @@ def make_stats(events: pd.DataFrame, tasks: pd.DataFrame) -> dict[str: pd.DataFr
 
     copy_events[KEY_DUREE] = copy_events[KEY_END] - copy_events[KEY_START]
     copy_events[KEY_DUREE] = copy_events[KEY_DUREE].apply(lambda x: x.total_seconds() / 3600)
-    copy_events = copy_events.groupby(key_evenement).sum().reset_index()[[key_evenement, KEY_DUREE]]
+    copy_events = copy_events.groupby(key_evenement).sum(numeric_only=True).reset_index()[[key_evenement, KEY_DUREE]]
     tache_to_duree = dict(zip(copy_events[key_evenement], copy_events[KEY_DUREE]))
     stat_tasks = pd.DataFrame.copy(tasks)
     stat_tasks[KEY_DUREE_EFFECTUEE] = stat_tasks[key_evenement].map(tache_to_duree)
@@ -242,5 +242,5 @@ def make_stats(events: pd.DataFrame, tasks: pd.DataFrame) -> dict[str: pd.DataFr
                                                           stat_projects[key_duree_evenement], 2)
     stat_projects = stat_projects.reset_index()
 
-    stats = {"tasks": stat_tasks, "projects": stat_projects}
+    stats = {"tasks": stat_tasks.to_dict(), "projects": stat_projects.to_dict()}
     return stats
