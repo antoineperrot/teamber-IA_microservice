@@ -1,7 +1,6 @@
 """
 Module d'optimisation.
 """
-from json import loads
 import datetime
 import pandas as pd
 
@@ -12,32 +11,9 @@ from api.services.planning_optimizer.lib_planning_optimizer.planning.planning im
     SimulatedAnnealingPlanningOptimizer,
 )
 from api.services.planning_optimizer.lib_planning_optimizer.tools import split_tasks
-
+from api.services.planning_optimizer.lib_planning_optimizer import ResultatCalcul
 from api.services.planning_optimizer.lib_planning_optimizer.planning.solution_interpreter import make_stats
 from api.string_keys import *
-
-
-class ResultatCalcul:
-    """Classe stockant un résultat de calcul"""
-
-    def __init__(self,
-                 events: pd.DataFrame | None,
-                 stats: dict[int:pd.DataFrame] | None,
-                 success: bool,
-                 message: str | None = None):
-        self.events = events
-        self.stats = stats
-        self.success = success
-        self.message = message
-
-    def serialize(self) -> dict:
-        """Méthode de sérialisation"""
-        out = {"events": loads(self.events.to_json(date_format="iso", date_unit="s")) if \
-            self.events is not None else None,
-               "stats": self.stats,
-               "success": str(self.success),
-               "message": str(self.message)}
-        return out
 
 
 def optimize_one_planning(

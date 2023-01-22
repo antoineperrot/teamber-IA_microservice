@@ -164,18 +164,20 @@ def find_next_section_ends(remaining_imp: pd.DataFrame,
 
 
 def find_sections_ends(
-    working_times: pd.DataFrame, date_end: pd.Timestamp
+    imperatifs: pd.DataFrame, date_start: pd.Timestamp, date_end: pd.Timestamp
 ) -> pd.DataFrame:
     """
     Découpe un sprint en plusieurs sous-sprint. Les sous-sprint sont les disponibilités d'un impératif au suivant.
     """
-
-    if isinstance(date_end, str):
-        date_end = pd.Timestamp(date_end)
-    remaining_imp = working_times
+    remaining_imp = imperatifs
 
     sections_starts = []
     sections_ends = []
+
+    # ajout première section à partir de date_start:
+    sections_starts.append(date_start)
+    sections_ends.append(imperatifs[key_evenement_date_debut].min())
+
     while len(remaining_imp) > 0:
         start_next_section, end_next_section, remaining_imp = find_next_section_ends(
             remaining_imp, date_end
@@ -190,7 +192,7 @@ def find_sections_ends(
         i: section_end for i, section_end in enumerate(sections_ends)
     }
     out = pd.DataFrame.from_dict(
-        {"start": dict_start_next_section, "end": dict_end_next_section}
+        {KEY_START: dict_start_next_section, KEY_END: dict_end_next_section}
     )
     return out
 
@@ -212,7 +214,10 @@ def compute_availabilities(
                                    date_end=pd.Timestamp(date_end),
                                    min_duration_section=min_duration_section)
     else:
-        sections_ends = find_sections_ends(working_times=imperatifs, date_end=pd.Timestamp(date_end))
+        sections_ends = find_sections_ends(imperatifs=imperatifs,
+                                           date_start=pd.Timestamp(date_start),
+                                           date_end=pd.Timestamp(date_end))
+
         bases = [
             make_base(working_times=working_times,
                       date_start=section_start,

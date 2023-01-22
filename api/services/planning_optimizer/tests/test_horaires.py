@@ -1,3 +1,4 @@
+import datetime
 import unittest
 
 import pandas as pd
@@ -199,6 +200,8 @@ class TestAvanceCurseurTemps(unittest.TestCase):
 
 class TestMakeDfPh(unittest.TestLoader):
     def setUp(self):
+        """setup"""
+
         self.dates_debut = []
         self.dates_fin = []
         self.df_horaires = []
@@ -553,6 +556,7 @@ class TestMakeDfPh(unittest.TestLoader):
 
 class TestFindSectionsEnds(unittest.TestCase):
     def setUp(self):
+        self.date_start = pd.Timestamp("2022-09-05 07:00:00+0000")
         self.date_end = pd.Timestamp("2022-09-09 16:00:00+0000")
         self.imperatifs = pd.DataFrame(
             {
@@ -606,27 +610,31 @@ class TestFindSectionsEnds(unittest.TestCase):
 
         self.expected_result = pd.DataFrame(
             {
-                "start": {
-                    0: pd.Timestamp("2022-09-05 09:30:00+0000", tz="UTC"),
-                    1: pd.Timestamp("2022-09-05 17:00:00+0000", tz="UTC"),
-                    2: pd.Timestamp("2022-09-06 10:00:00+0000", tz="UTC"),
-                    3: pd.Timestamp("2022-09-07 08:45:00+0000", tz="UTC"),
-                    4: pd.Timestamp("2022-09-07 14:10:00+0000", tz="UTC"),
-                    5: pd.Timestamp("2022-09-08 15:30:00+0000", tz="UTC"),
+                KEY_START: {
+                    0: pd.Timestamp("2022-09-05 07:00:00+0000", tz="UTC"),
+                    1: pd.Timestamp("2022-09-05 09:30:00+0000", tz="UTC"),
+                    2: pd.Timestamp("2022-09-05 17:00:00+0000", tz="UTC"),
+                    3: pd.Timestamp("2022-09-06 10:00:00+0000", tz="UTC"),
+                    4: pd.Timestamp("2022-09-07 08:45:00+0000", tz="UTC"),
+                    5: pd.Timestamp("2022-09-07 14:10:00+0000", tz="UTC"),
+                    6: pd.Timestamp("2022-09-08 15:30:00+0000", tz="UTC"),
                 },
-                "end": {
-                    0: pd.Timestamp("2022-09-05 15:00:00+0000", tz="UTC"),
-                    1: pd.Timestamp("2022-09-06 09:00:00+0000", tz="UTC"),
-                    2: pd.Timestamp("2022-09-07 07:00:00+0000", tz="UTC"),
-                    3: pd.Timestamp("2022-09-07 13:00:00+0000", tz="UTC"),
-                    4: pd.Timestamp("2022-09-08 14:30:00+0000", tz="UTC"),
-                    5: pd.Timestamp("2022-09-09 16:00:00+0000", tz="UTC"),
+                KEY_END: {
+                    0: pd.Timestamp("2022-09-05 08:30:00+0000", tz="UTC"),
+                    1: pd.Timestamp("2022-09-05 15:00:00+0000", tz="UTC"),
+                    2: pd.Timestamp("2022-09-06 09:00:00+0000", tz="UTC"),
+                    3: pd.Timestamp("2022-09-07 07:00:00+0000", tz="UTC"),
+                    4: pd.Timestamp("2022-09-07 13:00:00+0000", tz="UTC"),
+                    5: pd.Timestamp("2022-09-08 14:30:00+0000", tz="UTC"),
+                    6: pd.Timestamp("2022-09-09 16:00:00+0000", tz="UTC"),
                 },
             }
         )
 
     def test_find_sections_ends(self):
-        output_func = find_sections_ends(self.imperatifs, self.date_end)
+        output_func = find_sections_ends(imperatifs=self.imperatifs,
+                                         date_start=self.date_start,
+                                         date_end=self.date_end)
 
         pd.testing.assert_frame_equal(output_func, self.expected_result, check_dtype=False)
 
@@ -778,3 +786,90 @@ class TestComputeAvailabilities(unittest.TestCase):
             self.date_end,
             self.min_duration_section,
         )
+
+    def test_compute_availabilities_2(self):
+        date_start = datetime.datetime.fromisoformat("2023-01-16T05:00:00")
+        date_end = datetime.datetime.fromisoformat("2023-01-16T18:01:55")
+        min_duration_section = 0.001
+
+        horaires = pd.DataFrame({key_day_plage_horaire: {0: 0, 1: 0, 2: 1, 3: 1, 4: 2, 5: 2, 6: 3, 7: 3, 8: 4},
+                     key_debut_plage_horaire: {0: '06:30',
+                      1: '11:30',
+                      2: '06:30',
+                      3: '11:30',
+                      4: '06:30',
+                      5: '11:30',
+                      6: '06:30',
+                      7: '11:30',
+                      8: '07:00'},
+                     key_fin_plage_horaire: {0: '10:30',
+                      1: '15:30',
+                      2: '10:30',
+                      3: '15:30',
+                      4: '10:30',
+                      5: '15:30',
+                      6: '10:30',
+                      7: '15:30',
+                      8: '10:00'}})
+
+        imperatifs = pd.DataFrame.from_dict({key_evenement: {0: 3161,
+                                              1: 6673,
+                                              2: 1232,
+                                              3: 2186,
+                                              4: 1036,
+                                              5: 5544,
+                                              6: 6362},
+                                             key_evenement_project: {0: 6063,
+                                              1: 8646,
+                                              2: 4321,
+                                              3: 4947,
+                                              4: 1696,
+                                              5: 6471,
+                                              6: 7457},
+                                             'lgl_sfkligneparent': {0: 9006,
+                                              1: 9006,
+                                              2: 9006,
+                                              3: 9006,
+                                              4: 9006,
+                                              5: 9006,
+                                              6: 9006},
+                                             key_evenement_date_debut: {0: pd.Timestamp('2023-01-16 07:15:00'),
+                                              1: pd.Timestamp('2023-01-16 07:20:00'),
+                                              2: pd.Timestamp('2023-01-16 08:35:00'),
+                                              3: pd.Timestamp('2023-01-16 09:45:00'),
+                                              4: pd.Timestamp('2023-01-16 10:05:00'),
+                                              5: pd.Timestamp('2023-01-16 12:50:00'),
+                                              6: pd.Timestamp('2023-01-16 17:35:00')},
+                                             key_evenement_date_fin: {0: pd.Timestamp('2023-01-16 07:55:00'),
+                                              1: pd.Timestamp('2023-01-16 07:55:00'),
+                                              2: pd.Timestamp('2023-01-16 09:10:00'),
+                                              3: pd.Timestamp('2023-01-16 10:30:00'),
+                                              4: pd.Timestamp('2023-01-16 10:30:00'),
+                                              5: pd.Timestamp('2023-01-16 13:15:00'),
+                                              6: pd.Timestamp('2023-01-16 18:20:00')}})
+
+        expected_result = pd.DataFrame.from_dict({KEY_TIMESTAMP_DEBUT: {0: pd.Timestamp('2023-01-16 06:30:00'),
+                                                  1: pd.Timestamp('2023-01-16 07:55:00'),
+                                                  2: pd.Timestamp('2023-01-16 09:10:00'),
+                                                  3: pd.Timestamp('2023-01-16 11:30:00'),
+                                                  4: pd.Timestamp('2023-01-16 13:15:00')},
+                                                 KEY_TIMESTAMP_FIN: {0: pd.Timestamp('2023-01-16 07:15:00'),
+                                                  1: pd.Timestamp('2023-01-16 08:35:00'),
+                                                  2: pd.Timestamp('2023-01-16 09:45:00'),
+                                                  3: pd.Timestamp('2023-01-16 12:50:00'),
+                                                  4: pd.Timestamp('2023-01-16 15:30:00')},
+                                                 KEY_DUREE: {0: 0.75,
+                                                  1: 0.6666666666666666,
+                                                  2: 0.5833333333333334,
+                                                  3: 1.3333333333333333,
+                                                  4: 2.25}})
+        output_func = compute_availabilities(
+            working_times=horaires,
+            imperatifs=imperatifs,
+            date_start=date_start,
+            date_end=date_end,
+            min_duration_section=min_duration_section,
+        )
+
+        pd.testing.assert_frame_equal(output_func, expected_result, check_dtype=False)
+

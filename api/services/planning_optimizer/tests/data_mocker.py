@@ -56,7 +56,7 @@ def mock_df_tsk(liste_utl: list[int], avg_n_tasks: int = 25) -> pd.DataFrame:
     """
     logger_planning_optimizer.debug("mock taches")
     n_utl = len(liste_utl)
-    n_tasks = int(np.random.normal(avg_n_tasks, avg_n_tasks / 5))
+    n_tasks = max(1, int(np.random.normal(avg_n_tasks, avg_n_tasks / 5)))
     n_projets = n_utl * 3 + 1
     ids_tasks = generate_unique_ids(n_tasks)
     ids_prj = generate_unique_ids(n_projets)

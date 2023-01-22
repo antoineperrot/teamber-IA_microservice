@@ -29,8 +29,8 @@ def planning_optimizer_controller(json: dict) -> dict[str: dict[int: ResultatCal
         imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires = mock_back_data(
             date_start=front_end_request.date_start,
             date_end=front_end_request.date_end,
-            avg_n_tasks=10,
-            avg_n_users=2
+            avg_n_tasks=50,
+            avg_n_users=5
         )
 
     optimized_planning = solver_planning_optimizer(
