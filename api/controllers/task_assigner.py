@@ -9,11 +9,12 @@ from api.back_connector.task_assigner.task_assigner import fetch_task_assigner_d
 from api.services.task_assigner.lib_task_assigner.tools import ContrainteEtreSurProjet
 from api.services.task_assigner.solver import solveur_task_assigner, SolverCrashException
 from api.services.task_assigner.tests.data_mocker import mock_coherent_data
+from api.models import cache
 from api.loggers import logger_task_assigner
 from api.config import config
 
 
-class FrontEndTaskAssignerRequestContent:
+class FrontEndTaskAssignerRequestParameters:
     """Classe contenant ce les infos que doit faire parvenir le front lors d'un appel à TaskAssigner"""
     def __init__(self,
                  backend_access_token: str,
@@ -30,7 +31,7 @@ class FrontEndTaskAssignerRequestContent:
         self.curseur = float(curseur)
         try:
             self.contrainte_etre_sur_projet = ContrainteEtreSurProjet(contrainte_etre_sur_projet)
-        except ValueError as ve:
+        except ValueError:
             available_values = [ContrainteEtreSurProjet.OUI.value,
                                 ContrainteEtreSurProjet.NON.value,
                                 ContrainteEtreSurProjet.DE_PREFERENCE.value]
@@ -92,35 +93,8 @@ def task_assigner_controller(json_file: dict):
     -
     """
     logger_task_assigner.info("Appel du controller")
-    front_end_request_content = FrontEndTaskAssignerRequestContent.deserialize(json_file)
-
-    if config["MODE"] == "PRODUCTION":
-        df_prj, df_cmp, df_tsk, df_dsp = fetch_task_assigner_data_to_back(
-            backend_url=front_end_request_content.backend_url,
-            backend_access_token=front_end_request_content.backend_access_token,
-            date_start=front_end_request_content.date_start.isoformat(timespec="seconds"),
-            date_end=front_end_request_content.date_end.isoformat(timespec="seconds"))
-    else:
-        df_prj, df_cmp, df_tsk, df_dsp = mock_coherent_data()
-
-    check_data_consistency(df_prj, df_cmp, df_tsk, df_dsp)
-
-    # calcul d'une solution
-    try:
-        solution = solveur_task_assigner(
-            df_prj=df_prj,
-            df_cmp=df_cmp,
-            df_tsk=df_tsk,
-            df_dsp=df_dsp,
-            curseur=front_end_request_content.curseur,
-            contrainte_etre_sur_projet=front_end_request_content.contrainte_etre_sur_projet,
-            avantage_projet=front_end_request_content.avantage_projet,
-        )
-        return solution
-
-    except Exception as e:
-        logger_task_assigner.error("Crash du solveur", exc_info=str(e))
-        raise SolverCrashException()
+    request_parameters = FrontEndTaskAssignerRequestParameters.deserialize(json_file)
+    return cache.start_calcul(handler=handler_demande_task_assigner, request_parameters=request_parameters)
 
 
 def check_data_consistency(
@@ -137,3 +111,37 @@ def check_data_consistency(
         raise UnprocessableEntity(description="Pas de matrice de compétence disponible.")
     if len(df_tsk) == 0:
         raise UnprocessableEntity(description="Pas de tâches à assigner.")
+
+
+def handler_demande_task_assigner(request_parameters: FrontEndTaskAssignerRequestParameters):
+    """Handler d'une demande de task_assigner. Fonction appelée dans le thread de calcul."""
+
+    if config["MODE"] == "PRODUCTION":
+        df_prj, df_cmp, df_tsk, df_dsp = fetch_task_assigner_data_to_back(
+            backend_url=request_parameters.backend_url,
+            backend_access_token=request_parameters.backend_access_token,
+            date_start=request_parameters.date_start.isoformat(timespec="seconds"),
+            date_end=request_parameters.date_end.isoformat(timespec="seconds"))
+    else:
+        df_prj, df_cmp, df_tsk, df_dsp = mock_coherent_data()
+
+    check_data_consistency(df_prj, df_cmp, df_tsk, df_dsp)
+
+    # calcul d'une solution
+    try:
+        solution = solveur_task_assigner(
+            df_prj=df_prj,
+            df_cmp=df_cmp,
+            df_tsk=df_tsk,
+            df_dsp=df_dsp,
+            curseur=request_parameters.curseur,
+            contrainte_etre_sur_projet=request_parameters.contrainte_etre_sur_projet,
+            avantage_projet=request_parameters.avantage_projet,
+        )
+        return solution
+
+    except Exception as e:
+        logger_task_assigner.error("Crash du solveur", exc_info=str(e))
+        raise SolverCrashException()
+
+

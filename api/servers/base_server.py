@@ -11,6 +11,7 @@ from api.config import config
 from api.custom_json_encoder import CustomJsonEncoder
 from api.routes.task_assigner import bp_task_assigner
 from api.routes.planning_optimizer import bp_planning_optimizer
+from api.routes.get_etat import bp_get_etat
 from api.routes.ping import bp_ping
 
 
@@ -23,6 +24,7 @@ app.json_encoder = CustomJsonEncoder
 app.logger.setLevel(logging.DEBUG)
 app.register_blueprint(bp_task_assigner)
 app.register_blueprint(bp_planning_optimizer)
+app.register_blueprint(bp_get_etat)
 app.register_blueprint(bp_ping)
 
 

@@ -5,6 +5,7 @@ from datetime import datetime
 from pandas import DataFrame, Timestamp
 from flask.json import JSONEncoder
 from api.services.planning_optimizer.lib_planning_optimizer import ResultatCalcul
+from api.models import EtatCalcul, StatutCalculEnum
 from json import loads
 
 
@@ -15,10 +16,15 @@ class CustomJsonEncoder(JSONEncoder):
 
     def default(self, o):  # pylint: disable=E0202
         """custom encoder"""
+        if isinstance(o, StatutCalculEnum):
+            return o.value
         if isinstance(o, ResultatCalcul):
             return o.serialize()
+        if isinstance(o, EtatCalcul):
+            return o.serialize()
         elif isinstance(o, Timestamp):
-            o = o.to_pydatetime()
+            return o.to_pydatetime()
+        elif isinstance(o, datetime):
             return o.isoformat(timespec="seconds")
         elif isinstance(o, DataFrame):
             return loads(o.to_json(date_format="iso"))

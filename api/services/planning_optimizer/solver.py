@@ -2,8 +2,8 @@
 Fonction d'optimisation des plannings
 """
 import datetime
-
 from pandas import DataFrame
+from api.loggers import logger_planning_optimizer
 from api.services.planning_optimizer.lib_planning_optimizer import optimize_one_planning,\
     NoAvailabilitiesException, ResultatCalcul
 
@@ -33,7 +33,7 @@ def solver_planning_optimizer(
     utilisateurs = set(taches.keys())
 
     optimized_plannings = {}
-    for utl in utilisateurs:
+    for i, utl in enumerate(utilisateurs):
         int_utl = int(utl)
         try:
             optimized_plannings[int_utl] = optimize_one_planning(
@@ -45,7 +45,13 @@ def solver_planning_optimizer(
                 parts_max_length=parts_max_length,
                 min_duration_section=min_duration_section,
             )
+            logger_planning_optimizer.info(f"Optimisation des plannings: {i+1} sur {len(utilisateurs)} traité(s)."
+                                           f"Utilisateur {utl}: planning optimisé.")
+
         except NoAvailabilitiesException:
+            logger_planning_optimizer.warning(f"Optimisation des plannings: {i+1} sur {len(utilisateurs)} traité(s)."
+                                              f"Utilisateur {utl}: Pas de disponibilités pour cet utilisateur,"
+                                              f" impossible d'optimiser le planning.")
             optimized_plannings[int_utl] = ResultatCalcul(success=False,
                                                           message="No availibilities were found for this user given"
                                                                   " the sprint dates, the user working times and "

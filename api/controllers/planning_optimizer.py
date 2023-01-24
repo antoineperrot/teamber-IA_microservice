@@ -9,43 +9,11 @@ from api.services.planning_optimizer import solver_planning_optimizer
 from api.services.planning_optimizer.lib_planning_optimizer import ResultatCalcul
 from api.config import config
 from api.services.planning_optimizer.tests.data_mocker import mock_back_data
+from api.models import cache
+from api.models.calcul_etat import EtatCalcul
 
 
-def planning_optimizer_controller(json: dict) -> dict[str: dict[int: ResultatCalcul]]:
-    """Controller du service planning_optimizer"""
-    logger_planning_optimizer.info("Appel du controller")
-
-    front_end_request = FrontEndPlanningOptimizerRequestContent.deserialize(json=json)
-
-    if config["MODE"] == "PRODUCTION":
-        imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires = fetch_data_to_wandeed_backend(
-             url=front_end_request.backend_url,
-             access_token=front_end_request.backend_access_token,
-             date_start=front_end_request.date_start.isoformat(timespec="seconds"),
-             date_end=front_end_request.date_end.isoformat(timespec="seconds"),
-             key_project_prioritys_projets=front_end_request.key_project_prioritys_projets
-        )
-    else:
-        imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires = mock_back_data(
-            date_start=front_end_request.date_start,
-            date_end=front_end_request.date_end,
-            avg_n_tasks=50,
-            avg_n_users=5
-        )
-
-    optimized_planning = solver_planning_optimizer(
-        imperatifs=imperatifs,
-        working_times=horaires,
-        taches=taches,
-        date_start=front_end_request.date_start,
-        date_end=front_end_request.date_end,
-        parts_max_length=front_end_request.parts_max_length,
-        min_duration_section=front_end_request.min_duration_section,
-    )
-    return optimized_planning
-
-
-class FrontEndPlanningOptimizerRequestContent:
+class FrontEndPlanningOptimizerRequestParameters:
     """Classe contenant les infos que doit faire parvenir le front lors d'un appel à PlanningOptimizer"""
 
     def __init__(self,
@@ -140,3 +108,41 @@ class FrontEndPlanningOptimizerRequestContent:
             self.key_project_prioritys_projets[key] = int(value)
 
             return self.key_project_prioritys_projets
+
+
+def planning_optimizer_controller(json: dict) -> EtatCalcul:
+    """Controller du service planning_optimizer"""
+    logger_planning_optimizer.info("Appel du controller")
+    request_parameters = FrontEndPlanningOptimizerRequestParameters.deserialize(json=json)
+    return cache.start_calcul(handler=handler_demande_planning_optimizer, request_parameters=request_parameters)
+
+
+def handler_demande_planning_optimizer(request_parameters: FrontEndPlanningOptimizerRequestParameters) \
+        -> dict[str: dict[int: ResultatCalcul]]:
+    """Handler demande planning_optimizer"""
+    if config["MODE"] == "PRODUCTION":
+        imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires = fetch_data_to_wandeed_backend(
+             url=request_parameters.backend_url,
+             access_token=request_parameters.backend_access_token,
+             date_start=request_parameters.date_start.isoformat(timespec="seconds"),
+             date_end=request_parameters.date_end.isoformat(timespec="seconds"),
+             key_project_prioritys_projets=request_parameters.key_project_prioritys_projets
+        )
+    else:
+        imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires = mock_back_data(
+            date_start=request_parameters.date_start,
+            date_end=request_parameters.date_end,
+            avg_n_tasks=50,
+            avg_n_users=5)
+
+    optimized_plannings = solver_planning_optimizer(
+        imperatifs=imperatifs,
+        working_times=horaires,
+        taches=taches,
+        date_start=request_parameters.date_start,
+        date_end=request_parameters.date_end,
+        parts_max_length=request_parameters.parts_max_length,
+        min_duration_section=request_parameters.min_duration_section)
+
+    return optimized_plannings
+
