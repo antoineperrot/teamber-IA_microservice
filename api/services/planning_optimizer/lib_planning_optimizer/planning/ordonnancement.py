@@ -6,7 +6,7 @@ from random import choice
 import numpy as np
 import pandas as pd
 
-from api.services.planning_optimizer.solver.tools.energies import (
+from api.services.planning_optimizer.lib_planning_optimizer.tools import (
     energy_dispersion,
     energy_key_project_prioritys,
     energy_waisted_time,
@@ -29,9 +29,9 @@ class Ordonnancement:
     ):
         if ordonnancement is None and df_tsk is not None:
             self.tasks = df_tsk[
-                ["id_part", "length", key_project_priority, key_evenement]
+                [KEY_ID_PART, KEY_DUREE_PART, KEY_PROJECT_PRIORITY, key_evenement]
             ].values
-            self.ordonnancement = list(df_tsk["id_part"].values.astype(int))
+            self.ordonnancement = list(df_tsk[KEY_ID_PART].values.astype(int))
         else:
             self.ordonnancement = ordonnancement
         self.availabilities = availabilities

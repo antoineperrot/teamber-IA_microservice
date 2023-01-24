@@ -1,1 +1,1 @@
-from .planning_optimizer import fetch_data_to_wandeed_backend
+from api.back_connector.planning_optimizer.planning_optimizer import fetch_data_to_wandeed_backend

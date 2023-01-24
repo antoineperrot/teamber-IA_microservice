@@ -51,7 +51,7 @@ def map_key_project_prioritys_projets(
         if len(key_project_prioritys_projets) > 0
         else 0
     )
-    df_tsk[key_project_priority] = (
+    df_tsk[KEY_PROJECT_PRIORITY] = (
         df_tsk[key_evenement_project].map(key_project_prioritys_projets).fillna(niveau_min_key_project_priority)
     )
     return df_tsk

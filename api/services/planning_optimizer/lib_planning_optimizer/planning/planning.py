@@ -1,7 +1,6 @@
 """
 Module de la classe d'optimisation des plannings.
 """
-import os
 import datetime
 from datetime import datetime
 
@@ -9,15 +8,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from api.services.planning_optimizer.solver.planning.solution_interpreter import (
+from api.services.planning_optimizer.lib_planning_optimizer.planning.solution_interpreter import (
     schedule_events,
 )
-from api.services.planning_optimizer.solver.planning.ordonnancement import Ordonnancement
+from api.services.planning_optimizer.lib_planning_optimizer.planning.ordonnancement import Ordonnancement
 
 from api.string_keys import *
 
 
 class SimulatedAnnealingPlanningOptimizer:
+    """Planning optimisé avec l'algorithme de recuit simulé"""
     def __init__(self, availabilities: pd.DataFrame, tasks: pd.DataFrame,
                  save_for_testing: bool = False):
 
@@ -27,7 +27,7 @@ class SimulatedAnnealingPlanningOptimizer:
         self.preferences = [1 / 6, 2 / 3, 1 / 6]
         self.ordonnancement = Ordonnancement(
             df_tsk=tasks,
-            availabilities=list(availabilities["durée"].values),
+            availabilities=list(availabilities[KEY_DUREE].values),
             preferences=self.preferences,
         )
         self.statistics = None
@@ -95,9 +95,6 @@ class SimulatedAnnealingPlanningOptimizer:
         self.events = schedule_events(
             self.availabilities, self.tasks, self.ordonnancement
         )
-        if self.save_for_testing:
-            pass
-            #make_timeline(self.availabilities, )
         return self.events
 
     def get_unfilled_task(self) -> pd.DataFrame:
@@ -132,7 +129,7 @@ class SimulatedAnnealingPlanningOptimizer:
         completion_tasks = completion_tasks.loc[completion_tasks["completion"] < 100]
 
         sub_tasks2 = (
-            self.tasks[[key_evenement, key_evenement_project, key_project_priority]]
+            self.tasks[[key_evenement, key_evenement_project, KEY_PROJECT_PRIORITY]]
             .groupby(key_evenement)
             .mean()
         )
@@ -163,7 +160,3 @@ class SimulatedAnnealingPlanningOptimizer:
                 ax.flat[i].plot(range(len(stat)), stat)
             else:
                 ax.flat[i].scatter(range(len(stat)), stat)
-
-        if self.save_for_testing:
-            now = datetime.now()
-            now_timestamp = str(now.timestamp()).split('.')[0]

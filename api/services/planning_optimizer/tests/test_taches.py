@@ -1,13 +1,15 @@
+"""Module de test des handlers de manipulation des tâches utilisateurs."""
 import unittest
 
 import pandas as pd
 
-from api.services.planning_optimizer.solver.tools.taches import split_tasks
+from api.services.planning_optimizer.lib_planning_optimizer.tools import split_tasks
 from api.string_keys import *
 
 
 class TestSplitTasks(unittest.TestCase):
     def setUp(self):
+        """setup"""
         self.input_df = pd.DataFrame(
             {
                 key_duree_evenement: {
@@ -46,10 +48,10 @@ class TestSplitTasks(unittest.TestCase):
                     5: 9227,
                     6: 9077,
                 },
-                key_project_priority: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 1, 6: 0},
-                "n_parts": {0: 1, 1: 4, 2: 4, 3: 1, 4: 1, 5: 2, 6: 1},
-                "n_filled_parts": {0: 0, 1: 3, 2: 3, 3: 0, 4: 1, 5: 1, 6: 0},
-                "length": {0: 0.75, 1: 0.25, 2: 0.25, 3: 0.25, 4: 0.0, 5: 0.5, 6: 0.75},
+                KEY_PROJECT_PRIORITY: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 1, 6: 0},
+                KEY_NUMBER_PARTS: {0: 1, 1: 4, 2: 4, 3: 1, 4: 1, 5: 2, 6: 1},
+                KEY_NUMBER_FILLED_PARTS: {0: 0, 1: 3, 2: 3, 3: 0, 4: 1, 5: 1, 6: 0},
+                KEY_DUREE_PART: {0: 0.75, 1: 0.25, 2: 0.25, 3: 0.25, 4: 0.0, 5: 0.5, 6: 0.75},
             }
         )
 
@@ -121,7 +123,7 @@ class TestSplitTasks(unittest.TestCase):
                     12: 9227,
                     13: 9077,
                 },
-                key_project_priority: {
+                KEY_PROJECT_PRIORITY: {
                     0: 0,
                     1: 0,
                     2: 0,
@@ -137,7 +139,7 @@ class TestSplitTasks(unittest.TestCase):
                     12: 1,
                     13: 0,
                 },
-                "length": {
+                KEY_DUREE_PART: {
                     0: 0.75,
                     1: 0.25,
                     2: 1.0,
@@ -153,7 +155,7 @@ class TestSplitTasks(unittest.TestCase):
                     12: 1.0,
                     13: 0.75,
                 },
-                "id_part": {
+                KEY_ID_PART: {
                     0: 0,
                     1: 1,
                     2: 2,
@@ -181,7 +183,7 @@ class TestSplitTasks(unittest.TestCase):
         self.expected_result[key_evenement_project] = self.expected_result[
             key_evenement_project
         ].astype(int)
-        self.expected_result[key_project_priority] = self.expected_result[key_project_priority].astype(int)
+        self.expected_result[KEY_PROJECT_PRIORITY] = self.expected_result[KEY_PROJECT_PRIORITY].astype(int)
 
     def test_split_task(self):
         output_func = split_tasks(self.input_df, self.mod_length)

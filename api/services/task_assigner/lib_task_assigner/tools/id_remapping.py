@@ -2,28 +2,31 @@
 Contient toutes les fonctions qui consistent à remapper les entrees/sorties des
 ID locaux/externes.
 """
-from typing import Tuple, List
-
 import numpy as np
 import pandas as pd
 from api.string_keys import *
 
-def remap_df_out(df_out: pd.DataFrame, int_to_tsk, int_to_utl, int_to_prj, int_to_cmp):
+
+def remap_df_out(df_out: pd.DataFrame,
+                 mapping_int_to_tsk: dict,
+                 mapping_int_to_utl: dict,
+                 mapping_int_to_prj: dict,
+                 mapping_int_to_cmp: dict) -> pd.DataFrame:
     """
     REMAPPING DES ID LOCAUX EN ID WANDEED
     """
     remapped_df_out = pd.DataFrame.copy(df_out)
-    remapped_df_out["tsk"] = df_out["tsk"].map(int_to_tsk)
-    remapped_df_out["utl"] = df_out["utl"].map(int_to_utl)
-    remapped_df_out["prj"] = df_out["prj"].map(int_to_prj)
-    remapped_df_out["cmp"] = df_out["cmp"].map(int_to_cmp)
+    remapped_df_out["tsk"] = df_out["tsk"].map(mapping_int_to_tsk)
+    remapped_df_out["utl"] = df_out["utl"].map(mapping_int_to_utl)
+    remapped_df_out["prj"] = df_out["prj"].map(mapping_int_to_prj)
+    remapped_df_out["cmp"] = df_out["cmp"].map(mapping_int_to_cmp)
     remapped_df_out["duree_assignee"] = np.round(df_out["duree_assignee"], 2)
     return remapped_df_out
 
 
 def make_usefull_mapping_dicts(
     df_tsk: pd.DataFrame, df_dsp: pd.DataFrame
-) -> Tuple[dict, dict, dict, dict]:
+) -> tuple[dict, dict, dict, dict]:
     """
     FABRICATION DE DICTIONNAIRE UTILES PAR LA SUITE
     """
@@ -39,23 +42,23 @@ def make_mapping_dicts_extern_to_local(id_utl, id_prj, id_cmp, id_tsk):
     """
     CONVERSION DES IDS Wandeed en Identifiant local
     """
-    utl_to_int = {int(_id): int(_int) for _int, _id in enumerate(id_utl)}
-    prj_to_int = {int(_id): int(_int) for _int, _id in enumerate(id_prj)}
-    cmp_to_int = {int(_id): int(_int) for _int, _id in enumerate(id_cmp)}
-    tsk_to_int = {int(_id): int(_int) for _int, _id in enumerate(id_tsk)}
-    return utl_to_int, prj_to_int, cmp_to_int, tsk_to_int
+    mapping_utl_to_int = {int(_id): int(_int) for _int, _id in enumerate(id_utl)}
+    mapping_prj_to_int = {int(_id): int(_int) for _int, _id in enumerate(id_prj)}
+    mapping_cmp_to_int = {int(_id): int(_int) for _int, _id in enumerate(id_cmp)}
+    mapping_tsk_to_int = {int(_id): int(_int) for _int, _id in enumerate(id_tsk)}
+    return mapping_utl_to_int, mapping_prj_to_int, mapping_cmp_to_int, mapping_tsk_to_int
 
 
 def make_mapping_dicts_local_to_extern(id_utl, id_prj, id_cmp, id_tsk):
     """
     CONVERSION DES Identifiant local en IDS Wandeed
     """
-    int_to_utl = {int(_int): int(_id) for _int, _id in enumerate(id_utl)}
-    int_to_utl["not assigned"] = "not assigned"
-    int_to_prj = {int(_int): int(_id) for _int, _id in enumerate(id_prj)}
-    int_to_cmp = {int(_int): int(_id) for _int, _id in enumerate(id_cmp)}
-    int_to_tsk = {int(_int): int(_id) for _int, _id in enumerate(id_tsk)}
-    return int_to_utl, int_to_prj, int_to_cmp, int_to_tsk
+    mapping_int_to_utl = {int(_int): int(_id) for _int, _id in enumerate(id_utl)}
+    mapping_int_to_utl["not assigned"] = "not assigned"
+    mapping_int_to_prj = {int(_int): int(_id) for _int, _id in enumerate(id_prj)}
+    mapping_int_to_cmp = {int(_int): int(_id) for _int, _id in enumerate(id_cmp)}
+    mapping_int_to_tsk = {int(_int): int(_id) for _int, _id in enumerate(id_tsk)}
+    return mapping_int_to_utl, mapping_int_to_prj, mapping_int_to_cmp, mapping_int_to_tsk
 
 
 def make_list_ids(df_prj, df_cmp, df_tsk, df_dsp):
@@ -63,33 +66,33 @@ def make_list_ids(df_prj, df_cmp, df_tsk, df_dsp):
     FAIT LA LISTE DE TOUS LES IDS (PRJ, CMP, TSK, UTL) CONTENUS DANS LES DONNEES RECUES
     """
     # sauvegarde des id utilisateurs ET conservation des ids_utl uniques
-    lst_utl = []
+    lst_utl = list()
     lst_utl.append(list(np.unique(df_prj[key_user])))
     lst_utl.append(list(np.unique(df_cmp[key_emc_sfkutilisateur])))
     lst_utl.append(list(np.unique(df_dsp[key_user])))
     id_utl = list(np.sort(np.unique(flatten_list(lst_utl))))
 
     # sauvegarde des id projets ET conservation des ids_prj uniques
-    lst_prj = []
+    lst_prj = list()
     lst_prj.append(list(np.unique(df_prj[key_project])))
     lst_prj.append(list(np.unique(df_tsk[key_evenement_project])))
     id_prj = list(np.sort(np.unique(flatten_list(lst_prj))))
 
     # sauvegardes des ids competences ET conservation des ids_cmp uniques
-    lst_cmp = []
+    lst_cmp = list()
     lst_cmp.append(list(np.unique(df_cmp[key_emc_sfkarticle])))
     lst_cmp.append(list(np.unique(df_tsk[key_competence])))
     id_cmp = list(np.sort(np.unique(flatten_list(lst_cmp))))
 
     # sauvegardes des ids tsk ET conservation des ids_tsk uniques
-    lst_tsk = []
     id_tsk = list(np.sort(np.unique(df_tsk[key_evenement])))
 
     return id_utl, id_prj, id_cmp, id_tsk
 
 
-def flatten_list(list_of_list: List[list]) -> list:
-    out = []
+def flatten_list(list_of_list: list[list]) -> list:
+    """Met à place une liste de liste"""
+    out = list()
     for sublist in list_of_list:
         for item in sublist:
             out.append(item)
@@ -101,22 +104,22 @@ def add_local_ids_in_dfs(
     df_cmp: pd.DataFrame,
     df_tsk: pd.DataFrame,
     df_dsp: pd.DataFrame,
-    cmp_to_int: dict,
-    utl_to_int: dict,
-    tsk_to_int: dict,
-    prj_to_int: dict,
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    mapping_cmp_to_int: dict,
+    mapping_utl_to_int: dict,
+    mapping_tsk_to_int: dict,
+    mapping_prj_to_int: dict,
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     AJOUT DES VARIABLES LOCALES DANS LES DATAFRAMES
     """
-    df_cmp["cmp"] = df_cmp[key_emc_sfkarticle].map(cmp_to_int)
-    df_cmp["utl"] = df_cmp[key_emc_sfkutilisateur].map(utl_to_int)
-    df_tsk["tsk"] = df_tsk[key_evenement].map(tsk_to_int)
-    df_tsk["cmp"] = df_tsk[key_competence].map(cmp_to_int)
-    df_tsk["prj"] = df_tsk[key_evenement_project].map(prj_to_int)
-    df_prj["utl"] = df_prj[key_user].map(utl_to_int)
-    df_prj["prj"] = df_prj[key_project].map(prj_to_int)
-    df_dsp["utl"] = df_dsp[key_user].map(utl_to_int)
+    df_cmp["cmp"] = df_cmp[key_emc_sfkarticle].map(mapping_cmp_to_int)
+    df_cmp["utl"] = df_cmp[key_emc_sfkutilisateur].map(mapping_utl_to_int)
+    df_tsk["tsk"] = df_tsk[key_evenement].map(mapping_tsk_to_int)
+    df_tsk["cmp"] = df_tsk[key_competence].map(mapping_cmp_to_int)
+    df_tsk["prj"] = df_tsk[key_evenement_project].map(mapping_prj_to_int)
+    df_prj["utl"] = df_prj[key_user].map(mapping_utl_to_int)
+    df_prj["prj"] = df_prj[key_project].map(mapping_prj_to_int)
+    df_dsp["utl"] = df_dsp[key_user].map(mapping_utl_to_int)
 
     # commodités pour plus tard
     df_cmp = df_cmp.sort_values(by="utl")

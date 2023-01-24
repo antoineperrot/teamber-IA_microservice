@@ -2,16 +2,15 @@
 Fonctions pour générer des données aléatoires.
 """
 from random import choices
-from typing import Tuple, List
 
 import numpy as np
 import pandas as pd
 
 from api.string_keys import *
-from api.services.task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
+from api.services.task_assigner.lib_task_assigner.tools import ContrainteEtreSurProjet
 
 
-def generate_unique_ids(n: int) -> List[int]:
+def generate_unique_ids(n: int) -> list[int]:
     """
     Génère des listes aléatoires d'id
     """
@@ -25,7 +24,7 @@ def generate_unique_ids(n: int) -> List[int]:
     return ids
 
 
-def mock_coherent_data() -> Tuple[
+def mock_coherent_data() -> tuple[
     pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame
 ]:
     """
@@ -150,7 +149,7 @@ def mock_coherent_data() -> Tuple[
     return df_prj, df_cmp, df_tsk, df_dsp
 
 
-def mock_random_parameters() -> Tuple[float, ContrainteEtreSurProjet, float]:
+def mock_random_parameters() -> tuple[float, ContrainteEtreSurProjet, float]:
     """
     Génère des paramètres aléatoires de préférences d'optimisation.
     """

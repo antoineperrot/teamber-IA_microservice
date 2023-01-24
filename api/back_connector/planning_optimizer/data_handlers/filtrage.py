@@ -5,8 +5,6 @@ optimisé, et jeter les données inutiles. Par exemple:
 - les utilisateurs pour lesquels on a des tâches mais pas d'horaires
 - les utilisateurs pour lesquels on a pas de tâches.
 """
-from typing import Tuple
-
 import pandas as pd
 
 from api.back_connector.planning_optimizer.data_handlers.horaires import (
@@ -26,8 +24,11 @@ def filtre(
     df_imp: pd.DataFrame,
     df_hor: pd.DataFrame,
     df_tsk: pd.DataFrame,
-    key_project_prioritys_projets: dict,
-) -> Tuple[dict, dict, dict, list]:
+    key_project_prioritys_projets: dict[int: int],
+) -> tuple[dict[int: pd.DataFrame],
+           dict[int: pd.DataFrame],
+           dict[int: pd.DataFrame],
+           list[int]]:
     """
     Filtre et nettoie les données brutes reçues depuis le BACK Wandeed. Ne renvoie que le nécessaire à
     l'optimisation.

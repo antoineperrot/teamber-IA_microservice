@@ -6,7 +6,7 @@ import unittest
 
 import pandas as pd
 
-from api.services.planning_optimizer.solver.planning.solution_interpreter import (
+from api.services.planning_optimizer.lib_planning_optimizer.planning.solution_interpreter import (
     get_next_part,
     add_event,
     move_indexes_forward,
@@ -19,7 +19,7 @@ class TestSolutionInterpreter(unittest.TestCase):
     def setUp(self):
         self.parts = pd.DataFrame.from_dict(
             {
-                "start": {
+                KEY_START: {
                     0: pd.Timestamp("2022-09-05 09:30:00+0000", tz="UTC"),
                     1: pd.Timestamp("2022-09-05 11:30:00+0000", tz="UTC"),
                     2: pd.Timestamp("2022-09-05 12:30:00+0000", tz="UTC"),
@@ -51,7 +51,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     28: pd.Timestamp("2022-09-09 08:00:00+0000", tz="UTC"),
                     29: pd.Timestamp("2022-09-09 09:00:00+0000", tz="UTC"),
                 },
-                "end": {
+                KEY_END: {
                     0: pd.Timestamp("2022-09-05 09:45:00+0000", tz="UTC"),
                     1: pd.Timestamp("2022-09-05 12:30:00+0000", tz="UTC"),
                     2: pd.Timestamp("2022-09-05 13:30:00+0000", tz="UTC"),
@@ -147,7 +147,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     28: 9348,
                     29: 9348,
                 },
-                key_project_priority: {
+                KEY_PROJECT_PRIORITY: {
                     0: 2,
                     1: 1,
                     2: 1,
@@ -184,7 +184,7 @@ class TestSolutionInterpreter(unittest.TestCase):
 
         self.parts2 = pd.DataFrame.from_dict(
             {
-                "start": {
+                KEY_START: {
                     0: pd.Timestamp("2022-09-05 09:30:00+0000", tz="UTC"),
                     1: pd.Timestamp("2022-09-05 11:30:00+0000", tz="UTC"),
                     2: pd.Timestamp("2022-09-05 12:30:00+0000", tz="UTC"),
@@ -213,7 +213,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     25: pd.Timestamp("2022-09-09 08:45:00+0000", tz="UTC"),
                     26: pd.Timestamp("2022-09-09 09:00:00+0000", tz="UTC"),
                 },
-                "end": {
+                KEY_END: {
                     0: pd.Timestamp("2022-09-05 10:00:00+0000", tz="UTC"),
                     1: pd.Timestamp("2022-09-05 12:30:00+0000", tz="UTC"),
                     2: pd.Timestamp("2022-09-05 13:30:00+0000", tz="UTC"),
@@ -300,7 +300,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     25: 1805,
                     26: 1805,
                 },
-                key_project_priority: {
+                KEY_PROJECT_PRIORITY: {
                     0: 0,
                     1: 0,
                     2: 0,
@@ -335,7 +335,7 @@ class TestSolutionInterpreter(unittest.TestCase):
         self.make_events_input_1 = pd.DataFrame.copy(self.parts)
         self.make_events_expected_1 = pd.DataFrame.from_dict(
             {
-                "start": {
+                KEY_START: {
                     0: pd.Timestamp("2022-09-05 09:30:00+0000", tz="UTC"),
                     1: pd.Timestamp("2022-09-05 11:30:00+0000", tz="UTC"),
                     2: pd.Timestamp("2022-09-05 13:30:00+0000", tz="UTC"),
@@ -356,7 +356,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     17: pd.Timestamp("2022-09-09 07:00:00+0000", tz="UTC"),
                     18: pd.Timestamp("2022-09-09 08:00:00+0000", tz="UTC"),
                 },
-                "end": {
+                KEY_END: {
                     0: pd.Timestamp("2022-09-05 09:45:00+0000", tz="UTC"),
                     1: pd.Timestamp("2022-09-05 13:30:00+0000", tz="UTC"),
                     2: pd.Timestamp("2022-09-05 15:00:00+0000", tz="UTC"),
@@ -419,7 +419,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     17: 6675,
                     18: 9348,
                 },
-                key_project_priority: {
+                KEY_PROJECT_PRIORITY: {
                     0: 2,
                     1: 1,
                     2: 1,
@@ -446,7 +446,7 @@ class TestSolutionInterpreter(unittest.TestCase):
         self.make_events_input_2 = pd.DataFrame.copy(self.parts[:-1])
         self.make_events_expected_2 = pd.DataFrame.from_dict(
             {
-                "start": {
+                KEY_START: {
                     0: pd.Timestamp("2022-09-05 09:30:00+0000", tz="UTC"),
                     1: pd.Timestamp("2022-09-05 11:30:00+0000", tz="UTC"),
                     2: pd.Timestamp("2022-09-05 13:30:00+0000", tz="UTC"),
@@ -467,7 +467,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     17: pd.Timestamp("2022-09-09 07:00:00+0000", tz="UTC"),
                     18: pd.Timestamp("2022-09-09 08:00:00+0000", tz="UTC"),
                 },
-                "end": {
+                KEY_END: {
                     0: pd.Timestamp("2022-09-05 09:45:00+0000", tz="UTC"),
                     1: pd.Timestamp("2022-09-05 13:30:00+0000", tz="UTC"),
                     2: pd.Timestamp("2022-09-05 15:00:00+0000", tz="UTC"),
@@ -530,7 +530,7 @@ class TestSolutionInterpreter(unittest.TestCase):
                     17: 6675,
                     18: 9348,
                 },
-                key_project_priority: {
+                KEY_PROJECT_PRIORITY: {
                     0: 2,
                     1: 1,
                     2: 1,
@@ -577,11 +577,11 @@ class TestSolutionInterpreter(unittest.TestCase):
 
     def test_add_event(self):
         expected = {
-            "start": [pd.Timestamp("2022-09-05 09:30:00+0000", tz="UTC")],
-            "end": [pd.Timestamp("2022-09-05 09:45:00+0000", tz="UTC")],
+            KEY_START: [pd.Timestamp("2022-09-05 09:30:00+0000", tz="UTC")],
+            KEY_END: [pd.Timestamp("2022-09-05 09:45:00+0000", tz="UTC")],
             key_evenement: [4661],
             key_evenement_project: [4455],
-            key_project_priority: [2],
+            KEY_PROJECT_PRIORITY: [2],
         }
 
         output_func = add_event(self.parts, 0, 1, events=self.events)

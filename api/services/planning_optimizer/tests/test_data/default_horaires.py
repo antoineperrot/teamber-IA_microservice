@@ -22,7 +22,7 @@ default_horaires = pd.DataFrame(
             4: "06:30",
             5: "11:30",
             6: "06:30",
-            7: "10:30",
+            7: "11:30",
             8: "07:00",
         },
         key_fin_plage_horaire: {
