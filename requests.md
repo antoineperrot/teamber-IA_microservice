@@ -1,0 +1,202 @@
+## Requêtes
+### Task Assigner
+#### Requête pour récupérer la matrice projet
+```
+{
+  "select":[
+     "utl_spkutilisateur",
+     "int_sfkprojet"
+  ],
+  "from":"lst_vprojet_utilisateur_py"
+}
+```
+#### Requête pour récupérer les dispos utilisateurs
+```
+{
+"select":[
+     "utl_spkutilisateur",
+     "utl_sdispo"
+  ],
+  "from":"lst_vdispo_py"
+}
+```
+#### Requête matrice de compétence
+```
+{
+  "select":[
+     "emc_sfkutilisateur",
+     "emc_sfkarticle",
+     "emc_sniveau"
+  ],
+  "from":"lst_vcompetence_py"
+}
+```
+#### Requête pour obtenir les tâches des utilisateurs
+```
+{
+  "select":[
+     "evt_spkevenement",
+     "evt_sfkprojet",
+     "evt_dduree",
+     "lgl_sfkligneparent"
+  ],
+  "from":"lst_vevenement_py",
+  "where":{
+     "condition":"and",
+     "rules":[
+        {
+           "label":"evt_xdate_debut",
+           "field":"evt_xdate_debut",
+           "operator":"greaterthan",
+           "type":"date",
+           "value":"2023-01-18T21:01:55"
+        },
+        {
+           "label":"evt_xdate_fin",
+           "field":"evt_xdate_fin",
+           "operator":"lessthan",
+           "type":"date",
+           "value":"2023-01-21T21:01:55"
+        },
+        {
+           "label":"lgl_sfkligneparent",
+           "field":"lgl_sfkligneparent",
+           "operator":"isnotnull",
+           "type":"integer",
+           "value":"none"
+        }
+     ]
+  }
+}
+```
+
+## Planning optimizer
+
+#### Requêtes pour les impératifs des utilisateurs
+```
+{
+  "select":[
+     "evt_spkevenement",
+     "evt_sfkprojet",
+     "evt_dduree",
+     "lgl_sfkligneparent",
+     "evt_xdate_debut",
+     "evt_xdate_fin"
+  ],
+  "from":"lst_vevenement_py",
+  "where":{
+     "condition":"and",
+     "rules":[
+        {
+           "label":"evt_xdate_debut",
+           "field":"evt_xdate_debut",
+           "operator":"greaterthan",
+           "type":"date",
+           "value":"2023-01-16T05:01:55"
+        },
+        {
+           "label":"evt_xdate_fin",
+           "field":"evt_xdate_fin",
+           "operator":"lessthan",
+           "type":"date",
+           "value":"2023-01-20T21:01:55"
+        },
+        {
+           "label":"lgl_sfkligneparent",
+           "field":"lgl_sfkligneparent",
+           "operator":"isnotnull",
+           "type":"integer",
+           "value":"none"
+        },
+        {
+           "condition":"or",
+           "rules":[
+              {
+                 "label":"ecu_idsystem",
+                 "field":"ecu_idsystem",
+                 "operator":"equal",
+                 "type":"integer",
+                 "value":1
+              },
+              {
+                 "label":"ecu_idsystem",
+                 "field":"ecu_idsystem",
+                 "operator":"equal",
+                 "type":"integer",
+                 "value":2
+              }
+           ]
+        }
+     ]
+  }
+}
+```
+#### Requête pour les horaires des utilisateurs
+```
+{
+  "select":[
+     "epu_sfkutilisateur",
+     "epl_employe_horaire",
+     "epl_xdebutperiode",
+     "epl_xfinperiode"
+  ],
+  "from":"lst_vutilisateur_horaires_py",
+  "where":{
+     "condition":"and",
+     "rules":[
+        {
+           "label":"epl_xdebutperiode",
+           "field":"epl_xdebutperiode",
+           "operator":"lessthan",
+           "type":"date",
+           "value":"2023-01-20T21:01:55"
+        },
+        {
+           "label":"epl_xfinperiode",
+           "field":"epl_xfinperiode",
+           "operator":"greaterthan",
+           "type":"date",
+           "value":"2023-01-16T05:01:55"
+        }
+     ]
+  }
+},
+```
+#### Requêtes pour les tâches des utilisateurs
+```
+{
+  "select":[
+     "evt_spkevenement",
+     "evt_sfkprojet",
+     "evt_dduree",
+     "lgl_sfkligneparent"
+  ],
+  "from":"lst_vevenement_py",
+  "where":{
+     "condition":"and",
+     "rules":[
+        {
+           "label":"evt_xdate_debut",
+           "field":"evt_xdate_debut",
+           "operator":"greaterthan",
+           "type":"date",
+           "value":"2023-01-16T05:01:55"
+        },
+        {
+           "label":"evt_xdate_fin",
+           "field":"evt_xdate_fin",
+           "operator":"lessthan",
+           "type":"date",
+           "value":"2023-01-20T21:01:55"
+        },
+        {
+           "label":"lgl_sfkligneparent",
+           "field":"lgl_sfkligneparent",
+           "operator":"isnotnull",
+           "type":"integer",
+           "value":"none"
+        }
+     ]
+  }
+}
+```
