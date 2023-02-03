@@ -118,14 +118,11 @@ def handler_demande_task_assigner(request_parameters: FrontEndTaskAssignerReques
     """Handler d'une demande de task_assigner. Fonction appelée dans le thread de calcul."""
 
     if config["MODE"] == "PRODUCTION":
-        try:
-            df_prj, df_cmp, df_tsk, df_dsp = fetch_task_assigner_data_to_back(
-                backend_url=request_parameters.backend_url,
-                backend_access_token=request_parameters.backend_access_token,
-                date_start=request_parameters.date_start.isoformat(timespec="seconds"),
-                date_end=request_parameters.date_end.isoformat(timespec="seconds"))
-        except FailRecuperationBackendDataException as e:
-            pass
+        df_prj, df_cmp, df_tsk, df_dsp = fetch_task_assigner_data_to_back(
+            backend_url=request_parameters.backend_url,
+            backend_access_token=request_parameters.backend_access_token,
+            date_start=request_parameters.date_start.isoformat(timespec="seconds"),
+            date_end=request_parameters.date_end.isoformat(timespec="seconds"))
 
     else:
         df_prj, df_cmp, df_tsk, df_dsp = mock_coherent_data()

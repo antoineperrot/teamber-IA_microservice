@@ -25,7 +25,9 @@ def make_sql_requests(sql_queries: dict, url: str, access_token: str) -> dict:
     for key, sql_query in sql_queries.items():
         root_logger.info(f"Backend Data Recupération :  récupération de {key}")
         request = requests.post(url, headers=headers, json=sql_query)
+
         if request.status_code != 200:
+            root_logger.debug(str(request))
             raise FailRecuperationBackendDataException(missing_data=key)
         else:
             fetched_data[key] = request.json()["result"]

@@ -44,13 +44,14 @@ class CalculHandler:
             except FailRecuperationBackendDataException as e:
                 self.etat.set_statut(StatutCalculEnum.FAIL)
                 self.etat.set_result(None)
-                self.etat.set_message(e.msg)
+                self.etat.set_message(message=e.msg)
                 cache.refresh_status(self.etat)
 
             except Exception as e:
                 root_logger.error("Failed to compute planification", exc_info=e)
                 self.etat.set_statut(StatutCalculEnum.FAIL)
                 self.etat.set_result(None)
+                self.etat.set_message(str(e))
                 cache.refresh_status(self.etat)
 
             CalculHandler.calcul_lock.notify_all()

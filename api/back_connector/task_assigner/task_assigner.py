@@ -5,6 +5,7 @@ from pandas import DataFrame
 
 from api.back_connector.tools import make_sql_requests
 from api.string_keys import *
+from api.loggers import logger_task_assigner
 
 
 def fetch_task_assigner_data_to_back(backend_url: str,
@@ -76,6 +77,7 @@ def fetch_task_assigner_data_to_back(backend_url: str,
         },
     }
 
+    logger_task_assigner.debug(sql_queries)
     data = make_sql_requests(sql_queries=sql_queries,
                              url=backend_url,
                              access_token=backend_access_token)

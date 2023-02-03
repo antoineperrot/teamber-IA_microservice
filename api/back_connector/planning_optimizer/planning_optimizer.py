@@ -5,10 +5,10 @@ import pandas as pd
 
 from api.back_connector.planning_optimizer.data_handlers.filtrage import filtre
 from api.back_connector.tools import make_sql_requests
+from api.loggers import logger_planning_optimizer
 from api.string_keys import *
 
 
-# TODO: corriger les ValueError
 def fetch_data_to_wandeed_backend(
     url: str, access_token: str, date_start: str, date_end: str, key_project_prioritys_projets: dict
 ) -> tuple[dict[int: pd.DataFrame],
@@ -144,6 +144,7 @@ def fetch_data_to_wandeed_backend(
             },
         },
     }
+    logger_planning_optimizer.debug(sql_querys_dict)
     data = make_sql_requests(sql_querys_dict, url, access_token)
 
     # Mise en forme des données
