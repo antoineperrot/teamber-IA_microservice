@@ -9,6 +9,7 @@ from api.back_connector.task_assigner.task_assigner import fetch_task_assigner_d
 from api.services.task_assigner.lib_task_assigner.tools import ContrainteEtreSurProjet
 from api.services.task_assigner.solver import solveur_task_assigner, SolverCrashException
 from api.services.task_assigner.tests.data_mocker import mock_coherent_data
+from api.back_connector.tools import FailRecuperationBackendDataException
 from api.models import cache
 from api.loggers import logger_task_assigner
 from api.config import config
@@ -117,11 +118,15 @@ def handler_demande_task_assigner(request_parameters: FrontEndTaskAssignerReques
     """Handler d'une demande de task_assigner. Fonction appelée dans le thread de calcul."""
 
     if config["MODE"] == "PRODUCTION":
-        df_prj, df_cmp, df_tsk, df_dsp = fetch_task_assigner_data_to_back(
-            backend_url=request_parameters.backend_url,
-            backend_access_token=request_parameters.backend_access_token,
-            date_start=request_parameters.date_start.isoformat(timespec="seconds"),
-            date_end=request_parameters.date_end.isoformat(timespec="seconds"))
+        try:
+            df_prj, df_cmp, df_tsk, df_dsp = fetch_task_assigner_data_to_back(
+                backend_url=request_parameters.backend_url,
+                backend_access_token=request_parameters.backend_access_token,
+                date_start=request_parameters.date_start.isoformat(timespec="seconds"),
+                date_end=request_parameters.date_end.isoformat(timespec="seconds"))
+        except FailRecuperationBackendDataException as e:
+            pass
+
     else:
         df_prj, df_cmp, df_tsk, df_dsp = mock_coherent_data()
 

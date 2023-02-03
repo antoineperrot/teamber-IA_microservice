@@ -144,7 +144,6 @@ def fetch_data_to_wandeed_backend(
             },
         },
     }
-
     data = make_sql_requests(sql_querys_dict, url, access_token)
 
     # Mise en forme des données

@@ -2,6 +2,7 @@
 Module des fonctions tools de formulation du problèmes linéaire à partir des données entrantes.
 """
 import numpy as np
+
 from api.services.task_assigner.lib_task_assigner.tools import ContrainteEtreSurProjet
 
 

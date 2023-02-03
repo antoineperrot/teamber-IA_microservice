@@ -16,10 +16,11 @@ class EtatCalcul:
     """Class stockant l'état d'un calcul, caractérisé par son état (succès, échec etc.), et son résultat en cas de
     succès"""
 
-    def __init__(self, identifiant: int, statut: StatutCalculEnum):
+    def __init__(self, identifiant: int, statut: StatutCalculEnum, message: str = ""):
         self.identifiant = identifiant
         self.statut = statut
         self.result = None
+        self.message = message
         root_logger.info(self)
 
     def set_statut(self, new_statut: StatutCalculEnum):
@@ -36,9 +37,14 @@ class EtatCalcul:
         self.result = new_result
         root_logger.info(self)
 
+    def set_message(self, message: str):
+        """setter du message"""
+        self.message = message
+
     def serialize(self) -> dict:
         """Séarialisation method"""
         out = {"identifiant": self.identifiant,
                "statut": self.statut,
-               "result": self.result}
+               "result": self.result,
+               "message": self.message}
         return out

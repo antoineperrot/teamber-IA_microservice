@@ -6,8 +6,8 @@ from random import choices
 import numpy as np
 import pandas as pd
 
-from api.string_keys import *
 from api.services.task_assigner.lib_task_assigner.tools import ContrainteEtreSurProjet
+from api.string_keys import *
 
 
 def generate_unique_ids(n: int) -> list[int]:

@@ -2,6 +2,16 @@
 Module tools du back connector
 """
 import requests
+from api.loggers import root_logger
+
+
+class FailRecuperationBackendDataException(Exception):
+    """Exception à lever lorsque la récupération de données échoue"""
+    def __init__(self, missing_data):
+        self.msg = f"Erreur lors de la récupération des données auprès du BACK: {missing_data}."
+
+    def __repr__(self):
+        return self.msg
 
 
 def make_sql_requests(sql_queries: dict, url: str, access_token: str) -> dict:
@@ -13,12 +23,10 @@ def make_sql_requests(sql_queries: dict, url: str, access_token: str) -> dict:
     headers = {"Authorization": f"{access_token}", "Content-Type": "application/json"}
     fetched_data = {}
     for key, sql_query in sql_queries.items():
+        root_logger.info(f"Backend Data Recupération :  récupération de {key}")
         request = requests.post(url, headers=headers, json=sql_query)
         if request.status_code != 200:
-            # TODO: Add bonne exception
-            raise ValueError(
-                f"Erreur lors de la récupération des données auprès du BACK: {key}."
-            )
+            raise FailRecuperationBackendDataException(missing_data=key)
         else:
             fetched_data[key] = request.json()["result"]
 

@@ -4,6 +4,7 @@ Module for planification calcul handler
 from threading import Thread, Condition
 from api.models import StatutCalculEnum, EtatCalcul
 from api.loggers import root_logger
+from api.back_connector.tools import FailRecuperationBackendDataException
 
 
 class CalculHandler:
@@ -38,6 +39,12 @@ class CalculHandler:
                 solver_output = self.handler(**self.kwargs)
                 self.etat.set_statut(StatutCalculEnum.SUCCESS)
                 self.etat.set_result(solver_output)
+                cache.refresh_status(self.etat)
+
+            except FailRecuperationBackendDataException as e:
+                self.etat.set_statut(StatutCalculEnum.FAIL)
+                self.etat.set_result(None)
+                self.etat.set_message(e.msg)
                 cache.refresh_status(self.etat)
 
             except Exception as e:
