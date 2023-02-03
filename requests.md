@@ -73,13 +73,15 @@
 ## Planning optimizer
 
 #### Requêtes pour les impératifs des utilisateurs
+
+<span data-color="red">TODO: corriger la clé __lgl_sfkligneparent__, j'ai besoin de l'id utilisateur a la place</span>
 ```
 {
   "select":[
      "evt_spkevenement",
      "evt_sfkprojet",
      "evt_dduree",
-     "lgl_sfkligneparent",
+     "lgl_sfkligneparent", 
      "evt_xdate_debut",
      "evt_xdate_fin"
   ],
@@ -163,6 +165,7 @@
 },
 ```
 #### Requêtes pour les tâches des utilisateurs
+<span data-color="red">TODO: corriger la clé __lgl_sfkligneparent__, j'ai besoin de l'id utilisateur a la place</span>
 ```
 {
   "select":[
