@@ -2,6 +2,7 @@
 
 # clé BDD Wandeed :
 key_competence = "lgl_sfkligneparent"
+key_user_po = "evu_sfkutilisateur"
 key_evenement = "evt_spkevenement"
 key_duree_evenement = "evt_dduree"
 key_evenement_project = "evt_sfkprojet"

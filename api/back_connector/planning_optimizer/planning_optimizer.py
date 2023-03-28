@@ -7,6 +7,7 @@ from api.back_connector.planning_optimizer.data_handlers.filtrage import filtre
 from api.back_connector.tools import make_sql_requests
 from api.loggers import logger_planning_optimizer
 from api.string_keys import *
+from api.back_connector.planning_optimizer.requests import get_request_tasks, get_request_horaires, get_request_imperatifs
 
 
 def fetch_data_to_wandeed_backend(
@@ -41,108 +42,9 @@ def fetch_data_to_wandeed_backend(
         evenement_project       -> projet de rattachement de la tâche
     """
     sql_querys_dict = {
-        MY_KEY_IMPERATIFS: {
-            "select": LIST_FIELD_KEYS_IMPERATIFS_REQUEST,
-            "from": key_table_evenements,
-            "where": {
-                "condition": "and",
-                "rules": [
-                    {
-                        "label": key_evenement_date_debut,
-                        "field": key_evenement_date_debut,
-                        "operator": "greaterthan",
-                        "type": "date",
-                        "value": f"{date_start}",
-                    },
-                    {
-                        "label": key_evenement_date_fin,
-                        "field": key_evenement_date_fin,
-                        "operator": "lessthan",
-                        "type": "date",
-                        "value": f"{date_end}",
-                    },
-                    {
-                        "label": key_competence,
-                        "field": key_competence,
-                        "operator": "isnotnull",
-                        "type": "integer",
-                        "value": "none",
-                    },
-                    {
-                        "condition": "or",
-                        "rules": [
-                            {
-                                "label": "ecu_idsystem",
-                                "field": "ecu_idsystem",
-                                "operator": "equal",
-                                "type": "integer",
-                                "value": 1,
-                            },
-                            {
-                                "label": "ecu_idsystem",
-                                "field": "ecu_idsystem",
-                                "operator": "equal",
-                                "type": "integer",
-                                "value": 2,
-                            },
-                        ],
-                    },
-                ],
-            },
-        },
-        MY_KEY_HORAIRES: {
-            "select": LIST_FIELD_KEYS_HORAIRES_REQUEST,
-            "from": key_table_horaires_utilisateurs,
-            "where": {
-                "condition": "and",
-                "rules": [
-                    {
-                        "label": key_debut_periode_horaire_utilisateur,
-                        "field": key_debut_periode_horaire_utilisateur,
-                        "operator": "lessthan",
-                        "type": "date",
-                        "value": f"{date_end}",
-                    },
-                    {
-                        "label": key_fin_periode_horaire_utilisateur,
-                        "field": key_fin_periode_horaire_utilisateur,
-                        "operator": "greaterthan",
-                        "type": "date",
-                        "value": f"{date_start}",
-                    },
-                ],
-            },
-        },
-        MY_KEY_TACHES: {
-            "select": LIST_FIELD_KEYS_TACHES_REQUEST,
-            "from": key_table_evenements,
-            "where": {
-                "condition": "and",
-                "rules": [
-                    {
-                        "label": key_evenement_date_debut,
-                        "field": key_evenement_date_debut,
-                        "operator": "greaterthan",
-                        "type": "date",
-                        "value": f"{date_start}",
-                    },
-                    {
-                        "label": key_evenement_date_fin,
-                        "field": key_evenement_date_fin,
-                        "operator": "lessthan",
-                        "type": "date",
-                        "value": f"{date_end}",
-                    },
-                    {
-                        "label": key_competence,
-                        "field": key_competence,
-                        "operator": "isnotnull",
-                        "type": "integer",
-                        "value": "none",
-                    },
-                ],
-            },
-        },
+        MY_KEY_TACHES: get_request_tasks(date_start=date_start, date_end=date_end),
+        MY_KEY_HORAIRES: get_request_horaires(date_start=date_start, date_end=date_end),
+        MY_KEY_IMPERATIFS: get_request_imperatifs(date_start=date_start, date_end=date_end),
     }
     logger_planning_optimizer.debug(sql_querys_dict)
     data = make_sql_requests(sql_querys_dict, url, access_token)
