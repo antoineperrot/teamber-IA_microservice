@@ -53,7 +53,7 @@ LIST_FIELD_KEYS_IMPERATIFS_REQUEST = [
                 key_evenement,
                 key_evenement_project,
                 key_duree_evenement,
-                key_competence,  # TODO : à remplacer par clé utilisateur
+                key_user_po,
                 key_evenement_date_debut,
                 key_evenement_date_fin,
             ]
@@ -69,5 +69,7 @@ LIST_FIELD_KEYS_TACHES_REQUEST = [
                 key_evenement,
                 key_evenement_project,
                 key_duree_evenement,
-                key_competence,  # TODO : à remplacer par clé utilisateur
+                key_user_po,
+                key_evenement_date_debut,
+                key_evenement_date_fin
             ]
