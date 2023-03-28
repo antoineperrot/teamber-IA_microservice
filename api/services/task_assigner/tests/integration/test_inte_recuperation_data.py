@@ -21,7 +21,7 @@ class TestRecuperationDataTaskAssigner(unittest.TestCase):
 
         success = True
         try:
-            make_sql_requests(sql_queries={"test_query_tasks": sql_request},
+            make_sql_requests(sql_queries={"test_" + test_name: sql_request},
                               url=self.url,
                               access_token=self.access_token)
         except FailRecuperationBackendDataException:
