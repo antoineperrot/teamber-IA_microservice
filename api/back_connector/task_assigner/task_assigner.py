@@ -4,7 +4,8 @@ Module de récupération des données auprès du BACK pour la fonctionnalité ta
 from pandas import DataFrame
 
 from api.back_connector.tools import make_sql_requests
-from api.string_keys import *
+from api.back_connector.task_assigner.requests import get_tasks_request, get_dispo_user_request,\
+    get_matrice_competence_request, get_matrice_projet_request
 from api.loggers import logger_task_assigner
 
 
@@ -28,53 +29,10 @@ def fetch_task_assigner_data_to_back(backend_url: str,
 
     """
     sql_queries = {
-        "matrice_projet": {
-            "select": [key_user, key_project],
-            "from": "lst_vprojet_utilisateur_py",
-        },
-        "dispos_utilisateurs": {
-            "select": [key_user, key_user_dispo],
-            "from": "lst_vdispo_py",
-        },
-        "matrice_competence": {
-            "select": [key_emc_sfkutilisateur, key_emc_sfkarticle, key_emc_sniveau],
-            "from": "lst_vcompetence_py",
-        },
-        "taches": {
-            "select": [
-                key_evenement,
-                key_evenement_project,
-                key_duree_evenement,
-                key_competence,
-            ],
-            "from": "lst_vevenement_py",
-            "where": {
-                "condition": "and",
-                "rules": [
-                    {
-                        "label": "evt_xdate_debut",
-                        "field": "evt_xdate_debut",
-                        "operator": "greaterthan",
-                        "type": "date",
-                        "value": f"{date_start}",
-                    },
-                    {
-                        "label": "evt_xdate_fin",
-                        "field": "evt_xdate_fin",
-                        "operator": "lessthan",
-                        "type": "date",
-                        "value": f"{date_end}",
-                    },
-                    {
-                        "label": key_competence,
-                        "field": key_competence,
-                        "operator": "isnotnull",
-                        "type": "integer",
-                        "value": "none",
-                    },
-                ],
-            },
-        },
+        "matrice_projet": get_matrice_projet_request(),
+        "dispos_utilisateurs": get_dispo_user_request(),
+        "matrice_competence": get_matrice_competence_request(),
+        "taches": get_tasks_request(date_start=date_start, date_end=date_end),
     }
 
     logger_task_assigner.debug(sql_queries)

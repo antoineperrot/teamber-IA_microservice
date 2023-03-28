@@ -28,7 +28,7 @@ class TestRecuperationDataPlanningOptimizer(unittest.TestCase):
         except FailRecuperationBackendDataException:
             success = False
 
-        self.assertTrue(success, msg=f"Le test de récupération {test_name} optimizer a fail")
+        self.assertTrue(success, msg=f"Le test de récupération {test_name} a fail")
 
     def test_simple(self):
         url ="https://development.api.wandeed.com/api/agrp/1"
