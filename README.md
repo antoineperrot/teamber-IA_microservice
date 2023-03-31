@@ -24,14 +24,25 @@ Test les interfaces avec le back
 2. Se rendre dans le répertoire du projet
 3. Obtenir la clé API du back de [Dev Wandeed](https://development.wandeed.com)
 4. Lancer les commmandes :
+   1. Mettre en place l'environnement virtuel
+   ```
+   setup_venv.bat
+   ```
+   
+   2. L'activer
+   ```
+   venv\Scripts\activate
+   ```
+   
+   3. Run les test d'inté de Planning optimizer
 
-``` 
-python api\services\planning_optimizer\tests\integration\test_integration_recuperation_data.py "<api_key>" 
-```
-
-``` 
-python api\services\task_assigner\tests\integration\test_integration_recuperation_data.py "<api_key>" 
-```
+   ``` 
+   python api\services\planning_optimizer\tests\integration\test_integration_recuperation_data.py "<api_key>" 
+   ```
+   4. Run les tests d'inté de Task Assigner
+   ``` 
+   python api\services\task_assigner\tests\integration\test_integration_recuperation_data.py "<api_key>" 
+   ```
 
 
 
