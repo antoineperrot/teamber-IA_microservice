@@ -1,11 +1,19 @@
 """Contient la requête pour récupérer les imperatifs"""
+from typing import Optional
 from api.string_keys import *
 
 
-def get_request_imperatifs(date_start: str, date_end: str):
+def get_request_imperatifs(date_start: str, date_end: str, users: Optional[list[int]] = None) -> dict:
     """Retourne la requête pour récupérer les imperatifs"""
-    return {
-            "select": LIST_FIELD_KEYS_IMPERATIFS_REQUEST,
+    sql_request = {
+            "select": [
+                key_evenement,
+                key_evenement_project,
+                key_duree_evenement,
+                key_user_po,
+                key_evenement_date_debut,
+                key_evenement_date_fin,
+            ],
             "from": key_table_evenements,
             "where": {
                 "condition": "and",
@@ -53,3 +61,15 @@ def get_request_imperatifs(date_start: str, date_end: str):
                 ],
             },
         }
+
+    if users is not None:
+        sql_request["where"]["rules"].append({
+            "label": key_epu_sfkutilisateur,
+            "field": key_epu_sfkutilisateur,
+            "operator": "in",
+            "type": "number",
+            "value": users
+        }
+        )
+
+    return sql_request

@@ -47,29 +47,3 @@ KEY_END = "END"
 MY_KEY_IMPERATIFS = "IMPERATIFS"
 MY_KEY_HORAIRES = "HORAIRES"
 MY_KEY_TACHES = "TACHES"
-
-# Liste de clés requises dans les requêtes en BDD :
-LIST_FIELD_KEYS_IMPERATIFS_REQUEST = [
-                key_evenement,
-                key_evenement_project,
-                key_duree_evenement,
-                key_user_po,
-                key_evenement_date_debut,
-                key_evenement_date_fin,
-            ]
-
-LIST_FIELD_KEYS_HORAIRES_REQUEST = [
-                key_epu_sfkutilisateur,
-                key_epl_employe_horaire,
-                key_debut_periode_horaire_utilisateur,
-                key_fin_periode_horaire_utilisateur,
-            ]
-
-LIST_FIELD_KEYS_TACHES_REQUEST = [
-                key_evenement,
-                key_evenement_project,
-                key_duree_evenement,
-                key_user_po,
-                key_evenement_date_debut,
-                key_evenement_date_fin
-            ]
