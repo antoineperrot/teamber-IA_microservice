@@ -47,7 +47,7 @@ def run_test_inte(test_instance: unittest.TestCase):
         success = True
         msg = ""
         try:
-            exec(f"test.{test_method}()")
+            exec(f"test_instance.{test_method}()")
         except AssertionError as a:
             success = False
             msg = str(a)

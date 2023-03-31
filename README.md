@@ -34,12 +34,12 @@ Test les interfaces avec le back
    venv\Scripts\activate
    ```
    
-   3. Run les test d'inté de Planning optimizer
+   3. Run les test d'inté de Planning optimizer __Bien mettre les guillemets__
 
    ``` 
    python api\services\planning_optimizer\tests\integration\test_integration_recuperation_data.py "<api_key>" 
    ```
-   4. Run les tests d'inté de Task Assigner
+   4. Run les tests d'inté de Task Assigner __Bien mettre les guillemets__
    ``` 
    python api\services\task_assigner\tests\integration\test_integration_recuperation_data.py "<api_key>" 
    ```
