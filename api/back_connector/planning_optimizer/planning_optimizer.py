@@ -10,12 +10,15 @@ from api.string_keys import *
 from api.back_connector.planning_optimizer.requests import get_request_tasks, get_request_horaires, get_request_imperatifs
 
 
-def fetch_data_to_wandeed_backend(
-    url: str, access_token: str, date_start: str, date_end: str, key_project_prioritys_projets: dict
-) -> tuple[dict[int: pd.DataFrame],
-           dict[int: pd.DataFrame],
-           dict[int: pd.DataFrame],
-           list[int]]:
+def fetch_data_to_wandeed_backend(url: str,
+                                  access_token: str,
+                                  date_start: str,
+                                  date_end: str,
+                                  selected_users: list[int],
+                                  key_project_prioritys_projets: dict) -> tuple[dict[int: pd.DataFrame],
+                                                                                dict[int: pd.DataFrame],
+                                                                                dict[int: pd.DataFrame],
+                                                                                list[int]]:
     """
     Prépare et envoie les requêtes SQL auprès du Back Wandeed qui renvoie les données demandées.
 
@@ -23,6 +26,7 @@ def fetch_data_to_wandeed_backend(
     :param access_token: token d'accès à la base de données du back
     :param date_start: date de début du sprint à optimiser, au format ISO. example : "2022-10-03T06:31:00.000Z"
     :param date_end: date de FIN du sprint à optimiser, au format ISO. example : "2022-10-10T18:30:00.000Z"
+    :param selected_users: IDs des utilisateurs sélectionnés pour l'optimisation
     :param key_project_prioritys_projets: dictionnaire de la forme {id_projet (int):niveau_key_project_priority_projet (int)}.
                              Niveau le plus important: 0.
 
@@ -38,15 +42,15 @@ def fetch_data_to_wandeed_backend(
     :return df_tsk:
         duree_evenement          -> duree (en h) de la tâche
         evenement    -> id de la tâche
-        competence  -> utilisateur concerné # TODO: corriger clé
+        competence  -> utilisateur concerné
         evenement_project       -> projet de rattachement de la tâche
     """
     sql_querys_dict = {
-        MY_KEY_TACHES: get_request_tasks(date_start=date_start, date_end=date_end),
-        MY_KEY_HORAIRES: get_request_horaires(date_start=date_start, date_end=date_end),
-        MY_KEY_IMPERATIFS: get_request_imperatifs(date_start=date_start, date_end=date_end),
+        MY_KEY_TACHES: get_request_tasks(date_start=date_start, date_end=date_end, selected_users=selected_users),
+        MY_KEY_HORAIRES: get_request_horaires(date_start=date_start, date_end=date_end, selected_users=selected_users),
+        MY_KEY_IMPERATIFS: get_request_imperatifs(date_start=date_start, date_end=date_end, selected_users=selected_users),
     }
-    logger_planning_optimizer.debug(sql_querys_dict)
+
     data = make_sql_requests(sql_querys_dict, url, access_token)
 
     # Mise en forme des données

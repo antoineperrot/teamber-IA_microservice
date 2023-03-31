@@ -9,19 +9,19 @@ from api.back_connector.task_assigner.task_assigner import fetch_task_assigner_d
 from api.services.task_assigner.lib_task_assigner.tools import ContrainteEtreSurProjet
 from api.services.task_assigner.solver import solveur_task_assigner, SolverCrashException
 from api.services.task_assigner.tests.data_mocker import mock_coherent_data
-from api.back_connector.tools import FailRecuperationBackendDataException
 from api.models import cache
 from api.loggers import logger_task_assigner
 from api.config import config
 
 
 class FrontEndTaskAssignerRequestParameters:
-    """Classe contenant ce les infos que doit faire parvenir le front lors d'un appel à TaskAssigner"""
+    """Classe contenant les infos que doit faire parvenir le front lors d'un appel à TaskAssigner"""
     def __init__(self,
                  backend_access_token: str,
                  backend_url: str,
                  date_start: datetime,
                  date_end: datetime,
+                 selected_users: list[int],
                  curseur: float,
                  contrainte_etre_sur_projet: ContrainteEtreSurProjet,
                  avantage_projet: float):
@@ -29,6 +29,7 @@ class FrontEndTaskAssignerRequestParameters:
         self.backend_url = str(backend_url)
         self.date_start = date_start
         self.date_end = date_end
+        self.selected_users = selected_users
         self.curseur = float(curseur)
         try:
             self.contrainte_etre_sur_projet = ContrainteEtreSurProjet(contrainte_etre_sur_projet)
@@ -52,6 +53,7 @@ class FrontEndTaskAssignerRequestParameters:
                       backend_url=json["backend_url"],
                       date_start=datetime.fromisoformat(json["date_start"]),
                       date_end=datetime.fromisoformat(json["date_end"]),
+                      selected_users=json["selected_users"],
                       curseur=json["curseur"],
                       contrainte_etre_sur_projet=json["contrainte_etre_sur_projet"],
                       avantage_projet=json["avantage_projet"])
@@ -75,7 +77,6 @@ class FrontEndTaskAssignerRequestParameters:
                                                   f"'contrainte_etre_sur_projet': str ({available_values})\n"
                                                   "'avantage_projet': float\n")
 
-        out._check_values()
         return out
 
     def _check_values(self):
@@ -85,6 +86,19 @@ class FrontEndTaskAssignerRequestParameters:
             assert 0 <= self.curseur <= 1
         except AssertionError:
             raise UnprocessableEntity(description="'curseur' doit être entre 0 et 1.")
+
+        if not(isinstance(self.selected_users, list)):
+            raise UnprocessableEntity(description="'selected_users' doit être une liste d'entiers (IDs).")
+
+        if len(self.selected_users) == 0:
+            raise UnprocessableEntity(description="'selected_users' ne peut pas être une liste vide, veuillez"
+                                                  " indiquer des utilisateurs par leur ID.")
+        for user in self.selected_users:
+            try:
+                if int(user) != user:
+                    raise UnprocessableEntity(description="'selected_users' doit être une liste d'entiers (IDs).")
+            except Exception:
+                raise UnprocessableEntity(description="'selected_users' doit être une liste d'entiers (IDs).")
 
 
 def task_assigner_controller(json_file: dict):
@@ -145,5 +159,3 @@ def handler_demande_task_assigner(request_parameters: FrontEndTaskAssignerReques
     except Exception as e:
         logger_task_assigner.error("Crash du solveur", exc_info=str(e))
         raise SolverCrashException()
-
-

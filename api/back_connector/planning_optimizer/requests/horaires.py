@@ -3,7 +3,7 @@ from typing import Optional
 from api.string_keys import *
 
 
-def get_request_horaires(date_start: str, date_end: str, users: Optional[list[int]] = None) -> dict:
+def get_request_horaires(date_start: str, date_end: str, selected_users: Optional[list[int]] = None) -> dict:
     """Retourne la requête pour récupérer les horaires"""
     sql_request = {
         "select": [
@@ -34,13 +34,13 @@ def get_request_horaires(date_start: str, date_end: str, users: Optional[list[in
         },
     }
 
-    if users is not None:
+    if selected_users is not None:
         sql_request["where"]["rules"].append({
             "label": key_epu_sfkutilisateur,
             "field": key_epu_sfkutilisateur,
             "operator": "in",
             "type": "number",
-            "value": users
+            "value": selected_users
         }
         )
     return sql_request

@@ -12,7 +12,8 @@ from api.loggers import logger_task_assigner
 def fetch_task_assigner_data_to_back(backend_url: str,
                                      backend_access_token: str,
                                      date_start: str,
-                                     date_end: str) ->\
+                                     date_end: str,
+                                     selected_users: list[int]) ->\
         tuple[DataFrame, DataFrame, DataFrame, DataFrame]:
     """
     Va chercher auprès du Back les données nécessaires à l'optimisation de l'assignation des tâches.
@@ -29,9 +30,9 @@ def fetch_task_assigner_data_to_back(backend_url: str,
 
     """
     sql_queries = {
-        "matrice_projet": get_matrice_projet_request(),
-        "dispos_utilisateurs": get_dispo_user_request(),
-        "matrice_competence": get_matrice_competence_request(),
+        "matrice_projet": get_matrice_projet_request(selected_users=selected_users),
+        "dispos_utilisateurs": get_dispo_user_request(selected_users=selected_users),
+        "matrice_competence": get_matrice_competence_request(selected_users=selected_users),
         "taches": get_tasks_request(date_start=date_start, date_end=date_end),
     }
 

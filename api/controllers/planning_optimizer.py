@@ -21,6 +21,7 @@ class FrontEndPlanningOptimizerRequestParameters:
                  backend_access_token: str,
                  date_start: datetime,
                  date_end: datetime,
+                 selected_users: list[int],
                  key_project_prioritys_projets: dict,
                  parts_max_length: float,
                  min_duration_section: float):
@@ -28,6 +29,7 @@ class FrontEndPlanningOptimizerRequestParameters:
         self.backend_access_token = str(backend_access_token)
         self.date_start = date_start
         self.date_end = date_end
+        self.selected_users = selected_users
         self.key_project_prioritys_projets = key_project_prioritys_projets
         self.parts_max_length = float(parts_max_length)
         self.min_duration_section = float(min_duration_section)
@@ -44,6 +46,7 @@ class FrontEndPlanningOptimizerRequestParameters:
                       backend_url=json["backend_url"],
                       date_start=datetime.fromisoformat(json["date_start"]),
                       date_end=datetime.fromisoformat(json["date_end"]),
+                      selected_users=json["selected_users"],
                       key_project_prioritys_projets=json["key_project_prioritys_projets"],
                       parts_max_length=json["parts_max_length"],
                       min_duration_section=json["min_duration_section"])
@@ -63,7 +66,6 @@ class FrontEndPlanningOptimizerRequestParameters:
                                                   "'parts_max_length': float\n"
                                                   "'min_duration_section': float\n")
 
-        out._check_values()
         return out
 
     def _check_values(self):
@@ -82,6 +84,19 @@ class FrontEndPlanningOptimizerRequestParameters:
         if not (self.date_end - self.date_start).total_seconds() > 60 * 60:
             raise UnprocessableEntity(description="La période de sprint indiquée est trop courte. Minimum 1h.")
         self.key_project_prioritys_projets = self._assert_and_type_mapping_priority_structure()
+
+        if not(isinstance(self.selected_users, list)):
+            raise UnprocessableEntity(description="'selected_users' doit être une liste d'entiers (IDs).")
+
+        if len(self.selected_users) == 0:
+            raise UnprocessableEntity(description="'selected_users' ne peut pas être une liste vide, veuillez"
+                                                  " indiquer des utilisateurs par leur ID.")
+        for user in self.selected_users:
+            try:
+                if int(user) != user:
+                    raise UnprocessableEntity(description="'selected_users' doit être une liste d'entiers (IDs).")
+            except Exception:
+                raise UnprocessableEntity(description="'selected_users' doit être une liste d'entiers (IDs).")
 
     def _assert_and_type_mapping_priority_structure(self):
         """Vérifie la validité du dictionnaire de priorités envoyé"""
@@ -126,6 +141,7 @@ def handler_demande_planning_optimizer(request_parameters: FrontEndPlanningOptim
              access_token=request_parameters.backend_access_token,
              date_start=request_parameters.date_start.isoformat(timespec="seconds"),
              date_end=request_parameters.date_end.isoformat(timespec="seconds"),
+             selected_users=request_parameters.selected_users,
              key_project_prioritys_projets=request_parameters.key_project_prioritys_projets
         )
     else:
@@ -145,4 +161,3 @@ def handler_demande_planning_optimizer(request_parameters: FrontEndPlanningOptim
         min_duration_section=request_parameters.min_duration_section)
 
     return optimized_plannings
-

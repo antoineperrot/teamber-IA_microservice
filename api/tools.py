@@ -52,4 +52,4 @@ def run_test_inte(test_instance: unittest.TestCase):
             success = False
             msg = str(a)
 
-        print(f"TEST {i + 1} / {len(test_methods)} success : {success} - {test_method} - {msg}")
+        print(f"TEST {i + 1} / {len(test_methods)} success : {success} - {test_method} - {msg}\n")
