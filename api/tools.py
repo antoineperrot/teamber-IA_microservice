@@ -2,7 +2,7 @@
 Tools for the api
 """
 from flask import request, abort
-
+import unittest
 from api.config import config
 from functools import wraps
 
@@ -34,3 +34,22 @@ def api_key_required(func):
         return func(*args, **kwargs)
 
     return wrapper_function
+
+
+def run_test_inte(test_instance: unittest.TestCase):
+    """Run les tests d'intégration"""
+    test_instance.setUp()
+    object_methods = [method_name for method_name in dir(test_instance)
+                      if callable(getattr(test_instance, method_name))]
+
+    test_methods = list(filter(lambda name: name[:5] == "test_", object_methods))
+    for i, test_method in enumerate(test_methods):
+        success = True
+        msg = ""
+        try:
+            exec(f"test.{test_method}()")
+        except AssertionError as a:
+            success = False
+            msg = str(a)
+
+        print(f"TEST {i + 1} / {len(test_methods)} success : {success} - {test_method} - {msg}")
