@@ -25,14 +25,14 @@ def make_sql_requests(sql_queries: dict, url: str, access_token: str) -> dict:
     headers = {"Authorization": f"{access_token}", "Content-Type": "application/json"}
     fetched_data = {}
     for key, sql_query in sql_queries.items():
-        root_logger.info(f"Backend Data Recupération :  récupération de {key}")
-        request = requests.post(url, headers=headers, json=sql_query)
 
+        request = requests.post(url, headers=headers, json=sql_query)
         if request.status_code != 200:
             root_logger.warning(f"Backend Data Recupération :  récupération de {key}, "
                                 f"code erreur requête {request.status_code}")
             raise FailRecuperationBackendDataException(missing_data=key)
         else:
+            root_logger.info(f"Backend Data Recupération :  récupération de {key} - OK")
             fetched_data[key] = request.json()["result"]
 
     return fetched_data
@@ -41,6 +41,4 @@ def make_sql_requests(sql_queries: dict, url: str, access_token: str) -> dict:
 def to_iso_8601(date: datetime.datetime) -> str:
     """Convert to isoformat YYYY-MM-DDTHH:MM:SS.mmmmmmZ"""
     out = date.isoformat()
-    return out[:-3] + "Z"
-
-
+    return out + ".000Z"
