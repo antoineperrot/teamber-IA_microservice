@@ -45,6 +45,16 @@ Test les interfaces avec le back
    ```
 
 
+## BDD
+
+IP de la bdd de dev: 135.125.83.213
+
+Port: 5432
+
+user: wandeed
+
+passwd: vPbuDijpiCTtzHw7vcrQssgxu3dVtjkRQokNP9eSHCfeFFfgVi
+
 
 
 
