@@ -641,8 +641,8 @@ class TestFindSectionsEnds(unittest.TestCase):
 
 class TestComputeAvailabilities(unittest.TestCase):
     def setUp(self):
-        self.date_start = "2022-09-05 09:00:00+0000"
-        self.date_end = "2022-09-09 16:00:00+0000"
+        self.date_start = datetime.datetime(2022, 9, 5, 9, 0, 0) #"2022-09-05 09:00:00+0000"
+        self.date_end = datetime.datetime(2022, 9, 9, 16, 0, 0) #"2022-09-09 16:00:00+0000"
         self.min_duration_section = 0.5
         self.horaires = pd.DataFrame(
             {
@@ -788,8 +788,8 @@ class TestComputeAvailabilities(unittest.TestCase):
         )
 
     def test_compute_availabilities_2(self):
-        date_start = datetime.datetime.fromisoformat("2023-01-16T05:00:00")
-        date_end = datetime.datetime.fromisoformat("2023-01-16T18:01:55")
+        date_start = datetime.datetime(2023, 1, 16, 5, 0, 0) # "2023-01-16T05:00:00"
+        date_end = datetime.datetime(2023, 1, 16, 18, 1, 55) #.fromisoformat("2023-01-16T18:01:55")
         min_duration_section = 0.001
 
         horaires = pd.DataFrame({key_day_plage_horaire: {0: 0, 1: 0, 2: 1, 3: 1, 4: 2, 5: 2, 6: 3, 7: 3, 8: 4},
@@ -833,31 +833,31 @@ class TestComputeAvailabilities(unittest.TestCase):
                                               4: 9006,
                                               5: 9006,
                                               6: 9006},
-                                             key_evenement_date_debut: {0: pd.Timestamp('2023-01-16 07:15:00'),
-                                              1: pd.Timestamp('2023-01-16 07:20:00'),
-                                              2: pd.Timestamp('2023-01-16 08:35:00'),
-                                              3: pd.Timestamp('2023-01-16 09:45:00'),
-                                              4: pd.Timestamp('2023-01-16 10:05:00'),
-                                              5: pd.Timestamp('2023-01-16 12:50:00'),
-                                              6: pd.Timestamp('2023-01-16 17:35:00')},
-                                             key_evenement_date_fin: {0: pd.Timestamp('2023-01-16 07:55:00'),
-                                              1: pd.Timestamp('2023-01-16 07:55:00'),
-                                              2: pd.Timestamp('2023-01-16 09:10:00'),
-                                              3: pd.Timestamp('2023-01-16 10:30:00'),
-                                              4: pd.Timestamp('2023-01-16 10:30:00'),
-                                              5: pd.Timestamp('2023-01-16 13:15:00'),
-                                              6: pd.Timestamp('2023-01-16 18:20:00')}})
+                                             key_evenement_date_debut: {0: pd.Timestamp('2023-01-16 07:15:00', tz="UTC"),
+                                              1: pd.Timestamp('2023-01-16 07:20:00', tz="UTC"),
+                                              2: pd.Timestamp('2023-01-16 08:35:00', tz="UTC"),
+                                              3: pd.Timestamp('2023-01-16 09:45:00', tz="UTC"),
+                                              4: pd.Timestamp('2023-01-16 10:05:00', tz="UTC"),
+                                              5: pd.Timestamp('2023-01-16 12:50:00', tz="UTC"),
+                                              6: pd.Timestamp('2023-01-16 17:35:00', tz="UTC")},
+                                             key_evenement_date_fin: {0: pd.Timestamp('2023-01-16 07:55:00', tz="UTC"),
+                                              1: pd.Timestamp('2023-01-16 07:55:00', tz="UTC"),
+                                              2: pd.Timestamp('2023-01-16 09:10:00', tz="UTC"),
+                                              3: pd.Timestamp('2023-01-16 10:30:00', tz="UTC"),
+                                              4: pd.Timestamp('2023-01-16 10:30:00', tz="UTC"),
+                                              5: pd.Timestamp('2023-01-16 13:15:00', tz="UTC"),
+                                              6: pd.Timestamp('2023-01-16 18:20:00', tz="UTC")}})
 
-        expected_result = pd.DataFrame.from_dict({KEY_TIMESTAMP_DEBUT: {0: pd.Timestamp('2023-01-16 06:30:00'),
-                                                  1: pd.Timestamp('2023-01-16 07:55:00'),
-                                                  2: pd.Timestamp('2023-01-16 09:10:00'),
-                                                  3: pd.Timestamp('2023-01-16 11:30:00'),
-                                                  4: pd.Timestamp('2023-01-16 13:15:00')},
-                                                 KEY_TIMESTAMP_FIN: {0: pd.Timestamp('2023-01-16 07:15:00'),
-                                                  1: pd.Timestamp('2023-01-16 08:35:00'),
-                                                  2: pd.Timestamp('2023-01-16 09:45:00'),
-                                                  3: pd.Timestamp('2023-01-16 12:50:00'),
-                                                  4: pd.Timestamp('2023-01-16 15:30:00')},
+        expected_result = pd.DataFrame.from_dict({KEY_TIMESTAMP_DEBUT: {0: pd.Timestamp('2023-01-16 06:30:00', tz="UTC"),
+                                                  1: pd.Timestamp('2023-01-16 07:55:00', tz="UTC"),
+                                                  2: pd.Timestamp('2023-01-16 09:10:00', tz="UTC"),
+                                                  3: pd.Timestamp('2023-01-16 11:30:00', tz="UTC"),
+                                                  4: pd.Timestamp('2023-01-16 13:15:00', tz="UTC")},
+                                                 KEY_TIMESTAMP_FIN: {0: pd.Timestamp('2023-01-16 07:15:00', tz="UTC"),
+                                                  1: pd.Timestamp('2023-01-16 08:35:00', tz="UTC"),
+                                                  2: pd.Timestamp('2023-01-16 09:45:00', tz="UTC"),
+                                                  3: pd.Timestamp('2023-01-16 12:50:00', tz="UTC"),
+                                                  4: pd.Timestamp('2023-01-16 15:30:00', tz="UTC")},
                                                  KEY_DUREE: {0: 0.75,
                                                   1: 0.6666666666666666,
                                                   2: 0.5833333333333334,
