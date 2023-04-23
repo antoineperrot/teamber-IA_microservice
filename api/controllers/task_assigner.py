@@ -6,6 +6,7 @@ import pandas as pd
 from datetime import datetime
 from werkzeug.exceptions import UnprocessableEntity
 from api.back_connector.task_assigner.task_assigner import fetch_task_assigner_data_to_back
+from api.back_connector.tools import to_iso_8601
 from api.services.task_assigner.lib_task_assigner.tools import ContrainteEtreSurProjet
 from api.services.task_assigner.solver import solveur_task_assigner, SolverCrashException
 from api.services.task_assigner.tests.data_mocker import mock_coherent_data
@@ -21,7 +22,7 @@ class FrontEndTaskAssignerRequestParameters:
                  backend_url: str,
                  date_start: datetime,
                  date_end: datetime,
-                 selected_users: list[int],
+                 selected_users: list[int] | None,
                  curseur: float,
                  contrainte_etre_sur_projet: ContrainteEtreSurProjet,
                  avantage_projet: float):
@@ -31,6 +32,10 @@ class FrontEndTaskAssignerRequestParameters:
         self.date_end = date_end
         self.selected_users = selected_users
         self.curseur = float(curseur)
+
+        self.date_start = self.date_start.replace(second=0, microsecond=0)
+        self.date_end = self.date_end.replace(second=0, microsecond=0)
+
         try:
             self.contrainte_etre_sur_projet = ContrainteEtreSurProjet(contrainte_etre_sur_projet)
         except ValueError:
@@ -87,18 +92,19 @@ class FrontEndTaskAssignerRequestParameters:
         except AssertionError:
             raise UnprocessableEntity(description="'curseur' doit être entre 0 et 1.")
 
-        if not(isinstance(self.selected_users, list)):
-            raise UnprocessableEntity(description="'selected_users' doit être une liste d'entiers (IDs).")
+        if not(isinstance(self.selected_users, (list, type(None)))):
+            raise UnprocessableEntity(description="'selected_users' doit être une liste d'entiers (IDs) ou None.")
 
-        if len(self.selected_users) == 0:
-            raise UnprocessableEntity(description="'selected_users' ne peut pas être une liste vide, veuillez"
-                                                  " indiquer des utilisateurs par leur ID.")
-        for user in self.selected_users:
-            try:
-                if int(user) != user:
+        if isinstance(self.selected_users, list):
+            if len(self.selected_users) == 0:
+                raise UnprocessableEntity(description="'selected_users' ne peut pas être une liste vide, veuillez"
+                                                      " indiquer des utilisateurs par leur ID.")
+            for user in self.selected_users:
+                try:
+                    if int(user) != user:
+                        raise UnprocessableEntity(description="'selected_users' doit être une liste d'entiers (IDs).")
+                except Exception:
                     raise UnprocessableEntity(description="'selected_users' doit être une liste d'entiers (IDs).")
-            except Exception:
-                raise UnprocessableEntity(description="'selected_users' doit être une liste d'entiers (IDs).")
 
 
 def task_assigner_controller(json_file: dict):
@@ -127,6 +133,11 @@ def check_data_consistency(
     if len(df_tsk) == 0:
         raise UnprocessableEntity(description="Pas de tâches à assigner.")
 
+    logger_task_assigner.debug(f"len df_prj: {len(df_prj)}")
+    logger_task_assigner.debug(f"len df_cmp: {len(df_cmp)}")
+    logger_task_assigner.debug(f"len df_tsk: {len(df_tsk)}")
+    logger_task_assigner.debug(f"len df_dsp: {len(df_dsp)}")
+
 
 def handler_demande_task_assigner(request_parameters: FrontEndTaskAssignerRequestParameters):
     """Handler d'une demande de task_assigner. Fonction appelée dans le thread de calcul."""
@@ -135,8 +146,9 @@ def handler_demande_task_assigner(request_parameters: FrontEndTaskAssignerReques
         df_prj, df_cmp, df_tsk, df_dsp = fetch_task_assigner_data_to_back(
             backend_url=request_parameters.backend_url,
             backend_access_token=request_parameters.backend_access_token,
-            date_start=request_parameters.date_start.isoformat(timespec="seconds"),
-            date_end=request_parameters.date_end.isoformat(timespec="seconds"))
+            date_start=to_iso_8601(request_parameters.date_start),
+            date_end=to_iso_8601(request_parameters.date_end),
+            selected_users=request_parameters.selected_users)
 
     else:
         df_prj, df_cmp, df_tsk, df_dsp = mock_coherent_data()
