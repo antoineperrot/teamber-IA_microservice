@@ -39,6 +39,13 @@ def get_tasks_request(date_start: str, date_end: str, selected_users: list[int] 
                     "type": "integer",
                     "value": "none",
                 },
+                {
+                    "label": key_competence,
+                    "field": key_competence,
+                    "operator": "isnotnull",
+                    "type": "integer",
+                    "value": "none",
+                }
             ]}
     }
     if selected_users is not None:
