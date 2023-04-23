@@ -1,6 +1,7 @@
 """
 Configuration of the server
 """
+import os
 from dotenv import dotenv_values
 
 
@@ -13,7 +14,9 @@ class MissingDotenvFieldsException(Exception):
         self.missing_fields = missing_fields
 
 
-config = dotenv_values(".env")
+path_dot_env = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
+
+config = dotenv_values(path_dot_env)
 
 # Check config content
 required_fields = ["FLASK_API_KEY", "MODE"]
