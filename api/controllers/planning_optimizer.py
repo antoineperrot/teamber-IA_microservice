@@ -3,6 +3,8 @@ Module contenant les controllers des données d'entrée de la fonctionnalité pl
 """
 from datetime import datetime
 from werkzeug.exceptions import UnprocessableEntity
+
+from api.back_connector.tools import to_iso_8601
 from api.loggers import logger_planning_optimizer
 from api.back_connector.planning_optimizer import fetch_data_to_wandeed_backend
 from api.services.planning_optimizer import solver_planning_optimizer
@@ -21,7 +23,7 @@ class FrontEndPlanningOptimizerRequestParameters:
                  backend_access_token: str,
                  date_start: datetime,
                  date_end: datetime,
-                 selected_users: list[int],
+                 selected_users: list[int] | None,
                  key_project_prioritys_projets: dict,
                  parts_max_length: float,
                  min_duration_section: float):
@@ -33,6 +35,8 @@ class FrontEndPlanningOptimizerRequestParameters:
         self.key_project_prioritys_projets = key_project_prioritys_projets
         self.parts_max_length = float(parts_max_length)
         self.min_duration_section = float(min_duration_section)
+        self.date_start = self.date_start.replace(second=0, microsecond=0)
+        self.date_end = self.date_end.replace(second=0, microsecond=0)
 
         self._check_values()
 
@@ -61,9 +65,10 @@ class FrontEndPlanningOptimizerRequestParameters:
                                                   "'backend_access_token': str\n"
                                                   "'backend_url': str (URL)\n"
                                                   "'date_start': str (isoformat)\n"
-                                                  "'key_project_prioritys_projets': dict (isoformat)\n"
                                                   "'date_end': str (isoformat)\n"
+                                                  "'key_project_prioritys_projets': dict[int: int] \n"
                                                   "'parts_max_length': float\n"
+                                                  "'selected_users': list[int] OR None\n"
                                                   "'min_duration_section': float\n")
 
         return out
@@ -85,26 +90,27 @@ class FrontEndPlanningOptimizerRequestParameters:
             raise UnprocessableEntity(description="La période de sprint indiquée est trop courte. Minimum 1h.")
         self.key_project_prioritys_projets = self._assert_and_type_mapping_priority_structure()
 
-        if not(isinstance(self.selected_users, list)):
-            raise UnprocessableEntity(description="'selected_users' doit être une liste d'entiers (IDs).")
+        if not(isinstance(self.selected_users, (list, type(None)))):
+            raise UnprocessableEntity(description="'selected_users' doit être une liste d'entiers (IDs) OU None.")
 
-        if len(self.selected_users) == 0:
-            raise UnprocessableEntity(description="'selected_users' ne peut pas être une liste vide, veuillez"
-                                                  " indiquer des utilisateurs par leur ID.")
-        for user in self.selected_users:
-            try:
-                if int(user) != user:
+        if isinstance(self.selected_users, list):
+            if len(self.selected_users) == 0:
+                raise UnprocessableEntity(description="'selected_users' ne peut pas être une liste vide, veuillez"
+                                                      " indiquer des utilisateurs par leur ID.")
+            for user in self.selected_users:
+                try:
+                    if int(user) != user:
+                        raise UnprocessableEntity(description="'selected_users' doit être une liste d'entiers (IDs).")
+                except Exception:
                     raise UnprocessableEntity(description="'selected_users' doit être une liste d'entiers (IDs).")
-            except Exception:
-                raise UnprocessableEntity(description="'selected_users' doit être une liste d'entiers (IDs).")
 
-    def _assert_and_type_mapping_priority_structure(self):
+    def _assert_and_type_mapping_priority_structure(self) -> dict[int: int] | None:
         """Vérifie la validité du dictionnaire de priorités envoyé"""
-        try:
-            self.key_project_prioritys_projets = dict(self.key_project_prioritys_projets)
-        except ValueError:
-            raise ValueError("key_project_prioritys_projets n'a pas le bon format.\nFormat attendu : {int: int}.")
-
+        if not isinstance(self.key_project_prioritys_projets, (dict, type(None))):
+            raise ValueError("key_project_prioritys_projets n'a pas le bon type.\nTypes attendu : dictionnaire {int: int}"
+                             " OU None.")
+        if isinstance(self.key_project_prioritys_projets, type(None)):
+            return None
         for key, value in self.key_project_prioritys_projets.items():
             try:
                 key_float = float(key)
@@ -122,7 +128,7 @@ class FrontEndPlanningOptimizerRequestParameters:
                 raise TypeError(f"key_project_prioritys_projets: la valeur '{value}' n'est pas un entier.")
             self.key_project_prioritys_projets[key] = int(value)
 
-            return self.key_project_prioritys_projets
+        return self.key_project_prioritys_projets
 
 
 def planning_optimizer_controller(json: dict) -> EtatCalcul:
@@ -139,8 +145,8 @@ def handler_demande_planning_optimizer(request_parameters: FrontEndPlanningOptim
         imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires = fetch_data_to_wandeed_backend(
              url=request_parameters.backend_url,
              access_token=request_parameters.backend_access_token,
-             date_start=request_parameters.date_start.isoformat(timespec="seconds"),
-             date_end=request_parameters.date_end.isoformat(timespec="seconds"),
+             date_start=to_iso_8601(request_parameters.date_start),
+             date_end=to_iso_8601(request_parameters.date_end),
              selected_users=request_parameters.selected_users,
              key_project_prioritys_projets=request_parameters.key_project_prioritys_projets
         )
