@@ -2,7 +2,7 @@
 Module de récupération des données auprès du BACK pour la fonctionnalité planning_optimizer.
 """
 import pandas as pd
-
+from werkzeug.exceptions import UnprocessableEntity
 from api.back_connector.planning_optimizer.data_handlers.filtrage import filtre
 from api.back_connector.tools import make_sql_requests
 from api.loggers import logger_planning_optimizer
@@ -14,8 +14,8 @@ def fetch_data_to_wandeed_backend(url: str,
                                   access_token: str,
                                   date_start: str,
                                   date_end: str,
-                                  selected_users: list[int],
-                                  key_project_prioritys_projets: dict) -> tuple[dict[int: pd.DataFrame],
+                                  selected_users: list[int] | None,
+                                  key_project_prioritys_projets: dict | None) -> tuple[dict[int: pd.DataFrame],
                                                                                 dict[int: pd.DataFrame],
                                                                                 dict[int: pd.DataFrame],
                                                                                 list[int]]:
@@ -46,29 +46,52 @@ def fetch_data_to_wandeed_backend(url: str,
         evenement_project       -> projet de rattachement de la tâche
     """
     sql_querys_dict = {
-        MY_KEY_TACHES: get_request_tasks(date_start=date_start, date_end=date_end, selected_users=selected_users),
-        MY_KEY_HORAIRES: get_request_horaires(date_start=date_start, date_end=date_end, selected_users=selected_users),
-        MY_KEY_IMPERATIFS: get_request_imperatifs(date_start=date_start, date_end=date_end, selected_users=selected_users),
+        PO_MY_KEY_TACHES: get_request_tasks(date_start=date_start, date_end=date_end, selected_users=selected_users),
+        PO_MY_KEY_HORAIRES: get_request_horaires(date_start=date_start, date_end=date_end, selected_users=selected_users),
+        PO_MY_KEY_IMPERATIFS: get_request_imperatifs(date_start=date_start, date_end=date_end, selected_users=selected_users),
     }
 
     data = make_sql_requests(sql_querys_dict, url, access_token)
 
+    # premier check des données. check qu'on a au moins une données pour les taches.
+    for required_data_key in PO_REQUIRED_KEYS:
+        if len(data[required_data_key]) == 0:
+            raise UnprocessableEntity(description=PO_missing_data_msg[required_data_key])
+
     # Mise en forme des données
-    df_imp = pd.DataFrame(data[MY_KEY_IMPERATIFS])
-    df_hor = pd.DataFrame(data[MY_KEY_HORAIRES]).reindex(
-        columns=[
-            key_epu_sfkutilisateur,
-            key_debut_periode_horaire_utilisateur,
-            key_fin_periode_horaire_utilisateur,
-            key_epl_employe_horaire,
-        ]
-    )
-    df_hor.epl_xdebutperiode = pd.to_datetime(df_hor.epl_xdebutperiode).dt.date
-    df_hor.epl_xfinperiode = pd.to_datetime(df_hor.epl_xfinperiode).dt.date
-    df_hor = df_hor.sort_values(
-        by=[key_epu_sfkutilisateur, key_debut_periode_horaire_utilisateur]
-    ).reset_index(drop=True)
-    df_tsk = pd.DataFrame(data[MY_KEY_TACHES])
+    df_tsk = pd.DataFrame(data[PO_MY_KEY_TACHES])
+    df_tsk.dropna(inplace=True)
+    if len(df_tsk) == 0:
+        raise UnprocessableEntity(description=PO_missing_data_msg[PO_MY_KEY_TACHES])
+
+    df_tsk[key_evenement_project] = df_tsk[key_evenement_project].astype(int)
+    df_tsk = df_tsk[[key_evenement_project, key_evenement, key_user_po, key_duree_evenement,
+                     key_evenement_date_debut, key_evenement_date_fin]]
+    df_tsk.sort_values(by=[key_evenement_project, key_evenement, key_user_po], inplace=True)
+    df_tsk.reset_index(inplace=True, drop=True)
+
+    df_hor = pd.DataFrame(data[PO_MY_KEY_HORAIRES])
+    if len(df_hor) > 0:
+        df_hor = df_hor.reindex(
+            columns=[
+                key_epu_sfkutilisateur,
+                key_debut_periode_horaire_utilisateur,
+                key_fin_periode_horaire_utilisateur,
+                key_epl_employe_horaire,
+            ]
+        )
+        df_hor.epl_xdebutperiode = pd.to_datetime(df_hor.epl_xdebutperiode).dt.date
+        df_hor.epl_xfinperiode = pd.to_datetime(df_hor.epl_xfinperiode).dt.date
+        df_hor = df_hor.sort_values(
+            by=[key_epu_sfkutilisateur, key_debut_periode_horaire_utilisateur]
+        ).reset_index(drop=True)
+
+    df_imp = pd.DataFrame(data[PO_MY_KEY_IMPERATIFS])
+    if len(df_imp) > 0:
+        df_imp = df_imp[[key_user_po, key_evenement, key_duree_evenement, key_evenement_date_debut, key_evenement_date_fin]]
+        df_imp = df_imp.sort_values(by=[key_user_po, key_evenement])
+        df_imp[key_evenement_date_debut] = pd.to_datetime(df_imp[key_evenement_date_debut])
+        df_imp[key_evenement_date_fin] = pd.to_datetime(df_imp[key_evenement_date_fin])
 
     imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires = filtre(
         df_imp, df_hor, df_tsk, key_project_prioritys_projets

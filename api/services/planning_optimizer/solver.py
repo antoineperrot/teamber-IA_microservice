@@ -30,7 +30,8 @@ def solver_planning_optimizer(
     :param parts_max_length: float (en heures) de la durée maximales des nouvelles tâches
     """
 
-    utilisateurs = set(taches.keys())
+    utilisateurs = list(taches.keys())
+    utilisateurs.sort()
 
     optimized_plannings = {}
     for i, utl in enumerate(utilisateurs):

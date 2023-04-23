@@ -101,15 +101,18 @@ def split_tasks(tasks: pd.DataFrame, parts_max_length: float = 1.0) -> pd.DataFr
         [pd.DataFrame(row[1]).T] * int(row[1][KEY_NUMBER_FILLED_PARTS])
         for row in tasks.iterrows()
     ]
-    filled_rows = pd.concat(flatten_list(filled_rows))
-    filled_rows[KEY_DUREE_PART] = parts_max_length
-
+    flatten_list_filled_rows = flatten_list(filled_rows)
+    if len(flatten_list_filled_rows) > 0:
+        print()
+        filled_rows = pd.concat(flatten_list(filled_rows))
+        filled_rows[KEY_DUREE_PART] = parts_max_length
+    else:
+        filled_rows = pd.DataFrame()
     unfilled_rows = tasks.loc[
         (tasks[KEY_DUREE_PART] > 0) & (tasks[KEY_DUREE_PART] < parts_max_length)
     ]
     tasks_parts = pd.concat([filled_rows, unfilled_rows])
     tasks_parts[key_evenement] = tasks_parts[key_evenement].astype(int)
-    tasks_parts[key_competence] = tasks_parts[key_competence].astype(int)
     tasks_parts[key_evenement_project] = tasks_parts[key_evenement_project].astype(int)
     tasks_parts[KEY_PROJECT_PRIORITY] = tasks_parts[KEY_PROJECT_PRIORITY].astype(int)
     tasks_parts = tasks_parts.drop(columns=[KEY_NUMBER_PARTS, KEY_NUMBER_FILLED_PARTS])
@@ -140,7 +143,7 @@ def make_timeline(availabilities: pd.DataFrame,
         data_imperatifs.append(
             (row[KEY_TIMESTAMP_DEBUT].to_pydatetime(),
              row[KEY_TIMESTAMP_FIN].to_pydatetime(),
-             MY_KEY_IMPERATIFS
+             PO_MY_KEY_IMPERATIFS
              ))
 
     data_work = []
@@ -154,8 +157,8 @@ def make_timeline(availabilities: pd.DataFrame,
 
     data = data_work + data_imperatifs + data_availabilities
 
-    cats = {MY_KEY_IMPERATIFS: 1, KEY_AVAILABILITIES: 2, KEY_WORK: 3}
-    colormapping = {KEY_AVAILABILITIES: "C0", MY_KEY_IMPERATIFS: "C1", KEY_WORK: "C2"}
+    cats = {PO_MY_KEY_IMPERATIFS: 1, KEY_AVAILABILITIES: 2, KEY_WORK: 3}
+    colormapping = {KEY_AVAILABILITIES: "C0", PO_MY_KEY_IMPERATIFS: "C1", KEY_WORK: "C2"}
 
     verts = []
     colors = []
@@ -178,7 +181,7 @@ def make_timeline(availabilities: pd.DataFrame,
     ax.xaxis.set_major_formatter(mdates.AutoDateFormatter(loc))
 
     ax.set_yticks([1, 2, 3])
-    ax.set_yticklabels([MY_KEY_IMPERATIFS, KEY_AVAILABILITIES, KEY_WORK])
+    ax.set_yticklabels([PO_MY_KEY_IMPERATIFS, KEY_AVAILABILITIES, KEY_WORK])
 
     fig.tight_layout()
     return fig

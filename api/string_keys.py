@@ -44,6 +44,25 @@ KEY_NUMBER_FILLED_PARTS = "N_FILLED_PARTS"
 KEY_START = "START"
 KEY_END = "END"
 
-MY_KEY_IMPERATIFS = "IMPERATIFS"
-MY_KEY_HORAIRES = "HORAIRES"
-MY_KEY_TACHES = "TACHES"
+PO_MY_KEY_IMPERATIFS = "IMPERATIFS"
+PO_MY_KEY_HORAIRES = "HORAIRES"
+PO_MY_KEY_TACHES = "TACHES"
+
+PO_REQUIRED_KEYS = [PO_MY_KEY_TACHES]
+
+PO_missing_data_msg = {PO_MY_KEY_TACHES: "Aucune donnée valide récupérée pour les tâches à optimiser. Assurez-vous que sur la période indiquée, il existe bien des tâches faisant référence à des projets."}
+
+TA_MY_KEY_MATRICE_COMPETENCE = "MATRICE_COMPETENCE"
+TA_MY_KEY_DISPOS_UTILISATEURS = "DISPONIBILITES_UTILISATEURS"
+TA_MY_KEY_MATRICE_PROJET = "MATRICE_PROJET"
+TA_MY_KEY_TACHES_A_ASSIGNER = "TACHES_A_ASSIGNER"
+TA_REQUIRED_KEYS = [TA_MY_KEY_MATRICE_PROJET, TA_MY_KEY_MATRICE_COMPETENCE,
+                    TA_MY_KEY_DISPOS_UTILISATEURS, TA_MY_KEY_TACHES_A_ASSIGNER]
+
+TA_missing_data_msg = {TA_MY_KEY_DISPOS_UTILISATEURS: "les disponibilités des utilisateurs.",
+                       TA_MY_KEY_MATRICE_COMPETENCE: "la matrice de compétence est inexistante pour les utilisateurs sélectionnés. Veillez à bien renseigner les niveaux des utilisateurs pour chacune de leurs compétences.",
+                       TA_MY_KEY_TACHES_A_ASSIGNER: "les tâches à assigner. Veillez à ce qu'il y ait bien pour la période sélectionnée, des tâches faisant références à des compétences.",
+                       TA_MY_KEY_MATRICE_PROJET: "la matrice projet. Cette matrice renseigne pour chaque projet la liste des utilisateurs concernée. Veillez à ce que celle-ci soit bien remplie ou relacher la contrainte 'etre_sur_projet' à Faux."}
+
+for key, val in TA_missing_data_msg.items():
+    TA_missing_data_msg[key] = "Aucune donnée valide récupérée pour " + val

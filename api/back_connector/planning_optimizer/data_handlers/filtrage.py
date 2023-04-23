@@ -18,6 +18,7 @@ from api.back_connector.planning_optimizer.data_handlers.taches import (
     map_key_project_prioritys_projets,
 )
 from api.loggers import logger_planning_optimizer
+from api.tools import get_defaults_horaires
 
 
 def filtre(
@@ -41,31 +42,25 @@ def filtre(
 
     logger_planning_optimizer.info("filtrage des données du back.")
 
-    proccessable_users = set(taches.keys()) & set(horaires.keys())
+    all_users = list(taches.keys())
+    all_users.sort()
+    all_users = set(all_users)
+    users_with_horaires = set(all_users) & set(horaires.keys())
     utilisateurs_avec_taches_sans_horaires = list(
-        set(taches.keys()) - proccessable_users
+        set(all_users) - users_with_horaires
     )
 
     for utl in utilisateurs_avec_taches_sans_horaires:
         logger_planning_optimizer.info(
-            f"L'utilisateur {utl} n'a pas d'horaires, impossible d'optimiser ses tâches."
+            f"Mock des horaires de travail de l'utilisateur {utl}"
         )
+        horaires[utl] = get_defaults_horaires()
 
     # puis recoupage
-    for proccessable_user in proccessable_users:
-        if proccessable_user not in imperatifs.keys():
-            imperatifs[proccessable_user] = None
-    imperatifs = {
-        proccessable_user: imperatifs[proccessable_users]
-        for proccessable_user in proccessable_users
-    }
-    taches = {
-        proccessable_user: taches[proccessable_user]
-        for proccessable_user in proccessable_users
-    }
-    horaires = {
-        proccessable_user: horaires[proccessable_user]
-        for proccessable_user in proccessable_users
-    }
+    for user in all_users:
+        if user not in imperatifs.keys():
+            imperatifs[user] = None
+
+    horaires = {key: horaires[key] for key in all_users}
 
     return imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires

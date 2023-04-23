@@ -231,7 +231,7 @@ def make_stats(events: pd.DataFrame, tasks: pd.DataFrame) -> dict[str: dict]:
     stat_tasks[KEY_DUREE_EFFECTUEE] = stat_tasks[key_evenement].map(tache_to_duree)
     stat_tasks.fillna(0, inplace=True)
     stat_tasks[KEY_PCT_COMPLETION] = np.round(stat_tasks[KEY_DUREE_EFFECTUEE] / stat_tasks[key_duree_evenement], 2)
-    stat_tasks = stat_tasks[[key_evenement, key_competence, key_evenement_project,
+    stat_tasks = stat_tasks[[key_evenement, key_user_po, key_evenement_project,
                              KEY_PROJECT_PRIORITY, key_duree_evenement, KEY_DUREE_EFFECTUEE, KEY_PCT_COMPLETION]]
     stat_tasks.sort_values(by=KEY_PCT_COMPLETION, ascending=False)
 

@@ -8,7 +8,6 @@ def get_request_imperatifs(date_start: str, date_end: str, selected_users: Optio
     sql_request = {
             "select": [
                 key_evenement,
-                key_evenement_project,
                 key_duree_evenement,
                 key_user_po,
                 key_evenement_date_debut,

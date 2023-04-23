@@ -62,6 +62,8 @@ def avance_cuseur_temps(curseur_temps: pd.Timestamp,
     hour_ph = int(ph[key_fin_plage_horaire][:2])
     minutes_ph = int(ph[key_fin_plage_horaire][-2:])
     curseur_temps = curseur_temps.replace(hour=hour_ph, minute=minutes_ph, second=0)
+    if curseur_temps.date() == date_end_sprint.date():
+        print() # debug
     curseur_temps = min(curseur_temps, date_end_sprint)
     return curseur_temps
 
@@ -87,7 +89,7 @@ def make_base(
     curseur_temps = date_start
 
     sequence_ph = []
-    # TODO : corriger keys columns ?
+
     while curseur_temps < date_end:
         index_next_ph = find_next_ph(working_times, curseur_temps)
         next_ph = working_times.iloc[index_next_ph]
@@ -99,7 +101,7 @@ def make_base(
             minute=int(next_ph[key_debut_plage_horaire][-2:]),
             second=0,
         )
-        if next_ph_dict[KEY_TIMESTAMP_DEBUT] < date_end:
+        if next_ph_dict[key_day_plage_horaire] == curseur_temps.day_of_week and next_ph_dict[KEY_TIMESTAMP_DEBUT] < date_end:
             sequence_ph.append(pd.DataFrame([next_ph_dict]))
 
     if len(sequence_ph) == 0:
@@ -208,15 +210,15 @@ def compute_availabilities(
     A partir des horaires d'un utilisateur, de ses impératifs (événements non-replanifiables), d'une date de
     début et de fin de sprint, retourne les créneaux sur lesquels l'utilisateur est disponible.
     """
-    if len(imperatifs) == 0:
+    if imperatifs is None or len(imperatifs) == 0:
         availabilities = make_base(working_times=working_times,
                                    date_start=pd.Timestamp(date_start),
                                    date_end=pd.Timestamp(date_end),
                                    min_duration_section=min_duration_section)
     else:
         sections_ends = find_sections_ends(imperatifs=imperatifs,
-                                           date_start=pd.Timestamp(date_start),
-                                           date_end=pd.Timestamp(date_end))
+                                           date_start=pd.Timestamp(date_start).tz_localize("UTC"),
+                                           date_end=pd.Timestamp(date_end).tz_localize("UTC"))
 
         bases = [
             make_base(working_times=working_times,
@@ -226,9 +228,6 @@ def compute_availabilities(
             for (section_start, section_end) in sections_ends.values
         ]
         availabilities = pd.concat(bases)
-
-    if len(availabilities) == 0:
-        raise
 
     availabilities.reset_index(inplace=True, drop=True)
     return availabilities

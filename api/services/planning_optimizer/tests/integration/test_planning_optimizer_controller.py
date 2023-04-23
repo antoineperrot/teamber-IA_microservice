@@ -1,27 +1,38 @@
+from api.models.calcul_cache import cache
+from time import sleep
 from datetime import datetime, timedelta
-from api.controllers.task_assigner import task_assigner_controller,\
-    ContrainteEtreSurProjet
+from api.controllers.planning_optimizer import planning_optimizer_controller
+from api.models import StatutCalculEnum
 from api.tools import TestIntegration, run_test_integration
 
 
-class TaskAssignerControllerTest(TestIntegration):
+class PlanningOptimizerControllerTest(TestIntegration):
     def setUp(self) -> None:
         super().setUp()
 
-    def test__debug_end_to_end(self):
+    def test_debug_end_to_end(self):
         """Ce -test- sert à débugger en allant le plus loin possible à partir d'une requête"""
         json_file = {"backend_access_token": self.access_token,
                       "backend_url": self.url,
-                      "date_start": (datetime.now()).isoformat(),
-                      "date_end": (datetime.now() + timedelta(weeks=2)).isoformat(),
+                      "date_start": (datetime.now() - timedelta(weeks=6)).isoformat(),
+                      "date_end": (datetime.now() + timedelta(weeks=6) + timedelta(days=2)).isoformat(),
                       "selected_users": None,
-                      "contrainte_etre_sur_projet": ContrainteEtreSurProjet.OUI,
-                      "avantage_projet": 1.0,
-                      "curseur": 0}
-        task_assigner_controller(json_file=json_file)
+                      "key_project_prioritys_projets": None,
+                      "parts_max_length": 1,
+                      "min_duration_section": 0.5}
+
+        etat_calcul = planning_optimizer_controller(json=json_file)
+        success = True
+        while etat_calcul.statut in [StatutCalculEnum.IN_PROGRESS]:
+            etat_calcul = cache.get_status(calcul_id=etat_calcul.identifiant)
+            sleep(1)
+        if etat_calcul.statut == StatutCalculEnum.FAIL:
+            success = False
+
+        self.assertTrue(success, msg=f"Echec du test {etat_calcul.message}")
 
 
-test = TaskAssignerControllerTest()
+test = PlanningOptimizerControllerTest()
 test.setUp()
 if test.commandline:
     run_test_integration(test_integration=test)
