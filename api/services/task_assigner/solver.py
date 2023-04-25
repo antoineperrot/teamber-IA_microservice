@@ -1,6 +1,7 @@
 """
 Module du solveur de task assigner
 """
+import unittest
 import numpy as np
 import pandas as pd
 from scipy.optimize import linprog
@@ -30,6 +31,7 @@ from api.services.task_assigner.lib_task_assigner.tools.problem_formulation impo
     make_matrix_a_and_b,
     make_arcs_and_cost_func,
 )
+from api.string_keys import *
 
 
 class SolverCrashException(Exception):
@@ -152,6 +154,10 @@ def solveur_task_assigner(
         b=b,
         cost_func=cost_func
     )
+    # vérif validité solution :
+    test = unittest.TestCase()
+    test.assertAlmostEqual(solution_vector.sum(), df_dsp[key_user_dispo].sum())
+    test.assertAlmostEqual(solution_vector[:n_arcs].sum(), df_tsk[key_duree_evenement].sum())
 
     logger_task_assigner.debug("MISE EN FORME DE LA SOLUTION DANS UN DATAFRAME PANDAS")
     df_out = make_output_dataframe(

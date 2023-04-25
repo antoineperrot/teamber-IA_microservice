@@ -23,6 +23,11 @@ def make_stat_cmp(df_out: pd.DataFrame) -> pd.DataFrame:
     stat_cmp["total_h_non_assignees"] = stat_cmp["total_h_non_assignees"].fillna(0)
     stat_cmp.sort_values("total_h_non_assignees", ascending=False, inplace=True)
     stat_cmp.reset_index(inplace=True)
+
+
+    assert(all(stat_cmp["total_h_non_assignees"].values >= 0))
+    assert all(stat_cmp["niveau_cmp_moyen_par_h_realisee"].values >= 0)
+    assert all(stat_cmp["niveau_cmp_moyen_par_h_realisee"].values <= 3)
     return stat_cmp
 
 
@@ -55,6 +60,12 @@ def make_stat_utl(
         stat_utl["total_h_assignees"] / stat_utl["dsp_utl"], 2
     )
     stat_utl = stat_utl.reset_index().drop("utl_int", axis=1)
+
+    assert all(stat_utl["niveau_moyen_execution_tsk"] >= 0)
+    assert all(stat_utl["niveau_moyen_execution_tsk"] <= 3)
+    assert all(stat_utl["total_h_assignees"].values <= stat_utl["dsp_utl"].values)
+    assert all(stat_utl["taux_occupation"] <= 1)
+    assert all(stat_utl["taux_occupation"] >= 0)
     return stat_utl
 
 
@@ -91,6 +102,10 @@ def make_stat_tsk(
     stat_tsk.sort_values(by="pct_assignation_tache", inplace=True)
     stat_tsk.rename(mapper={"index": "tsk"}, axis=1, inplace=True)
     stat_tsk.reset_index(inplace=True, drop=True)
+
+    assert all(stat_tsk["pct_assignation_tache"] >= 0)
+    assert all(stat_tsk["pct_assignation_tache"] <= 100)
+    assert all(stat_tsk["n_utl_per_tsk"] >= 0)
     return stat_tsk
 
 
@@ -115,5 +130,7 @@ def make_stat_prj(df_out: pd.DataFrame) -> pd.DataFrame:
         stat_prj["n_missing_cmp_per_prj"].fillna(0).astype(int)
     )
     stat_prj.sort_values("total_h_non_assignees", ascending=False, inplace=True)
-    stat_prj.reset_index(inplace=True)
+    stat_prj.reset_index(inplace=True, drop=True)
+    assert all(stat_prj["n_missing_cmp_per_prj"] >= 0)
+    assert all(stat_prj["total_h_non_assignees"] >= 0)
     return stat_prj
