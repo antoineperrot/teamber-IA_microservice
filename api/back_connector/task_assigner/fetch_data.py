@@ -52,6 +52,8 @@ def fetch_task_assigner_data_to_back(backend_url: str,
         .reset_index(drop=True)
         .astype(int)
     )
+    if len(df_cmp) == 0:
+        raise UnprocessableEntity(description="Il n'existe aucun utilisateur compétent pour les tâches requises")
     df_cmp = df_cmp[[key_emc_sfkutilisateur, key_emc_sfkarticle, key_emc_sniveau]]
     df_cmp.sort_values(by=[key_emc_sfkutilisateur, key_emc_sfkarticle, key_emc_sniveau], inplace=True)
     df_cmp.reset_index(inplace=True, drop=True)
@@ -97,6 +99,8 @@ def fetch_task_assigner_data_to_back(backend_url: str,
         request_name=TA_MY_KEY_DISPOS_UTILISATEURS)
 
     df_dsp = DataFrame(data_dsp)
+    if len(df_dsp) == 0:
+        raise UnprocessableEntity(description="Aucune donnée sur la disponibilité des utlisateurs n'a pu être récupérée")
     df_dsp.sort_values(by=[key_user])
     df_dsp.reset_index(inplace=True, drop=True)
 

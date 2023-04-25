@@ -16,8 +16,8 @@ class TaskAssignerControllerTest(TestIntegration):
         """Ce -test- sert à débugger en allant le plus loin possible à partir d'une requête"""
         json_file = {"backend_access_token": self.access_token,
                       "backend_url": self.url,
-                      "date_start": (datetime.now() - timedelta(weeks=52)).isoformat(),
-                      "date_end": (datetime.now() - timedelta(weeks=4)).isoformat(),
+                      "date_start": (datetime.now() - timedelta(weeks=30)).isoformat(),
+                      "date_end": (datetime.now() + timedelta(weeks=16)).isoformat(),
                       "selected_users": None,
                       "contrainte_etre_sur_projet": ContrainteEtreSurProjet.NON,
                       "avantage_projet": 1.0,
