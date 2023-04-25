@@ -49,7 +49,7 @@ def solveur_task_assigner(
     curseur: float,
     contrainte_etre_sur_projet: ContrainteEtreSurProjet,
     avantage_projet: float,
-):
+) -> dict:
     """ Solveur de la fonctionnalité de task assigner """
     logger_task_assigner.info("Lancement du solveur")
 
@@ -147,7 +147,7 @@ def solveur_task_assigner(
                                       arcs=arcs)
 
     logger_task_assigner.debug("RESOLUTION DU PROBLEME DE PROGRAMMATION LINEAIRE")
-    solution_vector, outcome, method = solve_linear_programmation_problem(
+    solution_vector, outcome, method = solve_linear_programation_problem(
         matrix_a=matrix_a,
         b=b,
         cost_func=cost_func
@@ -203,7 +203,7 @@ def solveur_task_assigner(
     return solution
 
 
-def solve_linear_programmation_problem(
+def solve_linear_programation_problem(
     matrix_a: np.ndarray, b: np.ndarray, cost_func: np.ndarray
 ) -> tuple[np.ndarray, str, str]:
     """

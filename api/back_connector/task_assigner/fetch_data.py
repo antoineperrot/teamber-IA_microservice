@@ -68,8 +68,9 @@ def fetch_task_assigner_data_to_back(backend_url: str,
     df_cmp.reset_index(drop=True, inplace=True)
 
     # raffinage du df_tsk
-    undoable_tasks = df_tsk.loc[~df_tsk[key_competence].isin(competences_requises)]
-    df_tsk = df_tsk.loc[df_tsk[key_competence].isin(competences_requises)] # doable tasks
+    doable_tasks_index = df_tsk[key_competence].isin(competences_requises_with_candidate_users)
+    undoable_tasks = df_tsk.loc[~doable_tasks_index]
+    df_tsk = df_tsk.loc[doable_tasks_index] # doable tasks
 
     if len(df_tsk) == 0:
         raise UnprocessableEntity(description="Aucun utilisateur n'est compétent pour réaliser les tâches demandées. "

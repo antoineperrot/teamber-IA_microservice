@@ -13,6 +13,7 @@ from api.services.task_assigner.tests.data_mocker import mock_coherent_data
 from api.models import cache
 from api.loggers import logger_task_assigner
 from api.config import config
+from api.string_keys import *
 
 
 class FrontEndTaskAssignerRequestParameters:
@@ -152,6 +153,7 @@ def handler_demande_task_assigner(request_parameters: FrontEndTaskAssignerReques
 
     else:
         df_prj, df_cmp, df_tsk, df_dsp = mock_coherent_data()
+        undoable_tasks = None
 
     check_data_consistency(df_prj, df_cmp, df_tsk, df_dsp)
 
@@ -166,6 +168,9 @@ def handler_demande_task_assigner(request_parameters: FrontEndTaskAssignerReques
             contrainte_etre_sur_projet=request_parameters.contrainte_etre_sur_projet,
             avantage_projet=request_parameters.avantage_projet,
         )
+        if undoable_tasks is not None:
+            solution["unfeasible_tasks"] = {"ids": list(undoable_tasks[key_evenement].values),
+                                            "message": "Ces taches ne sont pas assignables car aucun utilisateur n'est compétent pour les réaliser. Veuillez bien renseigner les compétences des utilisateurs."}
         return solution
 
     except Exception as e:
