@@ -40,5 +40,6 @@ def make_sql_requests(sql_queries: dict, url: str, access_token: str) -> dict:
 
 def to_iso_8601(date: datetime.datetime) -> str:
     """Convert to isoformat YYYY-MM-DDTHH:MM:SS.mmmmmmZ"""
+    date = date.replace(second=0, microsecond=0)
     out = date.isoformat()
     return out + ".000Z"
