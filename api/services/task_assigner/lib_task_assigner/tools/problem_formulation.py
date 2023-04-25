@@ -30,7 +30,7 @@ def make_arcs_and_cost_func(
             lvl = mat_cmp[cmp, utl]
             score_cpr = mat_cpr[cmp, utl]  # score compromis
             utl_on_prj = mat_prj[prj, utl]
-            if lvl >= 0:
+            if score_cpr > 0:
                 if (
                     contrainte_etre_sur_projet == ContrainteEtreSurProjet.OUI
                     and utl_on_prj
@@ -91,4 +91,4 @@ def make_matrix_a_and_b(
         matrix_a[n_tsk + utl, n_arcs + utl] = 1  # variable d'écart (slack variable)
         b[n_tsk + utl] = mapping_utl_to_dsp[utl]
 
-    return matrix_a, b
+    return matrix_a.astype(int), b

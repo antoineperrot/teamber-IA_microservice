@@ -62,8 +62,6 @@ def avance_cuseur_temps(curseur_temps: pd.Timestamp,
     hour_ph = int(ph[key_fin_plage_horaire][:2])
     minutes_ph = int(ph[key_fin_plage_horaire][-2:])
     curseur_temps = curseur_temps.replace(hour=hour_ph, minute=minutes_ph, second=0)
-    if curseur_temps.date() == date_end_sprint.date():
-        print() # debug
     curseur_temps = min(curseur_temps, date_end_sprint)
     return curseur_temps
 

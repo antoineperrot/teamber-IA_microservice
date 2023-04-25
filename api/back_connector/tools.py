@@ -16,25 +16,29 @@ class FailRecuperationBackendDataException(Exception):
         return self.msg
 
 
+def make_sql_request(request_name: str, sql_query: dict, url: str, access_token: str) -> dict:
+    headers = {"Authorization": f"{access_token}", "Content-Type": "application/json"}
+    request = requests.post(url, headers=headers, json=sql_query)
+    if request.status_code != 200:
+        root_logger.warning(f"Backend Data Recupération :  récupération de {request_name}, "
+                            f"code erreur requête {request.status_code}")
+        raise FailRecuperationBackendDataException(missing_data=request_name)
+    else:
+        root_logger.info(f"Backend Data Recupération :  récupération de {request_name} - OK")
+
+    return request.json()["result"]
+
+
 def make_sql_requests(sql_queries: dict, url: str, access_token: str) -> dict:
     """
     :param sql_queries: dictionnaire de la forme {nom_requete: requete_sql}
     :param url: url de la base de données du back
     :param access_token: token d'accès à la base de données du back
     """
-    headers = {"Authorization": f"{access_token}", "Content-Type": "application/json"}
+
     fetched_data = {}
     for key, sql_query in sql_queries.items():
-
-        request = requests.post(url, headers=headers, json=sql_query)
-        if request.status_code != 200:
-            root_logger.warning(f"Backend Data Recupération :  récupération de {key}, "
-                                f"code erreur requête {request.status_code}")
-            raise FailRecuperationBackendDataException(missing_data=key)
-        else:
-            root_logger.info(f"Backend Data Recupération :  récupération de {key} - OK")
-            fetched_data[key] = request.json()["result"]
-
+        fetched_data[key] = make_sql_request(request_name=key, sql_query=sql_query, url=url, access_token=access_token)
     return fetched_data
 
 

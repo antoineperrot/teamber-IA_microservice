@@ -1,8 +1,10 @@
 """Request builder for tasks in Task Assigner"""
+from api.services.task_assigner.lib_task_assigner.tools import ContrainteEtreSurProjet
 from api.string_keys import *
 
 
-def get_tasks_request(date_start: str, date_end: str, selected_users: list[int] | None = None):
+def get_tasks_request(date_start: str, date_end: str,
+                      selected_users: list[int] | None = None):
     """Request builder for tasks in Task Assigner"""
 
     sql_request = {"select": [
@@ -45,9 +47,17 @@ def get_tasks_request(date_start: str, date_end: str, selected_users: list[int] 
                     "operator": "isnotnull",
                     "type": "integer",
                     "value": "none",
+                },
+                {
+                    "label": key_evenement_project,
+                    "field": key_evenement_project,
+                    "operator": "isnotnull",
+                    "type": "integer",
+                    "value": "None"
                 }
             ]}
     }
+
     if selected_users is not None:
         sql_request["where"] = {"condition": "and",
                                 "rules": []}

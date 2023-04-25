@@ -9,11 +9,11 @@ def make_mat_prj(df_prj: pd.DataFrame, n_prj: int, n_utl: int) -> np.ndarray:
     FABRICATION MATRICE PROJET
     """
     # construction d'un dictionnaire qui contient, pour chaque prjet, la liste des utilisateurs en faisant parti.
-    d_prj_to_utl = df_prj.groupby("prj")["utl"].apply(np.sort).to_dict()
+    d_prj_to_utl = df_prj.groupby("prj")["utl"].apply(np.unique).apply(sorted).to_dict()
 
     # REMPLISSAGE MATRICE PROJET :
     mat_prj = np.zeros((n_prj, n_utl)).astype(int)
-    for prj in range(n_prj):
+    for prj in d_prj_to_utl.keys():
         for utl in d_prj_to_utl[prj]:
             mat_prj[prj, utl] = 1
 

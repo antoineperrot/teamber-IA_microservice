@@ -1,8 +1,9 @@
-from api.models.calcul_cache import cache
-from time import sleep
 from datetime import datetime, timedelta
+from time import sleep
+
 from api.controllers.planning_optimizer import planning_optimizer_controller
 from api.models import StatutCalculEnum
+from api.models.calcul_cache import cache
 from api.tools import TestIntegration, run_test_integration
 
 

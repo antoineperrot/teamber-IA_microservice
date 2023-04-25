@@ -5,7 +5,7 @@ import pandas as pd
 
 from datetime import datetime
 from werkzeug.exceptions import UnprocessableEntity
-from api.back_connector.task_assigner.task_assigner import fetch_task_assigner_data_to_back
+from api.back_connector.task_assigner.fetch_data import fetch_task_assigner_data_to_back
 from api.back_connector.tools import to_iso_8601
 from api.services.task_assigner.lib_task_assigner.tools import ContrainteEtreSurProjet
 from api.services.task_assigner.solver import solveur_task_assigner, SolverCrashException
@@ -143,7 +143,7 @@ def handler_demande_task_assigner(request_parameters: FrontEndTaskAssignerReques
     """Handler d'une demande de task_assigner. Fonction appelée dans le thread de calcul."""
 
     if config["MODE"] == "PRODUCTION":
-        df_prj, df_cmp, df_tsk, df_dsp = fetch_task_assigner_data_to_back(
+        df_prj, df_cmp, df_tsk, df_dsp, undoable_tasks = fetch_task_assigner_data_to_back(
             backend_url=request_parameters.backend_url,
             backend_access_token=request_parameters.backend_access_token,
             date_start=to_iso_8601(request_parameters.date_start),
