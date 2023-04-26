@@ -1,10 +1,7 @@
 """Module des tools du solveur de planning optimizer"""
 import numpy as np
+import plotly.express as px
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-from matplotlib.collections import PolyCollection
-
 from api.services.task_assigner.lib_task_assigner.tools.id_remapping import flatten_list
 from api.string_keys import *
 
@@ -128,60 +125,37 @@ def make_timeline(availabilities: pd.DataFrame,
     """
     Dessine la timeline des événements planifiées, des disponibilités de travail et des impératifs.
     """
-    data_availabilities = []
 
-    for i, row in availabilities.iterrows():
-        data_availabilities.append(
-            (row[KEY_TIMESTAMP_DEBUT].to_pydatetime(),
-             row[KEY_TIMESTAMP_FIN].to_pydatetime(),
-             KEY_AVAILABILITIES
-             ))
+    if imperatifs is None:
+        task_imperatifs = []
+        start_imperatifs = []
+        end_imperatifs = []
+    else:
+        task_imperatifs = ["Imperatifs"] * len(imperatifs)
+        start_imperatifs = imperatifs[key_evenement_date_debut].to_list()
+        end_imperatifs = imperatifs[key_evenement_date_fin].to_list()
 
-    data_imperatifs = []
+    # create some sample data
+    data = {
+        'Task': task_imperatifs + ['Availabilities'] * len(availabilities) + ["Optimized tasks"] * len(
+            events),
+        'Start': start_imperatifs + availabilities[KEY_TIMESTAMP_DEBUT].to_list() + events[KEY_START].to_list(),
+        'Finish': end_imperatifs + availabilities[KEY_TIMESTAMP_FIN].to_list() + events[
+            KEY_END].to_list()
+    }
+    df = pd.DataFrame(data)
 
-    for i, row in imperatifs.iterrows():
-        data_imperatifs.append(
-            (row[KEY_TIMESTAMP_DEBUT].to_pydatetime(),
-             row[KEY_TIMESTAMP_FIN].to_pydatetime(),
-             PO_MY_KEY_IMPERATIFS
-             ))
+    # create the timeline using plotly express
+    fig = px.timeline(df, x_start='Start', x_end='Finish', y='Task', color='Task')
+    fig.update_traces(marker_color='green', selector=dict(name='Imperatifs'))
 
-    data_work = []
+    # update the layout
+    fig.update_layout(
+        title='My Timeline',
+        xaxis_title='Date',
+        yaxis_title='Task',
+        height=300
+    )
 
-    for i, row in events.iterrows():
-        data_work.append(
-            (row[KEY_TIMESTAMP_DEBUT].to_pydatetime(),
-             row[KEY_TIMESTAMP_FIN].to_pydatetime(),
-             KEY_WORK
-             ))
-
-    data = data_work + data_imperatifs + data_availabilities
-
-    cats = {PO_MY_KEY_IMPERATIFS: 1, KEY_AVAILABILITIES: 2, KEY_WORK: 3}
-    colormapping = {KEY_AVAILABILITIES: "C0", PO_MY_KEY_IMPERATIFS: "C1", KEY_WORK: "C2"}
-
-    verts = []
-    colors = []
-    for d in data:
-        v = [(mdates.date2num(d[0]), cats[d[2]] - .4),
-             (mdates.date2num(d[0]), cats[d[2]] + .4),
-             (mdates.date2num(d[1]), cats[d[2]] + .4),
-             (mdates.date2num(d[1]), cats[d[2]] - .4),
-             (mdates.date2num(d[0]), cats[d[2]] - .4)]
-        verts.append(v)
-        colors.append(colormapping[d[2]])
-
-    bars = PolyCollection(verts, facecolors=colors)
-
-    fig, ax = plt.subplots(figsize=(14, 3))
-    ax.add_collection(bars)
-    ax.autoscale()
-    loc = mdates.MinuteLocator(byminute=[0, 15, 30, 45])
-    ax.xaxis.set_major_locator(loc)
-    ax.xaxis.set_major_formatter(mdates.AutoDateFormatter(loc))
-
-    ax.set_yticks([1, 2, 3])
-    ax.set_yticklabels([PO_MY_KEY_IMPERATIFS, KEY_AVAILABILITIES, KEY_WORK])
-
-    fig.tight_layout()
-    return fig
+    # show the figure
+    fig.show()

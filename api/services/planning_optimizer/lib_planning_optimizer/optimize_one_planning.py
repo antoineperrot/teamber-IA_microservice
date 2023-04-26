@@ -4,13 +4,14 @@ Module d'optimisation.
 import datetime
 import pandas as pd
 
+from api.config import config
 from api.services.planning_optimizer.lib_planning_optimizer.planning.horaires import (
     compute_availabilities, NoAvailabilitiesException
 )
 from api.services.planning_optimizer.lib_planning_optimizer.planning.planning import (
     SimulatedAnnealingPlanningOptimizer,
 )
-from api.services.planning_optimizer.lib_planning_optimizer.tools import split_tasks
+from api.services.planning_optimizer.lib_planning_optimizer.tools import split_tasks, make_timeline
 from api.services.planning_optimizer.lib_planning_optimizer import ResultatCalcul
 from api.services.planning_optimizer.lib_planning_optimizer.planning.solution_interpreter import make_stats
 from api.string_keys import *
@@ -55,4 +56,7 @@ def optimize_one_planning(
     events = events[keys]
 
     out = ResultatCalcul(success=True, events=events, stats=stats)
+
+    if bool(config["TEST_MODE"]):
+        make_timeline(availabilities=availabilities, events=events, imperatifs=imperatifs)
     return out
