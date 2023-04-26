@@ -1,12 +1,17 @@
 """
 Module for custom encoder
 """
+import json
 from datetime import datetime
-from pandas import DataFrame, Timestamp
-from flask.json import JSONEncoder
-from api.services.planning_optimizer.lib_planning_optimizer import ResultatCalcul
-from api.models import EtatCalcul, StatutCalculEnum
+from json import JSONEncoder
 from json import loads
+
+from flask.json import JSONEncoder
+from flask.json.provider import JSONProvider
+from pandas import DataFrame, Timestamp
+
+from api.models import EtatCalcul, StatutCalculEnum
+from api.services.planning_optimizer.lib_planning_optimizer import ResultatCalcul
 
 
 class CustomJsonEncoder(JSONEncoder):
@@ -31,3 +36,16 @@ class CustomJsonEncoder(JSONEncoder):
 
         # default, if not one of the specified object. Caller's problem if this is not serializable.
         return JSONEncoder.default(self, o)
+
+
+class CustomJsonProvider(JSONProvider):
+    """
+    Custom json provider class
+    """
+
+    def dumps(self, obj, **kwargs):
+        kwargs["cls"] = CustomJsonEncoder
+        return json.dumps(obj, **kwargs)
+
+    def loads(self, s: str | bytes, **kwargs):
+        return json.loads(s, **kwargs)

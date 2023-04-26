@@ -8,7 +8,7 @@ from flask import Flask, jsonify, session, request
 from api.loggers import root_logger
 from werkzeug.exceptions import HTTPException
 from api.config import config
-from api.custom_json_encoder import CustomJsonEncoder
+from api.custom_json_encoder import CustomJsonProvider
 from api.routes.task_assigner import bp_task_assigner
 from api.routes.planning_optimizer import bp_planning_optimizer
 from api.routes.get_etat import bp_get_etat
@@ -20,7 +20,8 @@ REQUEST_RECEIVED_TIME = "request_received_time"
 app = Flask("API")
 app.config["SECRET_KEY"] = config["FLASK_API_KEY"]
 app.config["MODE"] = config["MODE"]
-app.json_encoder = CustomJsonEncoder
+app.json_provider_class = CustomJsonProvider
+app.json = CustomJsonProvider(app)
 app.logger.setLevel(logging.DEBUG)
 app.register_blueprint(bp_task_assigner)
 app.register_blueprint(bp_planning_optimizer)
@@ -35,7 +36,7 @@ def errorhandler(error):
     """
     app.logger.error(error)
 
-    app.logger.error("error traceback:\n" + traceback.format_exc())
+    root_logger.error("error traceback:\n" + traceback.format_exc())
     if isinstance(error, HTTPException):
         return (
             jsonify(
@@ -85,7 +86,4 @@ def after_request(response):
 
 
 if __name__ == "__main__":
-    app.logger.info("Routes are imported")
-    app.run(host=config["FLASK_HOST"],
-            port=config["FLASK_PORT"],
-            debug=config["FLASK_DEBUG"])
+    app.run(host=config["FLASK_HOST"], port=config["FLASK_PORT"], debug=bool(config["FLASK_DEBUG"]))
