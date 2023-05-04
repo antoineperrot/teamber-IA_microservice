@@ -68,6 +68,7 @@ def fetch_data_to_wandeed_backend(url: str,
     df_tsk = df_tsk[[key_evenement_project, key_evenement, key_user_po, key_duree_evenement,
                      key_evenement_date_debut, key_evenement_date_fin]]
     df_tsk.sort_values(by=[key_evenement_project, key_evenement, key_user_po], inplace=True)
+    df_tsk.drop_duplicates(inplace=True)
     df_tsk.reset_index(inplace=True, drop=True)
 
     df_hor = pd.DataFrame(data[PO_MY_KEY_HORAIRES])

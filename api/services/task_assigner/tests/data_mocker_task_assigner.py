@@ -1,7 +1,7 @@
 """
 Fonctions pour générer des données aléatoires.
 """
-from random import choices
+from random import choices, choice
 
 import numpy as np
 import pandas as pd
@@ -112,8 +112,8 @@ def mock_coherent_data() -> tuple[
                     {
                         key_duree_evenement: [duree],
                         key_evenement: [tsk],
-                        key_competence: [choices(ids_cmp)[0]],
-                        key_evenement_project: [choices(ids_prj)[0]],
+                        key_competence: [choice(ids_cmp)],
+                        key_evenement_project: [choice(ids_prj)],
                     },
                 ),
             ],

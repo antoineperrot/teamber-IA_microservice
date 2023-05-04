@@ -11,11 +11,6 @@ from api.services.planning_optimizer.lib_planning_optimizer.planning.ordonnancem
 from api.string_keys import *
 
 
-# ma clé locale pour ce fichier
-KEY_DUREE_EFFECTUEE = "DUREE_EFFECTUEE"
-KEY_PCT_COMPLETION = "PERCENT_COMPLETION"
-
-
 def get_next_part(i_current_part: int, parts: pd.DataFrame) -> int:
     """
     :param i_current_part: index de la ligne courante dans le dataframe
@@ -211,7 +206,7 @@ def schedule_events(
     return scheduled_parts, events
 
 
-def make_stats(events: pd.DataFrame, tasks: pd.DataFrame) -> dict[str: dict]:
+def make_stats(events: pd.DataFrame, tasks: pd.DataFrame, availabilities: pd.DataFrame) -> dict[str: dict]:
     """
     Fourni un pourcentage de planification des tâches, à partir de ce qui a pu être planifié, et des
     tâches que l"on souhaitait initialiement planifier de manière optimale dans la période de sprint.
@@ -242,5 +237,15 @@ def make_stats(events: pd.DataFrame, tasks: pd.DataFrame) -> dict[str: dict]:
                                                           stat_projects[key_duree_evenement], 2)
     stat_projects = stat_projects.reset_index()
 
-    stats = {"tasks": stat_tasks.to_dict(), "projects": stat_projects.to_dict()}
+    assert all(stat_projects["projet_percent_completion"] <= 1)
+    assert all(stat_projects["projet_percent_completion"] >= 0)
+
+    assert all(stat_tasks["KEY_PCT_COMPLETION"] <= 1)
+    assert all(stat_tasks["KEY_PCT_COMPLETION"] >= 0)
+
+    stats = {"tasks": stat_tasks,
+             "projects": stat_projects,
+             "total_working_time": stat_tasks[KEY_DUREE_EFFECTUEE].sum(),
+             "total_available_time": availabilities[KEY_DUREE].sum()}
+
     return stats

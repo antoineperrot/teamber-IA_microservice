@@ -25,6 +25,7 @@ def optimize_one_planning(
     date_end: datetime.datetime,
     parts_max_length: float,
     min_duration_section: float,
+    utilisateur_id: int,
     save_optimization_statistics: bool = False,
 ) -> ResultatCalcul:
     """
@@ -50,13 +51,14 @@ def optimize_one_planning(
 
     optimizer.optimize(n_iterations_per_task=250)
     events, ordonnancement = optimizer.schedule_events()
-    stats = make_stats(events, taches)
+    stats = make_stats(events=events, tasks=taches, availabilities=availabilities)
     events = events.drop(KEY_ID_PART, axis="columns")
     keys = [key_evenement, key_evenement_project, KEY_PROJECT_PRIORITY, KEY_START, KEY_END]
     events = events[keys]
 
     out = ResultatCalcul(success=True, events=events, stats=stats)
 
-    if bool(config["TEST_MODE"]):
-        make_timeline(availabilities=availabilities, events=events, imperatifs=imperatifs)
+    if bool(int(config["TEST_MODE"])):
+        make_timeline(
+            availabilities=availabilities, events=events, imperatifs=imperatifs, utilisateur_id=utilisateur_id)
     return out

@@ -1,7 +1,7 @@
 """Route du service task_assigner"""
 from flask import jsonify, request, make_response, Blueprint
 
-from api.controllers.task_assigner import task_assigner_controller
+from api.controllers.task_assigner_controller import task_assigner_controller
 from api.tools import api_key_required
 
 

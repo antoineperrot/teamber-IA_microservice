@@ -121,7 +121,8 @@ def split_tasks(tasks: pd.DataFrame, parts_max_length: float = 1.0) -> pd.DataFr
 
 def make_timeline(availabilities: pd.DataFrame,
                   events: pd.DataFrame,
-                  imperatifs: pd.DataFrame):
+                  imperatifs: pd.DataFrame,
+                  utilisateur_id: int):
     """
     Dessine la timeline des événements planifiées, des disponibilités de travail et des impératifs.
     """
@@ -151,7 +152,7 @@ def make_timeline(availabilities: pd.DataFrame,
 
     # update the layout
     fig.update_layout(
-        title='My Timeline',
+        title=f'Timeline sprint utilisateur {utilisateur_id}',
         xaxis_title='Date',
         yaxis_title='Task',
         height=300

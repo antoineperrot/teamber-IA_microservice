@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from time import sleep
 
-from api.controllers.task_assigner import task_assigner_controller, \
+from api.controllers.task_assigner_controller import task_assigner_controller, \
     ContrainteEtreSurProjet
 from api.models import StatutCalculEnum
 from api.models.calcul_cache import cache

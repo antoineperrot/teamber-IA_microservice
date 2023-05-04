@@ -2,10 +2,37 @@
 Fonction d'optimisation des plannings
 """
 import datetime
+
+import pandas as pd
+from numpy import round
 from pandas import DataFrame
 from api.loggers import logger_planning_optimizer
 from api.services.planning_optimizer.lib_planning_optimizer import optimize_one_planning,\
     NoAvailabilitiesException, ResultatCalcul
+from api.string_keys import *
+
+
+def make_global_stats(stats_users: list[DataFrame]):
+    """Statistiques globales sur les projets"""
+    df_projects = [utl_stats["projects"] for utl_stats in stats_users]
+    df_all = pd.concat(df_projects, ignore_index=True)
+
+    # we can then group the dataframe by "project" and sum the "length" column
+    stats_by_project = df_all.groupby(key_evenement_project).agg({KEY_DUREE_EFFECTUEE: "sum", key_duree_evenement: "sum"})
+    stats_by_project["pct_completion"] = round(stats_by_project[KEY_DUREE_EFFECTUEE] / stats_by_project[key_duree_evenement], 2)
+    total_worked_time = round(sum([utl_stats["total_working_time"] for utl_stats in stats_users]), 2)
+    total_available_time = round(sum([utl_stats["total_available_time"] for utl_stats in stats_users]), 2)
+    worked_time_percent = round(total_worked_time / total_available_time, 2)
+    stats_users = {"project": stats_by_project,
+                   "total_worked_time": total_worked_time,
+                   "total_available_time": total_available_time,
+                   "worked_time_percent": worked_time_percent}
+    assert all(stats_by_project["pct_completion"] <= 1)
+    assert all(stats_by_project["pct_completion"] >= 0)
+    assert worked_time_percent >= 0
+    assert worked_time_percent <= 1
+    # print the resulting dataframe
+    return stats_users
 
 
 def solver_planning_optimizer(
@@ -34,10 +61,11 @@ def solver_planning_optimizer(
     utilisateurs.sort()
 
     optimized_plannings = {}
+    users_stats = []
     for i, utl in enumerate(utilisateurs):
         int_utl = int(utl)
         try:
-            optimized_plannings[int_utl] = optimize_one_planning(
+            resultat = optimize_one_planning(
                 working_times=working_times[utl],
                 taches=taches[utl],
                 imperatifs=imperatifs[utl],
@@ -45,7 +73,10 @@ def solver_planning_optimizer(
                 date_end=date_end,
                 parts_max_length=parts_max_length,
                 min_duration_section=min_duration_section,
+                utilisateur_id=int_utl
             )
+            optimized_plannings[int_utl] = resultat
+            users_stats.append(resultat.stats)
             logger_planning_optimizer.info(f"Optimisation des plannings: {i+1} sur {len(utilisateurs)} traité(s)."
                                            f"Utilisateur {utl}: planning optimisé.")
 
@@ -60,4 +91,7 @@ def solver_planning_optimizer(
                                                           stats=None,
                                                           events=None)
 
-    return {"solution": optimized_plannings}
+    global_stats = make_global_stats(stats_users=users_stats)
+
+    return {"solution": optimized_plannings,
+            "global_stats": global_stats}

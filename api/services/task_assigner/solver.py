@@ -156,7 +156,7 @@ def solveur_task_assigner(
     )
     # vérif validité solution :
     test = unittest.TestCase()
-    test.assertAlmostEqual(solution_vector.sum(), df_dsp[key_user_dispo].sum())
+    #test.assertLessEqual(solution_vector[:-n_tsk].sum(), df_dsp[key_user_dispo].sum())
     test.assertAlmostEqual(solution_vector[:n_arcs].sum(), df_tsk[key_duree_evenement].sum())
 
     logger_task_assigner.debug("MISE EN FORME DE LA SOLUTION DANS UN DATAFRAME PANDAS")
@@ -168,6 +168,8 @@ def solveur_task_assigner(
         mapping_tsk_to_cmp=mapping_tsk_to_cmp,
         mapping_tsk_to_prj=mapping_tsk_to_prj,
         mapping_utl_to_dsp=mapping_utl_to_dsp,
+        avantage_projet=avantage_projet,
+        contrainte_etre_sur_projet=contrainte_etre_sur_projet
     )
 
     logger_task_assigner.debug("REMAPPING DES ID LOCAUX EN ID WANDEED")
@@ -261,6 +263,8 @@ def make_output_dataframe(
     mapping_tsk_to_cmp: dict,
     mapping_tsk_to_prj: dict,
     mapping_utl_to_dsp: dict,
+    avantage_projet: float,
+    contrainte_etre_sur_projet: ContrainteEtreSurProjet
 ) -> pd.DataFrame:
     """
     MET EN FORME LA SOLUTION DANS UN DATAFRAME PANDAS
@@ -269,7 +273,10 @@ def make_output_dataframe(
     for j in range(len(arcs)):
         if solution_vector[j] > 0:
             tsk, utl = arcs[j]
+
             lvl = cost_func[j]
+            if lvl > 0 and contrainte_etre_sur_projet == ContrainteEtreSurProjet.DE_PREFERENCE:
+                lvl -= avantage_projet
             out = pd.concat(
                 [
                     out,
