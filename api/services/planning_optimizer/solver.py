@@ -12,18 +12,18 @@ from api.services.planning_optimizer.lib_planning_optimizer import optimize_one_
 from api.string_keys import *
 
 
-def make_global_stats(stats_users: list[DataFrame]):
+def make_global_stats(global_stats: list[DataFrame]):
     """Statistiques globales sur les projets"""
-    df_projects = [utl_stats["projects"] for utl_stats in stats_users]
+    df_projects = [utl_stats["projects"] for utl_stats in global_stats]
     df_all = pd.concat(df_projects, ignore_index=True)
 
     # we can then group the dataframe by "project" and sum the "length" column
     stats_by_project = df_all.groupby(key_evenement_project).agg({KEY_DUREE_EFFECTUEE: "sum", key_duree_evenement: "sum"})
     stats_by_project["pct_completion"] = round(stats_by_project[KEY_DUREE_EFFECTUEE] / stats_by_project[key_duree_evenement], 2)
-    total_worked_time = round(sum([utl_stats["total_working_time"] for utl_stats in stats_users]), 2)
-    total_available_time = round(sum([utl_stats["total_available_time"] for utl_stats in stats_users]), 2)
+    total_worked_time = round(sum([utl_stats["total_working_time"] for utl_stats in global_stats]), 2)
+    total_available_time = round(sum([utl_stats["total_available_time"] for utl_stats in global_stats]), 2)
     worked_time_percent = round(total_worked_time / total_available_time, 2)
-    stats_users = {"project": stats_by_project,
+    global_stats = {"project": stats_by_project,
                    "total_worked_time": total_worked_time,
                    "total_available_time": total_available_time,
                    "worked_time_percent": worked_time_percent}
@@ -32,7 +32,7 @@ def make_global_stats(stats_users: list[DataFrame]):
     assert worked_time_percent >= 0
     assert worked_time_percent <= 1
     # print the resulting dataframe
-    return stats_users
+    return global_stats
 
 
 def solver_planning_optimizer(
@@ -91,7 +91,7 @@ def solver_planning_optimizer(
                                                           stats=None,
                                                           events=None)
 
-    global_stats = make_global_stats(stats_users=users_stats)
+    global_stats = make_global_stats(global_stats=users_stats)
 
     return {"solution": optimized_plannings,
             "global_stats": global_stats}

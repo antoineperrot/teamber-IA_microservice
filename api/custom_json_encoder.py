@@ -32,7 +32,7 @@ class CustomJsonEncoder(JSONEncoder):
         elif isinstance(o, datetime):
             return o.isoformat(timespec="seconds")
         elif isinstance(o, DataFrame):
-            return loads(o.to_json(date_format="iso"))
+            return o.to_dict()
 
         # default, if not one of the specified object. Caller's problem if this is not serializable.
         return JSONEncoder.default(self, o)
