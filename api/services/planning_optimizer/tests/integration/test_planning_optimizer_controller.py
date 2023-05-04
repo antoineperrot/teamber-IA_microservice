@@ -11,7 +11,7 @@ class PlanningOptimizerControllerTest(TestIntegration):
     def setUp(self) -> None:
         super().setUp()
 
-    def test_debug_end_to_end(self):
+    def test_planning_optimization_controller(self):
         """Ce -test- sert à débugger en allant le plus loin possible à partir d'une requête"""
         json_file = {"backend_access_token": self.access_token,
                       "backend_url": self.url,

@@ -2,8 +2,11 @@
 import numpy as np
 import plotly.express as px
 import pandas as pd
+
+from api.loggers import logger_planning_optimizer
 from api.services.task_assigner.lib_task_assigner.tools.id_remapping import flatten_list
 from api.string_keys import *
+from api.tools import timed_function
 
 KEY_AVAILABILITIES = "AVAILABILITIES"
 KEY_WORK = "WORK"
@@ -82,6 +85,7 @@ def energy_dispersion(ordo_evt):
     return out
 
 
+@timed_function(logger_planning_optimizer)
 def split_tasks(tasks: pd.DataFrame, parts_max_length: float = 1.0) -> pd.DataFrame:
     """
     Découpe des tâches en plusieurs tâches de durées plus courtes.

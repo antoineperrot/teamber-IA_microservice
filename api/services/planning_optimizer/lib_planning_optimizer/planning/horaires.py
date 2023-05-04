@@ -6,6 +6,7 @@ import datetime
 import pandas as pd
 from api.string_keys import *
 from api.loggers import logger_planning_optimizer
+from api.tools import timed_function
 
 
 class NoAvailabilitiesException(Exception):
@@ -197,6 +198,7 @@ def find_sections_ends(
     return out
 
 
+@timed_function(logger_planning_optimizer)
 def compute_availabilities(
     working_times: pd.DataFrame,
     imperatifs: pd.DataFrame,

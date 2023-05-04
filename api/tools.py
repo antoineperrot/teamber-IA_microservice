@@ -1,6 +1,8 @@
 """
 Tools for the api
 """
+from time import time
+import logging
 import sys
 from flask import request, abort
 import unittest
@@ -37,6 +39,28 @@ def api_key_required(func):
         return func(*args, **kwargs)
 
     return wrapper_function
+
+
+def timed_function(logger: logging.Logger):
+    """
+    Cette fonction permettra d'en décorer d'autre afin de les chronométrer, en faisant paraître les temps dans les logs.
+    """
+
+    def inner(func):
+        """inner"""
+
+        def wrapper_function(*args, **kwargs):
+            """fonction wrapper"""
+            t_start = time()
+            return_args = func(*args, **kwargs)
+            t_end = time()
+            execution_time = t_end - t_start
+            logger.info(f"Temps execution {func.__name__}: {execution_time:.4f}")
+            return return_args
+
+        return wrapper_function
+
+    return inner
 
 
 class TestIntegration(unittest.TestCase):

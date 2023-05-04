@@ -5,10 +5,8 @@ import numpy as np
 from pandas import DataFrame
 from werkzeug.exceptions import UnprocessableEntity
 from api.back_connector.tools import make_sql_request
-from api.services.task_assigner.lib_task_assigner.tools import ContrainteEtreSurProjet
 from api.back_connector.task_assigner.requests import get_tasks_request, get_dispo_user_request,\
     get_matrice_competence_request, get_matrice_projet_request
-from api.loggers import logger_task_assigner
 from api.string_keys import *
 
 

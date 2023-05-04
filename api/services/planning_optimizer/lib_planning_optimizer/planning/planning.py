@@ -8,12 +8,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from api.loggers import logger_planning_optimizer
 from api.services.planning_optimizer.lib_planning_optimizer.planning.solution_interpreter import (
     schedule_events,
 )
 from api.services.planning_optimizer.lib_planning_optimizer.planning.ordonnancement import Ordonnancement
 
 from api.string_keys import *
+from api.tools import timed_function
 
 
 class SimulatedAnnealingPlanningOptimizer:
@@ -88,6 +90,7 @@ class SimulatedAnnealingPlanningOptimizer:
 
         self.ordonnancement = ordonnancement_optimal
 
+    @timed_function(logger_planning_optimizer)
     def schedule_events(self) -> pd.DataFrame:
         """
         Construit le dataframe des tâches planifiées de manière optimale.

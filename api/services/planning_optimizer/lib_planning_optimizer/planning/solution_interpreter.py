@@ -5,10 +5,12 @@ import datetime
 import numpy as np
 import pandas as pd
 
+from api.loggers import logger_planning_optimizer
 from api.services.planning_optimizer.lib_planning_optimizer.planning.ordonnancement import (
     Ordonnancement,
 )
 from api.string_keys import *
+from api.tools import timed_function
 
 
 def get_next_part(i_current_part: int, parts: pd.DataFrame) -> int:
@@ -206,6 +208,7 @@ def schedule_events(
     return scheduled_parts, events
 
 
+@timed_function(logger_planning_optimizer)
 def make_stats(events: pd.DataFrame, tasks: pd.DataFrame, availabilities: pd.DataFrame) -> dict[str: dict]:
     """
     Fourni un pourcentage de planification des tâches, à partir de ce qui a pu être planifié, et des
@@ -240,8 +243,8 @@ def make_stats(events: pd.DataFrame, tasks: pd.DataFrame, availabilities: pd.Dat
     assert all(stat_projects["projet_percent_completion"] <= 1)
     assert all(stat_projects["projet_percent_completion"] >= 0)
 
-    assert all(stat_tasks["KEY_PCT_COMPLETION"] <= 1)
-    assert all(stat_tasks["KEY_PCT_COMPLETION"] >= 0)
+    assert all(stat_tasks[KEY_PCT_COMPLETION] <= 1)
+    assert all(stat_tasks[KEY_PCT_COMPLETION] >= 0)
 
     stats = {"tasks": stat_tasks,
              "projects": stat_projects,
