@@ -64,7 +64,7 @@ def make_global_stats(users_stats: dict[int: DataFrame]) -> dict:
     assert worked_time_percent <= 1
     # print the resulting dataframe
 
-    if bool(int(config["TEST_MODE"])):
+    if bool(int(config["SHOW_PLOTS"])):
         make_global_stats_charts(global_stats)
     return global_stats
 

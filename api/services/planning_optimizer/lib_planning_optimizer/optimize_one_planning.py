@@ -58,7 +58,7 @@ def optimize_one_planning(
 
     out = ResultatCalcul(success=True, events=events, stats=stats)
 
-    if bool(int(config["TEST_MODE"])):
+    if bool(int(config["SHOW_PLOTS"])):
         make_timeline(
             availabilities=availabilities, events=events, imperatifs=imperatifs, utilisateur_id=utilisateur_id)
     return out
