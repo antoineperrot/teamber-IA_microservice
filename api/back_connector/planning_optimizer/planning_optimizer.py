@@ -1,5 +1,5 @@
 """
-Module de récupération des données auprès du BACK pour la fonctionnalité planning_optimizer.
+Module de récupération des données auprès du BACK pour la fonctionnalité lib_planning_optimizer.
 """
 import pandas as pd
 from werkzeug.exceptions import UnprocessableEntity

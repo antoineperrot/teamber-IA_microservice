@@ -1,16 +1,17 @@
 """
-Module contenant les controllers des données d'entrée de la fonctionnalité planning_optimizer
+Module contenant les controllers des données d'entrée de la fonctionnalité lib_planning_optimizer
 """
 from datetime import datetime
+
 from werkzeug.exceptions import UnprocessableEntity
 
-from api.back_connector.tools import to_iso_8601
-from api.loggers import logger_planning_optimizer
 from api.back_connector.planning_optimizer import fetch_data_to_wandeed_backend
-from api.services.planning_optimizer import solver_planning_optimizer
-from api.services.planning_optimizer.lib_planning_optimizer import ResultatCalcul
+from api.back_connector.tools import to_iso_8601
 from api.config import config
-from api.services.planning_optimizer.tests.data_mocker import mock_back_data
+from api.lib_planning_optimizer.resultat_calcul import ResultatCalcul
+from api.lib_planning_optimizer.solver import solver_planning_optimizer
+from api.lib_planning_optimizer.tests.data_mocker import mock_back_data
+from api.loggers import logger_planning_optimizer
 from api.models import cache
 from api.models.calcul_etat import EtatCalcul
 
@@ -132,7 +133,7 @@ class FrontEndPlanningOptimizerRequestParameters:
 
 
 def planning_optimizer_controller(json: dict) -> EtatCalcul:
-    """Controller du service planning_optimizer"""
+    """Controller du service lib_planning_optimizer"""
     logger_planning_optimizer.info("Appel du controller")
     request_parameters = FrontEndPlanningOptimizerRequestParameters.deserialize(json=json)
     return cache.start_calcul(handler=handler_demande_planning_optimizer, request_parameters=request_parameters)
@@ -140,7 +141,7 @@ def planning_optimizer_controller(json: dict) -> EtatCalcul:
 
 def handler_demande_planning_optimizer(request_parameters: FrontEndPlanningOptimizerRequestParameters) \
         -> dict[str: dict[int: ResultatCalcul]]:
-    """Handler demande planning_optimizer"""
+    """Handler demande lib_planning_optimizer"""
     if config["MODE"] == "PRODUCTION":
         imperatifs, horaires, taches, utilisateurs_avec_taches_sans_horaires = fetch_data_to_wandeed_backend(
              url=request_parameters.backend_url,

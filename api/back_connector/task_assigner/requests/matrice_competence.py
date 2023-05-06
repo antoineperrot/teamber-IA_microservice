@@ -1,8 +1,10 @@
 """Request builder for matrice compétence in Task Assigner"""
+from typing import Optional
 from api.string_keys import *
 
 
-def get_matrice_competence_request(selected_competences: list[int] | None = None):
+def get_matrice_competence_request(selected_competences: Optional[list[int]] = None,
+                                   selected_users: Optional[list[int]] = None):
     """Request builder for matrice compétence in Task Assigner"""
     sql_request = {"select": [key_emc_sfkutilisateur, key_emc_sfkarticle, key_emc_sniveau],
                    "from": "lst_vcompetence_py",
@@ -48,6 +50,15 @@ def get_matrice_competence_request(selected_competences: list[int] | None = None
             "operator": "in",
             "type": "integer",
             "value": selected_competences
+        }
+        )
+    if selected_users is not None:
+        sql_request["where"]["rules"].append({
+            "label": key_emc_sfkutilisateur,
+            "field": key_emc_sfkutilisateur,
+            "operator": "in",
+            "type": "integer",
+            "value": selected_users
         }
         )
 

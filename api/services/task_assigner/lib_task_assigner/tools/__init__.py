@@ -1,3 +1,0 @@
-from api.services.task_assigner.lib_task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
-from api.services.task_assigner.lib_task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
-from api.services.task_assigner.lib_task_assigner.tools.problem_formulation import ContrainteEtreSurProjet

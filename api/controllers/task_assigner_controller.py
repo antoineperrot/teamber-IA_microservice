@@ -7,9 +7,9 @@ from datetime import datetime
 from werkzeug.exceptions import UnprocessableEntity
 from api.back_connector.task_assigner.fetch_data import fetch_task_assigner_data_to_back
 from api.back_connector.tools import to_iso_8601
-from api.services.task_assigner.lib_task_assigner.tools import ContrainteEtreSurProjet
-from api.services.task_assigner.solver import solveur_task_assigner, SolverCrashException
-from api.services.task_assigner.tests.data_mocker_task_assigner import mock_coherent_data
+from api.lib_task_assigner.tools.contrainte_projet import ContrainteEtreSurProjet
+from api.lib_task_assigner.solver import solveur_task_assigner, SolverCrashException
+from api.lib_task_assigner.tests.data_mocker_task_assigner import mock_coherent_data
 from api.models import cache
 from api.loggers import logger_task_assigner
 from api.config import config
@@ -141,7 +141,7 @@ def check_data_consistency(
 
 
 def handler_demande_task_assigner(request_parameters: FrontEndTaskAssignerRequestParameters, force_mock: bool = False):
-    """Handler d'une demande de task_assigner. Fonction appelée dans le thread de calcul."""
+    """Handler d'une demande de lib_task_assigner. Fonction appelée dans le thread de calcul."""
 
     if config["MODE"] == "PRODUCTION" and not force_mock:
         df_prj, df_cmp, df_tsk, df_dsp, undoable_tasks = fetch_task_assigner_data_to_back(

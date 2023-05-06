@@ -1,5 +1,4 @@
 """Request builder for tasks in Task Assigner"""
-from api.services.task_assigner.lib_task_assigner.tools import ContrainteEtreSurProjet
 from api.string_keys import *
 
 

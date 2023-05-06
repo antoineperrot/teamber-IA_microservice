@@ -1,5 +1,5 @@
 """
-Module de récupération des données auprès du BACK pour la fonctionnalité task_assigner.
+Module de récupération des données auprès du BACK pour la fonctionnalité lib_task_assigner.
 """
 import numpy as np
 from pandas import DataFrame

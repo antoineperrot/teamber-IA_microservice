@@ -17,13 +17,13 @@ class TestMakeCleanHor(unittest.TestCase):
     def setUp(self):
         self.input_value = pickle.load(
             open(
-                "api/back_connector/planning_optimizer/data_handlers/tests/test_data/input_handler_hor.pkl",
+                "api/back_connector/lib_planning_optimizer/data_handlers/tests/test_data/input_handler_hor.pkl",
                 "rb",
             )
         )
         self.expected_result = pickle.load(
             open(
-                "api/back_connector/planning_optimizer/data_handlers/tests/test_data/expected_result_make_clean_hor.pkl",
+                "api/back_connector/lib_planning_optimizer/data_handlers/tests/test_data/expected_result_make_clean_hor.pkl",
                 "rb",
             )
         )
