@@ -10,9 +10,12 @@ from api.lib_planning_optimizer.planning.planning import SimulatedAnnealingPlann
 from api.lib_planning_optimizer.planning.solution_interpreter import make_stats
 from api.lib_planning_optimizer.resultat_calcul import ResultatCalcul
 from api.lib_planning_optimizer.tools import split_tasks, make_timeline
+from api.loggers import logger_planning_optimizer
 from api.string_keys import *
+from api.tools import timed_function
 
 
+@timed_function(logger=logger_planning_optimizer)
 def optimize_one_planning(
     working_times: pd.DataFrame,
     taches: pd.DataFrame,
@@ -46,15 +49,10 @@ def optimize_one_planning(
     )
 
     optimizer.optimize(n_iterations_per_task=250)
-    events, ordonnancement = optimizer.schedule_events()
-    stats = make_stats(events=events, tasks=taches, availabilities=availabilities)
-    events = events.drop(KEY_ID_PART, axis="columns")
-    keys = [key_evenement, key_evenement_project, KEY_PROJECT_PRIORITY, KEY_START, KEY_END]
-    events = events[keys]
-
-    out = ResultatCalcul(success=True, events=events, stats=stats)
+    ordonnancement, events = optimizer.schedule_events()
+    stats = make_stats(events=ordonnancement, tasks=taches, availabilities=availabilities)
 
     if bool(int(config["SHOW_PLOTS"])):
         make_timeline(
             availabilities=availabilities, events=events, imperatifs=imperatifs, utilisateur_id=utilisateur_id)
-    return out
+    return ResultatCalcul(success=True, events=events, stats=stats)

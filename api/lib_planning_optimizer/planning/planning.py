@@ -34,7 +34,9 @@ class SimulatedAnnealingPlanningOptimizer:
         self.events = None
         self.unfilled_tasks = None
         self.save_for_testing = save_for_testing
+        self.scheduled_parts = None
 
+    @timed_function(logger=logger_planning_optimizer)
     def optimize(
         self,
         n_iterations_per_task: int = 250,
@@ -89,14 +91,14 @@ class SimulatedAnnealingPlanningOptimizer:
         self.ordonnancement = ordonnancement_optimal
 
     @timed_function(logger_planning_optimizer)
-    def schedule_events(self) -> pd.DataFrame:
+    def schedule_events(self) -> tuple[pd.DataFrame, pd.DataFrame]:
         """
         Construit le dataframe des tâches planifiées de manière optimale.
         """
-        self.events = schedule_events(
+        self.scheduled_parts, self.events = schedule_events(
             self.availabilities, self.tasks, self.ordonnancement
         )
-        return self.events
+        return self.scheduled_parts, self.events
 
     def get_unfilled_task(self) -> pd.DataFrame:
         """

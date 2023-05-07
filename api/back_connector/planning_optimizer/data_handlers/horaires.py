@@ -103,6 +103,8 @@ def make_clean_hor(df_hor: pd.DataFrame) -> dict:
     nettoyé et cohérent.
     """
     horaires = {}
+    if len(df_hor) == 0:
+        return horaires
     for utl in df_hor[key_epu_sfkutilisateur].unique():
         list_horaires_utl = list(
             df_hor.loc[

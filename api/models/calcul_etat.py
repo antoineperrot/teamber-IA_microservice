@@ -21,7 +21,6 @@ class EtatCalcul:
         self.statut = statut
         self.result = None
         self.message = message
-        root_logger.info(self)
 
     def set_statut(self, new_statut: StatutCalculEnum):
         """setter du statut"""
@@ -29,7 +28,8 @@ class EtatCalcul:
         root_logger.info(self)
 
     def __repr__(self) -> str:
-        out = f"EtatCalcul(identifiant={self.identifiant}, statut={self.statut}, result={self.result})"
+        out = f"EtatCalcul(identifiant={self.identifiant}, statut={self.statut}, result=Not logged," \
+              f" message={self.message})"
         return out
 
     def set_result(self, new_result):

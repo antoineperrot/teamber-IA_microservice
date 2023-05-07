@@ -43,7 +43,7 @@ def fetch_task_assigner_data_to_back(backend_url: str,
     data_cmp = make_sql_request(sql_query=get_matrice_competence_request(selected_competences=competences_requises),
                                 url=backend_url,
                                 access_token=backend_access_token,
-                                request_name=TA_MY_KEY_TACHES_A_ASSIGNER)
+                                request_name=TA_MY_KEY_MATRICE_COMPETENCE)
 
     df_cmp = (
         DataFrame(data_cmp)

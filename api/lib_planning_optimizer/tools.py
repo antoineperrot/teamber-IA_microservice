@@ -104,7 +104,6 @@ def split_tasks(tasks: pd.DataFrame, parts_max_length: float = 1.0) -> pd.DataFr
     ]
     flatten_list_filled_rows = flatten_list(filled_rows)
     if len(flatten_list_filled_rows) > 0:
-        print()
         filled_rows = pd.concat(flatten_list(filled_rows))
         filled_rows[KEY_DUREE_PART] = parts_max_length
     else:
@@ -123,6 +122,7 @@ def split_tasks(tasks: pd.DataFrame, parts_max_length: float = 1.0) -> pd.DataFr
     return tasks_parts
 
 
+@timed_function(logger=logger_planning_optimizer)
 def make_timeline(availabilities: pd.DataFrame,
                   events: pd.DataFrame,
                   imperatifs: pd.DataFrame,

@@ -10,8 +10,8 @@ from flask.json import JSONEncoder
 from flask.json.provider import JSONProvider
 from pandas import DataFrame, Timestamp
 
+from api.lib_planning_optimizer.resultat_calcul import ResultatCalcul
 from api.models import EtatCalcul, StatutCalculEnum
-from api.lib_planning_optimizer import ResultatCalcul
 
 
 class CustomJsonEncoder(JSONEncoder):

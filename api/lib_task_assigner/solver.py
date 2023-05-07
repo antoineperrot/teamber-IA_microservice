@@ -32,6 +32,7 @@ from api.lib_task_assigner.tools.problem_formulation import (
     make_arcs_and_cost_func,
 )
 from api.string_keys import *
+from api.tools import timed_function
 
 
 class SolverCrashException(Exception):
@@ -43,6 +44,7 @@ class SolverCrashException(Exception):
         return self.msg
 
 
+@timed_function(logger=logger_task_assigner)
 def solveur_task_assigner(
     df_prj: pd.DataFrame,
     df_cmp: pd.DataFrame,
@@ -210,6 +212,7 @@ def solveur_task_assigner(
     return solution
 
 
+@timed_function(logger=logger_task_assigner)
 def solve_linear_programation_problem(
     matrix_a: np.ndarray, b: np.ndarray, cost_func: np.ndarray
 ) -> tuple[np.ndarray, str, str]:

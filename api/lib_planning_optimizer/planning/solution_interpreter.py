@@ -20,19 +20,20 @@ def get_next_part(i_current_part: int, parts: pd.DataFrame) -> int:
         ou len(parts) si arrive au bparts du df.
     :return i_next_part: première partie du prochain événement ou dernière partie du df si arrive au bparts du df.
     """
-    current_part = parts.iloc[i_current_part]
+    current_intermediate_part = parts.iloc[i_current_part]
     i_next_part = i_current_part + 1
     next_part = parts.iloc[i_next_part if i_next_part < len(parts) else len(parts) - 1]
+    def move_forward(current_intermediate_part, next_part) -> bool:
+        return (next_part[KEY_START] == current_intermediate_part[KEY_END]
+                and next_part[key_evenement] == current_intermediate_part[key_evenement]
+                and next_part[key_evenement_project] == current_intermediate_part[key_evenement_project]
+                and i_next_part < len(parts)
+                )
+    while move_forward(current_intermediate_part, next_part):
+        current_intermediate_part = next_part
+        i_next_part += 1
+        next_part = parts.iloc[i_next_part if i_next_part < len(parts) else len(parts) - 1]
 
-    while (
-        next_part[KEY_START] == current_part[KEY_END]
-        and next_part[key_evenement] == current_part[key_evenement]
-        and i_next_part < len(parts)
-    ):
-        i_next_part = i_next_part + 1
-        next_part = parts.iloc[
-            i_next_part if i_next_part < len(parts) else len(parts) - 1
-        ]
     return i_next_part
 
 
@@ -135,6 +136,8 @@ def make_events(parts: pd.DataFrame) -> pd.DataFrame:
         )
 
     events = pd.DataFrame(events)
+    keys = [key_evenement, key_evenement_project, KEY_PROJECT_PRIORITY, KEY_START, KEY_END]
+    events = events[keys]
     return events
 
 
@@ -191,7 +194,7 @@ def schedule_parts(
 
 def schedule_events(
     availabilities: pd.DataFrame, tasks: pd.DataFrame, ordonnancement: Ordonnancement
-):
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Planifie les événements correspondant à l"ordonnancement quasi-optimal des tâches calculé lors de l"optimisation,
     à partir des disponibilités et des tâches.

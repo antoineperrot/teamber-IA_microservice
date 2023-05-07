@@ -6,7 +6,7 @@ from api.tools import api_key_required
 bp_planning_optimizer = Blueprint("routes_planning_optimizer", __name__)
 
 
-@bp_planning_optimizer.route("/api/lib_planning_optimizer", methods=["POST"])
+@bp_planning_optimizer.route("/api/planning_optimizer", methods=["POST"])
 @api_key_required
 def start_planning_optimizer():
     """Route du service lib_planning_optimizer"""

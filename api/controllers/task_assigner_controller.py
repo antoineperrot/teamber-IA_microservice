@@ -169,7 +169,7 @@ def handler_demande_task_assigner(request_parameters: FrontEndTaskAssignerReques
             avantage_projet=request_parameters.avantage_projet,
         )
         if undoable_tasks is not None:
-            solution["unfeasible_tasks"] = {"ids": list(undoable_tasks[key_evenement].values),
+            solution["unfeasible_tasks"] = {"ids": [int(val) for val in undoable_tasks[key_evenement].values],
                                             "message": "Ces taches ne sont pas assignables car aucun utilisateur n'est compétent pour les réaliser. Veuillez bien renseigner les compétences des utilisateurs."}
         return solution
 

@@ -8,7 +8,7 @@ from api.tools import api_key_required
 bp_task_assigner = Blueprint("routes_task_assigner", __name__)
 
 
-@bp_task_assigner.route("/api/lib_task_assigner", methods=["POST"])
+@bp_task_assigner.route("/api/task_assigner", methods=["POST"])
 @api_key_required
 def task_assigner_route():
     """Route du service lib_task_assigner"""

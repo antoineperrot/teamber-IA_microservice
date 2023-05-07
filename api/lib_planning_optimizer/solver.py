@@ -10,7 +10,7 @@ from api.config import config
 from api.lib_planning_optimizer.planning.horaires import NoAvailabilitiesException
 from api.lib_planning_optimizer.resultat_calcul import ResultatCalcul
 from api.loggers import logger_planning_optimizer
-from api.lib_planning_optimizer import optimize_one_planning
+from api.lib_planning_optimizer.optimize_one_planning import optimize_one_planning
 from api.string_keys import *
 
 
