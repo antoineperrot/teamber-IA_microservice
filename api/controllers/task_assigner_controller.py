@@ -14,6 +14,7 @@ from api.models import cache
 from api.loggers import logger_task_assigner
 from api.config import config
 from api.string_keys import *
+from api.tools import timed_function
 
 
 class FrontEndTaskAssignerRequestParameters:
@@ -140,6 +141,7 @@ def check_data_consistency(
     logger_task_assigner.debug(f"len df_dsp: {len(df_dsp)}")
 
 
+@timed_function(logger=logger_task_assigner)
 def handler_demande_task_assigner(request_parameters: FrontEndTaskAssignerRequestParameters, force_mock: bool = False):
     """Handler d'une demande de lib_task_assigner. Fonction appelée dans le thread de calcul."""
 

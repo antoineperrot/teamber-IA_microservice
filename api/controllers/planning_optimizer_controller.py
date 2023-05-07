@@ -14,6 +14,7 @@ from api.lib_planning_optimizer.tests.data_mocker import mock_back_data
 from api.loggers import logger_planning_optimizer
 from api.models import cache
 from api.models.calcul_etat import EtatCalcul
+from api.tools import timed_function
 
 
 class FrontEndPlanningOptimizerRequestParameters:
@@ -139,6 +140,7 @@ def planning_optimizer_controller(json: dict) -> EtatCalcul:
     return cache.start_calcul(handler=handler_demande_planning_optimizer, request_parameters=request_parameters)
 
 
+@timed_function(logger=logger_planning_optimizer)
 def handler_demande_planning_optimizer(request_parameters: FrontEndPlanningOptimizerRequestParameters) \
         -> dict[str: dict[int: ResultatCalcul]]:
     """Handler demande lib_planning_optimizer"""

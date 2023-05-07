@@ -25,7 +25,6 @@ class EtatCalcul:
     def set_statut(self, new_statut: StatutCalculEnum):
         """setter du statut"""
         self.statut = new_statut
-        root_logger.info(self)
 
     def __repr__(self) -> str:
         out = f"EtatCalcul(identifiant={self.identifiant}, statut={self.statut}, result=Not logged," \
